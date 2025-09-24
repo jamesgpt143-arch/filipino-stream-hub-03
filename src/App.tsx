@@ -8,7 +8,6 @@ import Homepage from "./pages/Homepage";
 import Channels from "./pages/Channels";
 import Movies from "./pages/Movies";
 import TVSeries from "./pages/TVSeries";
-import Comments from "./pages/Comments";
 import NotFound from "./pages/NotFound";
 import { disableDevTools } from "./utils/disableDevTools";
 import { useEffect } from "react";
@@ -33,7 +32,6 @@ const App = () => {
           <Route path="/channels" element={<Channels />} />
           <Route path="/movies" element={<Movies />} />
           <Route path="/tv-series" element={<TVSeries />} />
-          <Route path="/comments" element={<Comments />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

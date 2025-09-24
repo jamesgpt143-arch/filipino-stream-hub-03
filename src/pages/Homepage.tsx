@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tv, Film, Play, Star, Users, Globe } from 'lucide-react';
+import { Tv, Film, Play, Star, Globe } from 'lucide-react';
 import { AddChannelForm } from '@/components/AddChannelForm';
 
 const Homepage = () => {
@@ -94,7 +94,7 @@ const Homepage = () => {
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Button asChild className="h-24 bg-gradient-primary hover:shadow-glow">
             <Link to="/channels" className="flex flex-col items-center gap-2">
               <Tv className="w-8 h-8" />
@@ -113,13 +113,6 @@ const Homepage = () => {
             <Link to="/tv-series" className="flex flex-col items-center gap-2 text-primary-foreground">
               <Tv className="w-8 h-8" />
               <span className="font-medium">TV Series</span>
-            </Link>
-          </Button>
-
-          <Button asChild variant="outline" className="h-24 border-primary/20 hover:bg-primary/10">
-            <Link to="/comments" className="flex flex-col items-center gap-2 text-primary-foreground">
-              <Users className="w-8 h-8" />
-              <span className="font-medium">Community</span>
             </Link>
           </Button>
         </div>

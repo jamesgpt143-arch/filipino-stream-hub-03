@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
-import { Tv, Film, Menu, X, MessageCircle, Home } from 'lucide-react';
+import { Tv, Film, Menu, X, Home } from 'lucide-react';
 import { Clock } from './Clock';
 
 export const Navigation = () => {
@@ -13,7 +13,6 @@ export const Navigation = () => {
     { path: '/channels', label: 'IPTV Channels', icon: Tv },
     { path: '/movies', label: 'Movies', icon: Film },
     { path: '/tv-series', label: 'TV Series', icon: Tv },
-    { path: '/comments', label: 'Comments', icon: MessageCircle },
   ];
 
   return (
