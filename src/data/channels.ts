@@ -494,7 +494,7 @@ name: 'KPlus',
   name: 'MTV',
   manifestUri: 'https://linearjitp-playback.astro.com.my/dash-wv/linear/5014/default_ott.mpd',
   clearKey: {
-    'bd17afb5dc9648a39be79ee3634dd4b8': '3ecf305d54a7729299b93a3d69c02ea5'
+    '3ac2542a4f7be746633db07647451710': '22f964a6d6927ccdba482e775cdff190'
   },
   type: 'mpd',
   logo: 'https://logos-world.net/wp-content/uploads/2020/09/MTV-Emblem.png'
