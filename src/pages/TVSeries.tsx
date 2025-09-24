@@ -7,6 +7,8 @@ import { TVShowCard } from '@/components/TVShowCard';
 import { VideoModal } from '@/components/VideoModal';
 import { TVShow, Season, Episode, tmdbApi } from '@/lib/tmdb';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Info } from 'lucide-react';
 
 const TVSeries = () => {
   const [shows, setShows] = useState<TVShow[]>([]);
@@ -144,6 +146,13 @@ const TVSeries = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Browser Notice */}
+        <Alert className="mb-6 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Note:</strong> For the best streaming experience with minimal ads, we recommend using Brave Browser or enabling an ad blocker.
+          </AlertDescription>
+        </Alert>
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {Array.from({ length: 12 }).map((_, index) => (

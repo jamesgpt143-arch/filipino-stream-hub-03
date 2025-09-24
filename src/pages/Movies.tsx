@@ -6,6 +6,8 @@ import { MovieCard } from '@/components/MovieCard';
 import { VideoModal } from '@/components/VideoModal';
 import { Movie, tmdbApi } from '@/lib/tmdb';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Info } from 'lucide-react';
 
 const Movies = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -103,6 +105,13 @@ const Movies = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Browser Notice */}
+        <Alert className="mb-6 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Note:</strong> For the best streaming experience with minimal ads, we recommend using Brave Browser or enabling an ad blocker.
+          </AlertDescription>
+        </Alert>
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {Array.from({ length: 12 }).map((_, index) => (
