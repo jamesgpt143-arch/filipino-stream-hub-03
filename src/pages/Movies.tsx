@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Search, Filter } from 'lucide-react';
 import { MovieCard } from '@/components/MovieCard';
 import { VideoModal } from '@/components/VideoModal';
-import { Clock } from '@/components/Clock';
 import { Movie, tmdbApi } from '@/lib/tmdb';
 import { useToast } from '@/hooks/use-toast';
 
@@ -86,7 +85,6 @@ const Movies = () => {
             <div>
               <h1 className="text-3xl font-bold text-primary-foreground mb-2">Movies</h1>
               <p className="text-primary-foreground/80">Discover popular movies</p>
-              <Clock />
             </div>
             
             <div className="flex items-center gap-4 w-full lg:w-auto">
