@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Tv, Film, Menu, X, MessageCircle, Home } from 'lucide-react';
+import { Clock } from './Clock';
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,6 +29,7 @@ export const Navigation = () => {
               <h1 className="text-xl font-bold text-primary-foreground">
                 flameiptv
               </h1>
+              <Clock />
             </div>
           </Link>
 

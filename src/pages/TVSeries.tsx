@@ -5,7 +5,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Search } from 'lucide-react';
 import { TVShowCard } from '@/components/TVShowCard';
 import { VideoModal } from '@/components/VideoModal';
-import { Clock } from '@/components/Clock';
 import { TVShow, Season, Episode, tmdbApi } from '@/lib/tmdb';
 import { useToast } from '@/hooks/use-toast';
 
@@ -127,7 +126,6 @@ const TVSeries = () => {
             <div>
               <h1 className="text-3xl font-bold text-primary-foreground mb-2">TV Series</h1>
               <p className="text-primary-foreground/80">Discover popular TV shows</p>
-              <Clock />
             </div>
             
             <div className="flex items-center gap-4 w-full lg:w-auto">
