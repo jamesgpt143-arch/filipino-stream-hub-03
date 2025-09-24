@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* flameiptv - Dark streaming theme */
+    --background: 220 23% 6%;
+    --foreground: 210 40% 98%;
+
+    --card: 220 23% 8%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 23% 8%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Filipino flag inspired colors */
+    --primary: 201 96% 32%; /* Blue */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 348 83% 47%; /* Red */
+    --secondary-foreground: 210 40% 98%;
+
+    --accent: 48 96% 53%; /* Yellow */
+    --accent-foreground: 220 23% 6%;
+
+    --muted: 220 13% 18%;
+    --muted-foreground: 215 13.8% 34.1%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 13% 18%;
+    --input: 220 13% 18%;
+    --ring: 201 96% 32%;
+
+    /* Design tokens */
+    --radius: 0.75rem;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary) / 0.9), hsl(var(--secondary) / 0.8));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--muted) / 0.3));
+    
+    /* Shadows */
+    --shadow-elegant: 0 20px 40px -10px hsl(var(--primary) / 0.3);
+    --shadow-card: 0 8px 30px -5px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 30px hsl(var(--accent) / 0.3);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Same as root - this is a dark-first design */
+    --background: 220 23% 6%;
+    --foreground: 210 40% 98%;
+
+    --card: 220 23% 8%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 23% 8%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 201 96% 32%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 348 83% 47%;
+    --secondary-foreground: 210 40% 98%;
+
+    --accent: 48 96% 53%;
+    --accent-foreground: 220 23% 6%;
+
+    --muted: 220 13% 18%;
+    --muted-foreground: 215 13.8% 34.1%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 13% 18%;
+    --input: 220 13% 18%;
+    --ring: 201 96% 32%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary));
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--secondary));
+  }
+}
+
+@layer components {
+  /* Utility classes for gradients */
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+  
+  .bg-gradient-card {
+    background: var(--gradient-card);
+  }
+  
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+  
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  
+  .transition-spring {
+    transition: var(--transition-spring);
+  }
+}
