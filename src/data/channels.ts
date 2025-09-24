@@ -491,17 +491,12 @@ name: 'KPlus',
   type: 'mpd',
   logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Cinemax_%28Yellow%29.svg/1200px-Cinemax_%28Yellow%29.svg.png'
 }, {
-  name: 'MTV',
+  name: 'MTV Live',
   manifestUri: 'https://linearjitp-playback.astro.com.my/dash-wv/linear/5014/default_ott.mpd',
   clearKey: {
     '3ac2542a4f7be746633db07647451710': '22f964a6d6927ccdba482e775cdff190'
   },
   type: 'mpd',
-  logo: 'https://logos-world.net/wp-content/uploads/2020/09/MTV-Emblem.png'
-}, {
-  name: 'MTV Live',
-  manifestUri: 'https://iptvproxy-five.vercel.app/api/hls?url=http://38b891c9.rossteleccom.net/iptv/4HP7GES799X3WU/221/index.m3u8',
-  type: 'hls',
   logo: 'https://www.seekpng.com/png/detail/57-579021_file-mtv-live-svg-mtv-live-logo-png.png'
 }, {
   name: 'NAT GEO WILD',
