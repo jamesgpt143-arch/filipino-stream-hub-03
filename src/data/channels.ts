@@ -261,7 +261,7 @@ export const channels: Channel[] = [
   logo: 'https://logos-world.net/wp-content/uploads/2020/12/DreamWorks-Animation-Logo.png'
 }, {
  name: 'ESPN',
-  manifestUri: 'https://iptvproxy-five.vercel.app/api/hls?url=http://41.205.93.154/ESPN/index.m3u8',
+  manifestUri: 'https://gtv.fflame143.workers.dev/master.m3u8',
   type: 'hls',
   logo: 'https://th.bing.com/th/id/OIP.X0rfjwnmj1p_6q6OiYJS3wHaEK?rs=1&pid=ImgDetMain'
 }, {
