@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Info } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
+import { Facebook } from 'lucide-react';
 
 const TVSeries = () => {
   const [shows, setShows] = useState<TVShow[]>([]);
@@ -293,9 +294,17 @@ const TVSeries = () => {
           <p className="text-sm text-muted-foreground">
             flameiptv
           </p>
-          <div className="mt-3">
-            <DonateButton />
-          </div>
+        <div className="mt-3">
+          <DonateButton />
+          <a 
+            href="https://web.facebook.com/james.benavides.921" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-block mt-2 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors"
+          >
+            <Facebook className="w-4 h-4" />
+          </a>
+        </div>
         </div>
       </footer>
     </div>

@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tv, Film, Play, Star, Globe } from 'lucide-react';
 import { AddChannelForm } from '@/components/AddChannelForm';
 import { DonateButton } from '@/components/DonateButton';
+import { Facebook } from 'lucide-react';
 
 const Homepage = () => {
   return (
@@ -161,6 +162,14 @@ const Homepage = () => {
           </p>
           <div className="mt-3">
             <DonateButton />
+            <a 
+              href="https://web.facebook.com/james.benavides.921" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-block mt-2 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors"
+            >
+              <Facebook className="w-4 h-4" />
+            </a>
           </div>
         </div>
       </footer>

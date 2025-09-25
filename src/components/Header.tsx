@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { Search, Tv, Menu, X, Facebook } from 'lucide-react';
+import { Search, Tv, Menu, X } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Clock } from './Clock';
 import { categories } from '@/data/channels';
@@ -37,14 +37,6 @@ export const Header = ({
               </h1>
               <Clock />
             </div>
-            <a 
-              href="https://web.facebook.com/james.benavides.921" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors ml-2"
-            >
-              <Facebook className="w-4 h-4" />
-            </a>
           </div>
 
           {/* Search */}
