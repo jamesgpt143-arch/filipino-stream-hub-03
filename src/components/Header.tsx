@@ -41,9 +41,9 @@ export const Header = ({
               href="https://web.facebook.com/james.benavides.921" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-primary-foreground hover:text-accent transition-colors"
+              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors ml-2"
             >
-              <Facebook className="w-5 h-5" />
+              <Facebook className="w-4 h-4" />
             </a>
           </div>
 
