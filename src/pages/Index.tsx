@@ -4,6 +4,7 @@ import { ChannelGrid } from '@/components/ChannelGrid';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { channels, Channel } from '@/data/channels';
 import { useToast } from '@/hooks/use-toast';
+import { DonateButton } from '@/components/DonateButton';
 
 const Index = () => {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
@@ -84,6 +85,9 @@ const Index = () => {
           <p className="text-xs text-muted-foreground mt-2">
             Powered by Shaka Player | Built with React & TypeScript
           </p>
+          <div className="mt-3">
+            <DonateButton />
+          </div>
         </div>
       </footer>
     </div>

@@ -9,6 +9,7 @@ import { TVShow, Season, Episode, tmdbApi } from '@/lib/tmdb';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Info } from 'lucide-react';
+import { DonateButton } from '@/components/DonateButton';
 
 const TVSeries = () => {
   const [shows, setShows] = useState<TVShow[]>([]);
@@ -285,6 +286,18 @@ const TVSeries = () => {
           )[selectedServer]}
         />
       )}
+
+      {/* Footer */}
+      <footer className="border-t border-border mt-12 py-8">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            flameiptv
+          </p>
+          <div className="mt-3">
+            <DonateButton />
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

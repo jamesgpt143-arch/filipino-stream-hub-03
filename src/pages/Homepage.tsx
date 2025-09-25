@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tv, Film, Play, Star, Globe } from 'lucide-react';
 import { AddChannelForm } from '@/components/AddChannelForm';
+import { DonateButton } from '@/components/DonateButton';
 
 const Homepage = () => {
   return (
@@ -158,9 +159,8 @@ const Homepage = () => {
           <p className="text-sm text-primary-foreground/60">
             flameiptv - Premium Streaming Experience
           </p>
-          <div className="mt-3 p-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20 max-w-md mx-auto">
-            <p className="text-sm font-medium text-accent">💰 GCASH: 09310799262</p>
-            <p className="text-xs text-primary-foreground/60 mt-1">Support the stream</p>
+          <div className="mt-3">
+            <DonateButton />
           </div>
         </div>
       </footer>
