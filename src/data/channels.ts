@@ -40,7 +40,7 @@ export const channels: Channel[] = [
   logo: 'https://api.discovery.com/v1/images/5bc91c366b66d1494068339e?aspectRatio=1x1&width=192&key=3020a40c2356a645b4b4'
 }, {
   name: 'Animax',
-  manifestUri: 'https://iptvproxy-five.vercel.app/api/hls?url=http://202.80.222.20/cdn/iptv/Tvod/001/channel2000122/1024.m3u8',
+  manifestUri: 'https://stream.ads.ottera.tv/playlist.m3u8?network_id=10935',
   type: 'hls',
   logo: 'https://i.imgur.com/VLlyHhT.png'
 }, {
