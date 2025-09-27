@@ -114,7 +114,7 @@ const Movies = () => {
           </AlertDescription>
         </Alert>
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {Array.from({ length: 12 }).map((_, index) => (
               <div key={index} className="animate-pulse">
                 <div className="bg-muted aspect-[2/3] rounded-lg mb-4"></div>
@@ -125,7 +125,7 @@ const Movies = () => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
               {movies.map((movie) => (
                 <MovieCard
                   key={movie.id}
