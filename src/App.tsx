@@ -7,7 +7,9 @@ import { Navigation } from "./components/Navigation";
 import Homepage from "./pages/Homepage";
 import Channels from "./pages/Channels";
 import Movies from "./pages/Movies";
+import MovieDetail from "./pages/MovieDetail";
 import TVSeries from "./pages/TVSeries";
+import TVSeriesDetail from "./pages/TVSeriesDetail";
 import NotFound from "./pages/NotFound";
 import { disableDevTools } from "./utils/disableDevTools";
 import { useEffect } from "react";
@@ -31,7 +33,9 @@ const App = () => {
           <Route path="/" element={<Homepage />} />
           <Route path="/channels" element={<Channels />} />
           <Route path="/movies" element={<Movies />} />
+          <Route path="/movie/:id" element={<MovieDetail />} />
           <Route path="/tv-series" element={<TVSeries />} />
+          <Route path="/tv-series/:id" element={<TVSeriesDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

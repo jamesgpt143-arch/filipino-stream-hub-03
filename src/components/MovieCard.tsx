@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Star, Play, ChevronDown } from 'lucide-react';
 import { Movie, tmdbApi } from '@/lib/tmdb';
+import { useNavigate } from 'react-router-dom';
 
 interface MovieCardProps {
   movie: Movie;
@@ -12,10 +13,14 @@ interface MovieCardProps {
 
 export const MovieCard = ({ movie, onPlay }: MovieCardProps) => {
   const servers = tmdbApi.getMovieStreamUrls(movie.id);
+  const navigate = useNavigate();
   
   return (
     <Card className="group cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg bg-card border-border overflow-hidden">
-      <div className="relative aspect-[2/3] overflow-hidden">
+      <div 
+        className="relative aspect-[2/3] overflow-hidden"
+        onClick={() => navigate(`/movie/${movie.id}`)}
+      >
         <img
           src={tmdbApi.getImageUrl(movie.poster_path)}
           alt={movie.title}

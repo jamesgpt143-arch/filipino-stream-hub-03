@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Star, Play, ChevronDown } from 'lucide-react';
 import { TVShow, tmdbApi } from '@/lib/tmdb';
+import { useNavigate } from 'react-router-dom';
 
 interface TVShowCardProps {
   show: TVShow;
@@ -12,10 +13,14 @@ interface TVShowCardProps {
 
 export const TVShowCard = ({ show, onPlay }: TVShowCardProps) => {
   const servers = tmdbApi.getTVEpisodeStreamUrls(show.id, 1, 1); // Sample for server list
+  const navigate = useNavigate();
   
   return (
     <Card className="group cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg bg-card border-border overflow-hidden">
-      <div className="relative aspect-[2/3] overflow-hidden">
+      <div 
+        className="relative aspect-[2/3] overflow-hidden"
+        onClick={() => navigate(`/tv-series/${show.id}`)}
+      >
         <img
           src={tmdbApi.getImageUrl(show.poster_path)}
           alt={show.name}
