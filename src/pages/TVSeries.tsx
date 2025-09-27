@@ -128,7 +128,6 @@ const TVSeries = () => {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-primary-foreground mb-2">TV Series</h1>
-              <p className="text-primary-foreground/80">Discover popular TV shows</p>
             </div>
             
             <div className="flex items-center gap-4 w-full lg:w-auto">
