@@ -52,10 +52,10 @@ export const channels: Channel[] = [
   type: 'hls',
   logo: 'https://www.tablotv.com/wp-content/uploads/2023/12/AnimeXHIDIVE_official-768x499.png'
 }, {
-    name: 'Aniplus',
-  manifestUri: 'https://empty-dream-82f5.fflame143.workers.dev/?target=https://amg18481-amg18481c1-amgplt0352.playout.now3.amagi.tv/playlist/amg18481-amg18481c1-amgplt0352/playlist.m3u8',
+    name: 'Ani-One',
+  manifestUri: 'https://amg19223-amg19223c9-amgplt0019.playout.now3.amagi.tv/playlist/amg19223-amg19223c9-amgplt0019/playlist.m3u8',
   type: 'hls',
-  logo: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KSNq4KRLsA56rVchoQZFnjEu-t7DLt-dBfi75YVdE0R1EL59XvINBaRFGj1LLayf8czW-Q4vRV2wKZyimsu2wyaJ7iONrvv8YdgZecTzbP_qOAxgX_vW3BDZa57YX6_3Ig5FVgSIdpjp_dqMGyElN3MpF3BtKlX3CQntI8owTDetuv2jw=s1024?authuser=5'
+  logo: 'https://i.ibb.co/Rpj2zNY7/1.png'
 }, {
   name: 'ANC',
   manifestUri: 'https://cdn-ue1-prod.tsv2.amagi.tv/linear/amg01006-abs-cbn-anc-global-dash-abscbnono/index.mpd',
@@ -402,6 +402,14 @@ name: 'GMA (Youtube Stream)',
   },
   type: 'mpd',
   logo: 'https://i.pinimg.com/originals/28/43/e5/2843e5c36e847576f1e86e80f43e5384.jpg'
+}, {
+   name: 'Jeepney TV',
+  manifestUri: 'https://abslive.akamaized.net/dash/live/2028025/jeepneytv/manifest.mpd',
+  clearKey: {
+    '90ea4079e02f418db7b170e8763e65f0': '1bfe2d166e31d03eee86ee568bd6c272'
+  },
+  type: 'mpd',
+  logo: 'https://th.bing.com/th/id/OIP.PNeE4yWz4_Tp1O-dCdY_xAHaEP?rs=1&pid=ImgDetMain'
 }, {
   name: 'Jungo Pinoy tv',
   manifestUri: 'https://jungotvstream.chanall.tv/jungotv/jungopinoytv/stream.m3u8',
