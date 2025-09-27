@@ -40,11 +40,8 @@ export const channels: Channel[] = [
   logo: 'https://api.discovery.com/v1/images/5bc91c366b66d1494068339e?aspectRatio=1x1&width=192&key=3020a40c2356a645b4b4'
 }, {
   name: 'Animax',
-  manifestUri: 'https://animax.b-cdn.net/mirror/animax/static.mpd',
-  clearKey: {
-    '8421c9bc0b5241e59fe4377405a5305e': 'a8570f08dd26e5210041d85d7a84d6f4'
-  },
-  type: 'mpd',
+  manifestUri: 'https://iptvproxy-five.vercel.app/api/hls?url=http://202.80.222.20/cdn/iptv/Tvod/001/channel2000122/1024.m3u8',
+  type: 'hls',
   logo: 'https://i.imgur.com/VLlyHhT.png'
 }, {
   name: 'Anime X Hidive',
