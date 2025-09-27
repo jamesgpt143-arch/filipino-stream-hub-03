@@ -50,7 +50,7 @@ export const channels: Channel[] = [
   logo: 'https://www.tablotv.com/wp-content/uploads/2023/12/AnimeXHIDIVE_official-768x499.png'
 }, {
     name: 'Aniplus',
-  manifestUri: 'https://amg18481-amg18481c1-amgplt0352.playout.now3.amagi.tv/playlist/amg18481-amg18481c1-amgplt0352/playlist.m3u8',
+  manifestUri: 'https://empty-dream-82f5.fflame143.workers.dev/',
   type: 'hls',
   logo: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KSNq4KRLsA56rVchoQZFnjEu-t7DLt-dBfi75YVdE0R1EL59XvINBaRFGj1LLayf8czW-Q4vRV2wKZyimsu2wyaJ7iONrvv8YdgZecTzbP_qOAxgX_vW3BDZa57YX6_3Ig5FVgSIdpjp_dqMGyElN3MpF3BtKlX3CQntI8owTDetuv2jw=s1024?authuser=5'
 }, {
