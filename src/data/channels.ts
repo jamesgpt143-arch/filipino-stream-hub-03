@@ -40,8 +40,11 @@ export const channels: Channel[] = [
   logo: 'https://api.discovery.com/v1/images/5bc91c366b66d1494068339e?aspectRatio=1x1&width=192&key=3020a40c2356a645b4b4'
 }, {
   name: 'Animax',
-  manifestUri: 'https://stream.ads.ottera.tv/playlist.m3u8?network_id=10935',
-  type: 'hls',
+  manifestUri: 'https://qp-pldt-live-bpk-01-prod.akamaized.net/bpk-tv/cg_animax_sd_new/default/index.mpd',
+  clearKey: {
+    '92032b0e41a543fb9830751273b8debd': '03f8b65e2af785b10d6634735dbe6c11'
+  },
+  type: 'mpd',
   logo: 'https://i.imgur.com/VLlyHhT.png'
 }, {
   name: 'Anime X Hidive',
