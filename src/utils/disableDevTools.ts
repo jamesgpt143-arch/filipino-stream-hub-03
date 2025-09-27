@@ -1,6 +1,6 @@
 // Disable developer tools and inspect element
 export const disableDevTools = () => {
-  // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+   Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
   document.addEventListener('keydown', (e) => {
     // F12
     if (e.keyCode === 123) {
