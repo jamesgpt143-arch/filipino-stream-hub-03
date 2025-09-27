@@ -59,11 +59,8 @@ export const MovieCard = ({ movie, onPlay }: MovieCardProps) => {
         <h3 className="font-semibold text-foreground line-clamp-2 mb-2">
           {movie.title}
         </h3>
-        <p className="text-sm text-muted-foreground mb-2">
+        <p className="text-sm text-muted-foreground">
           {new Date(movie.release_date).getFullYear()}
-        </p>
-        <p className="text-sm text-muted-foreground line-clamp-3">
-          {movie.overview}
         </p>
       </CardContent>
     </Card>

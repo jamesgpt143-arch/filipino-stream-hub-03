@@ -59,11 +59,8 @@ export const TVShowCard = ({ show, onPlay }: TVShowCardProps) => {
         <h3 className="font-semibold text-foreground line-clamp-2 mb-2">
           {show.name}
         </h3>
-        <p className="text-sm text-muted-foreground mb-2">
+        <p className="text-sm text-muted-foreground">
           {new Date(show.first_air_date).getFullYear()}
-        </p>
-        <p className="text-sm text-muted-foreground line-clamp-3">
-          {show.overview}
         </p>
       </CardContent>
     </Card>
