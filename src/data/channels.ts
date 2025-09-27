@@ -107,6 +107,11 @@ export const channels: Channel[] = [
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.O2OG_59US0j-zqWyZwqhXAHaCH?rs=1&pid=ImgDetMain'
 }, {
+   name: 'Blast Sports',
+  manifestUri: 'https://amg19223-amg19223c1-amgplt0351.playout.now3.amagi.tv/playlist/amg19223-amg19223c1-amgplt0351/playlist.m3u8',
+  type: 'hls',
+  logo: 'https://is1-ssl.mzstatic.com/image/thumb/Purple112/v4/62/d2/16/62d216ec-1c2f-0e1f-530e-0bdb23150ea2/AppIcon-0-0-1x_U007emarketing-0-10-0-0-85-220.png/1200x630wa.png'
+}, {
   name: 'Bloomberg',
   manifestUri: 'https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/bloomberg_sd/default/index.mpd',
   clearKey: {
