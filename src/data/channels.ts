@@ -57,6 +57,11 @@ export const channels: Channel[] = [
   type: 'hls',
   logo: 'https://i.ibb.co/Rpj2zNY7/1.png'
 }, {
+   name: 'Aniplus',
+  manifestUri: 'https://amg18481-amg18481c1-amgplt0352.playout.now3.amagi.tv/playlist/amg18481-amg18481c1-amgplt0352/playlist.m3u8',
+  type: 'hls',
+  logo: 'https://i.ibb.co/N2WkpBbJ/Gemini-Generated-Image-dwpwypdwpwypdwpw.png'
+}, {
   name: 'ANC',
   manifestUri: 'https://cdn-ue1-prod.tsv2.amagi.tv/linear/amg01006-abs-cbn-anc-global-dash-abscbnono/index.mpd',
   clearKey: {
@@ -106,6 +111,11 @@ export const channels: Channel[] = [
   },
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.O2OG_59US0j-zqWyZwqhXAHaCH?rs=1&pid=ImgDetMain'
+}, {
+    name: 'Blast Movies',
+  manifestUri: 'https://amg19223-amg19223c7-amgplt0351.playout.now3.amagi.tv/playlist/amg19223-amg19223c7-amgplt0351/playlist.m3u8',
+  type: 'hls',
+  logo: 'https://i.ibb.co/G3sSvQmD/unnamed-2.png'
 }, {
    name: 'Blast Sports',
   manifestUri: 'https://amg19223-amg19223c1-amgplt0351.playout.now3.amagi.tv/playlist/amg19223-amg19223c1-amgplt0351/playlist.m3u8',
@@ -639,6 +649,11 @@ name: 'KPlus',
   type: 'hls',
   logo: 'https://tse1.mm.bing.net/th/id/OIP.14iQmo2HrOxiL10lttVslgAAAA?rs=1&pid=ImgDetMain&o=7&rm=3'
 }, {
+     name: 'Red Bull TV',
+  manifestUri: 'https://d3k3xxewhm1my2.cloudfront.net/playlist.m3u8',
+  type: 'hls',
+  logo: 'https://i.ibb.co/cK5FsbyM/unnamed-1.png'
+}, {
   name: 'Rock Action',
   manifestUri: 'https://qp-pldt-live-bpk-01-prod.akamaized.net/bpk-tv/dr_rockextreme/default/index.mpd',
   clearKey: {
@@ -755,6 +770,11 @@ name: 'KPlus',
   },
   type: 'mpd',
   logo: 'https://logos-download.com/wp-content/uploads/2016/04/Nickelodeon_logo_logotype_2.png'
+}, {
+   name: 'Tennis+',
+  manifestUri: 'https://amg01935-amg01935c1-amgplt0352.playout.now3.amagi.tv/playlist/amg01935-amg01935c1-amgplt0352/playlist.m3u8',
+  type: 'hls',
+  logo: 'https://i.ibb.co/wNqkRfjw/unnamed.png'
 }, {
   name: 'Thrill',
   manifestUri: 'https://qp-pldt-live-bpk-01-prod.akamaized.net/bpk-tv/cg_thrill_sd/default/index.mpd',
