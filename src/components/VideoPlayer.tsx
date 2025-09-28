@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { Button } from './ui/button';
 import { List } from 'lucide-react';
@@ -45,7 +44,7 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
   const [currentEmbedUrl, setCurrentEmbedUrl] = useState<string>('');
 
   useEffect(() => {
-    // Tinitiyak na ang Shaka player ay available dahil na-load na ito sa index.html
+    // Ensure Shaka polyfills are installed
     if (window.shaka) {
       window.shaka.polyfill.installAll();
       if (!window.shaka.Player.isBrowserSupported()) {
@@ -53,7 +52,6 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
       }
     }
 
-    // Ang cleanup function na ito ay tatakbo kapag nagbago ang channel o kapag na-unmount ang component
     return () => {
       if (uiRef.current) {
         uiRef.current.destroy();
@@ -71,21 +69,31 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
   }, []);
 
   useEffect(() => {
+    const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
     const loadChannel = async () => {
-      // Linisin muna ang dating player instance
-      if (uiRef.current) await uiRef.current.destroy();
-      if (playerRef.current) await playerRef.current.destroy();
-      if (jwPlayerRef.current) jwPlayerRef.current.remove();
-      playerRef.current = null;
-      uiRef.current = null;
-      jwPlayerRef.current = null;
-      
+      // Cleanup previous players
+      if (uiRef.current) {
+        await uiRef.current.destroy();
+        uiRef.current = null;
+      }
+      if (playerRef.current) {
+        await playerRef.current.destroy();
+        playerRef.current = null;
+      }
+      if (jwPlayerRef.current) {
+        jwPlayerRef.current.remove();
+        jwPlayerRef.current = null;
+        // Small delay para sure na flushed si JW
+        await delay(50);
+      }
+
       if (!channel) return;
 
       setIsLoading(true);
       setError(null);
 
-      // Kung ang channel ay YouTube, huwag nang ituloy ang player setup
+      // Handle YouTube type
       if (channel.type === 'youtube') {
         if (channel.hasMultipleStreams && channel.youtubeChannelId) {
           setShowStreamSelector(true);
@@ -97,21 +105,19 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
         return;
       }
 
-      // Check kung m3u8 para gamitin ang JW Player
+      // Check kung m3u8 → JW Player
       const isM3u8 = channel.manifestUri?.includes('.m3u8');
       setShowStreamSelector(false);
-      
+
       if (isM3u8 && window.jwplayer) {
-        // Gamitin ang JW Player para sa m3u8 streams
         try {
           if (!containerRef.current) return;
-          
+
           const playerId = `jwplayer-${Date.now()}`;
           const playerDiv = document.createElement('div');
           playerDiv.id = playerId;
           playerDiv.className = 'w-full h-full';
-          
-          // Clear container at ilagay ang player div
+
           containerRef.current.innerHTML = '';
           containerRef.current.appendChild(playerDiv);
 
@@ -146,15 +152,22 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
           setIsLoading(false);
         }
       } else {
-        // Gamitin ang Shaka Player para sa iba pang formats
-        if (!videoRef.current || !containerRef.current) return;
-        
+        // Shaka Player for DASH/others
+        if (!containerRef.current) return;
+
         try {
           if (!window.shaka || !window.shaka.ui) {
             setError('Shaka Player UI not ready');
             setIsLoading(false);
             return;
           }
+
+          // 🟢 Recreate <video> element para clean slate
+          containerRef.current.innerHTML = '';
+          const videoEl = document.createElement('video');
+          videoEl.className = 'w-full h-full';
+          containerRef.current.appendChild(videoEl);
+          videoRef.current = videoEl as HTMLVideoElement;
 
           const player = new window.shaka.Player(videoRef.current);
           const ui = new window.shaka.ui.Overlay(player, containerRef.current, videoRef.current);
@@ -186,7 +199,7 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
             player.setTextTrackVisibility(true);
             player.selectTextTrack(englishTrack);
           }
-          
+
           setIsLoading(false);
           videoRef.current?.play();
 
@@ -236,16 +249,12 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
             )}
           </>
         ) : (
-          <div 
+          <div
             ref={containerRef}
             className="relative w-full h-full"
             style={{ '--shaka-primary-color': 'hsl(var(--primary))' } as any}
           >
-            <video
-              ref={videoRef}
-              className="w-full h-full"
-              poster=""
-            />
+            <video ref={videoRef} className="w-full h-full" poster="" />
             {isLoading && (
               <div className="absolute inset-0 bg-black/80 flex items-center justify-center animate-fade-in z-20">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -259,16 +268,19 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
           </div>
         )}
 
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={onClose} 
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onClose}
           className="absolute top-4 right-4 text-white hover:bg-white/20 z-30"
         >
           ✕
         </Button>
-        {channel.type === 'youtube' && channel.hasMultipleStreams && channel.youtubeChannelId && !showStreamSelector && (
-           <Button
+        {channel.type === 'youtube' &&
+          channel.hasMultipleStreams &&
+          channel.youtubeChannelId &&
+          !showStreamSelector && (
+            <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowStreamSelector(true)}
@@ -277,7 +289,7 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
             >
               <List className="w-4 h-4" />
             </Button>
-        )}
+          )}
       </div>
     </Card>
   );
