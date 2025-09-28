@@ -1,3 +1,4 @@
+// src/components/VideoPlayer.tsx
 
 import { useEffect, useRef, useState } from 'react';
 import { Button } from './ui/button';
@@ -36,14 +37,18 @@ const Placeholder = () => (
 export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<any>(null);
-  const uiRef = useRef<any>(null);
-  const jwPlayerRef = useRef<any>(null);
+  const jwPlayerContainerRef = useRef<HTMLDivElement>(null); // BAGONG REF para sa JW Player
+
+  // Player instances
+  const playerRef = useRef<any>(null); // Shaka Player
+  const jwPlayerRef = useRef<any>(null); // JW Player
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showStreamSelector, setShowStreamSelector] = useState(false);
   const [currentEmbedUrl, setCurrentEmbedUrl] = useState<string>('');
 
+  // Cleanup effect to destroy players when component unmounts
   useEffect(() => {
     // Tinitiyak na ang Shaka player ay available dahil na-load na ito sa index.html
     if (window.shaka) {
@@ -52,115 +57,78 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
         setError('Browser not supported');
       }
     }
-
-    // Ang cleanup function na ito ay tatakbo kapag nagbago ang channel o kapag na-unmount ang component
+    
     return () => {
-      if (uiRef.current) {
-        uiRef.current.destroy();
-        uiRef.current = null;
-      }
       if (playerRef.current) {
         playerRef.current.destroy();
-        playerRef.current = null;
       }
       if (jwPlayerRef.current) {
         jwPlayerRef.current.remove();
-        jwPlayerRef.current = null;
       }
     };
   }, []);
 
   useEffect(() => {
+    const cleanupPlayers = () => {
+        if (playerRef.current) {
+            playerRef.current.destroy();
+            playerRef.current = null;
+        }
+        if (jwPlayerRef.current) {
+            jwPlayerRef.current.remove();
+            jwPlayerRef.current = null;
+        }
+    };
+
     const loadChannel = async () => {
-      // Linisin muna ang dating player instance
-      if (uiRef.current) await uiRef.current.destroy();
-      if (playerRef.current) await playerRef.current.destroy();
-      if (jwPlayerRef.current) jwPlayerRef.current.remove();
-      playerRef.current = null;
-      uiRef.current = null;
-      jwPlayerRef.current = null;
+      cleanupPlayers();
       
-      if (!channel) return;
+      if (!channel) {
+        setIsLoading(false);
+        setError(null);
+        return;
+      }
 
       setIsLoading(true);
       setError(null);
+      setShowStreamSelector(false);
+      setCurrentEmbedUrl('');
 
-      // Kung ang channel ay YouTube, huwag nang ituloy ang player setup
+
+      // Handle YouTube streams
       if (channel.type === 'youtube') {
         if (channel.hasMultipleStreams && channel.youtubeChannelId) {
           setShowStreamSelector(true);
         } else {
-          setShowStreamSelector(false);
           setCurrentEmbedUrl(channel.embedUrl || '');
         }
         setIsLoading(false);
         return;
       }
-
-      // Check kung m3u8 para gamitin ang JW Player
-      const isM3u8 = channel.manifestUri?.includes('.m3u8');
-      setShowStreamSelector(false);
       
-      if (isM3u8 && window.jwplayer) {
-        // Gamitin ang JW Player para sa m3u8 streams
+      // Handle HLS streams with JW Player
+      if (channel.manifestUri?.includes('.m3u8') && window.jwplayer && jwPlayerContainerRef.current) {
         try {
-          if (!containerRef.current) return;
-          
-          const playerId = `jwplayer-${Date.now()}`;
-          const playerDiv = document.createElement('div');
-          playerDiv.id = playerId;
-          playerDiv.className = 'w-full h-full';
-          
-          // Clear container at ilagay ang player div
-          containerRef.current.innerHTML = '';
-          containerRef.current.appendChild(playerDiv);
-
-          const player = window.jwplayer(playerId).setup({
+          const player = window.jwplayer(jwPlayerContainerRef.current.id).setup({
             file: channel.manifestUri,
             width: '100%',
             height: '100%',
             autostart: true,
-            mute: false,
-            stretching: 'uniform',
-            primary: 'html5',
-            hlshtml: true,
-            androidhls: true
           });
-
           jwPlayerRef.current = player;
-
-          player.on('ready', () => {
-            setIsLoading(false);
-            console.log('JW Player ready for', channel.name);
-          });
-
-          player.on('error', (event: any) => {
-            console.error('JW Player Error:', event);
-            setError(`Player Error: ${event.message || 'Unknown error'}`);
-            setIsLoading(false);
-          });
-
+          player.on('ready', () => setIsLoading(false));
+          player.on('error', (e: any) => setError(`Player Error: ${e.message}`));
         } catch (err) {
-          console.error('Error loading JW Player:', err);
-          setError(`Failed to load ${channel.name}: ${err instanceof Error ? err.message : 'Unknown error'}`);
-          setIsLoading(false);
+          setError(`Failed to load ${channel.name}`);
         }
-      } else {
-        // Gamitin ang Shaka Player para sa iba pang formats
-        if (!videoRef.current || !containerRef.current) return;
-        
+      } 
+      // Handle MPD streams with Shaka Player
+      else if (videoRef.current && containerRef.current) {
         try {
-          if (!window.shaka || !window.shaka.ui) {
-            setError('Shaka Player UI not ready');
-            setIsLoading(false);
-            return;
-          }
-
           const player = new window.shaka.Player(videoRef.current);
-          const ui = new window.shaka.ui.Overlay(player, containerRef.current, videoRef.current);
           playerRef.current = player;
-          uiRef.current = ui;
 
+          const ui = new window.shaka.ui.Overlay(player, containerRef.current, videoRef.current);
           ui.configure({ addBigPlayButton: true });
 
           player.addEventListener('error', (event: any) => {
@@ -168,28 +136,13 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
             setError(`Player Error: ${event.detail.message || 'Unknown error'}`);
           });
 
-          player.getNetworkingEngine().registerRequestFilter((type: any, request: any) => {
-            request.headers['Referer'] = channel.referer || 'https://example.com';
-          });
-
           if (channel.clearKey) {
             player.configure({ drm: { clearKeys: channel.clearKey } });
-          } else if (channel.widevineUrl) {
-            player.configure({ drm: { servers: { 'com.widevine.alpha': channel.widevineUrl } } });
           }
 
           await player.load(channel.manifestUri);
-
-          const textTracks = player.getTextTracks();
-          const englishTrack = textTracks.find((track: any) => track.language === 'en');
-          if (englishTrack) {
-            player.setTextTrackVisibility(true);
-            player.selectTextTrack(englishTrack);
-          }
-          
           setIsLoading(false);
           videoRef.current?.play();
-
         } catch (err) {
           console.error('Error loading channel:', err);
           setError(`Failed to load ${channel.name}: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -214,10 +167,35 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
     );
   }
 
+  const isShaka = channel.type === 'mpd' || (channel.type === 'hls' && !channel.manifestUri?.includes('.m3u8'));
+  const isJWP = channel.type === 'hls' && channel.manifestUri?.includes('.m3u8');
+  const isYoutube = channel.type === 'youtube';
+
   return (
     <Card className="bg-gradient-card shadow-elegant border-primary/20 overflow-hidden w-full">
       <div className="relative bg-black w-full aspect-video">
-        {channel.type === 'youtube' ? (
+        {/* Shaka Player Container */}
+        <div 
+          ref={containerRef}
+          className={`relative w-full h-full ${isShaka ? 'block' : 'hidden'}`}
+          style={{ '--shaka-primary-color': 'hsl(var(--primary))' } as any}
+        >
+          <video
+            ref={videoRef}
+            className="w-full h-full"
+            poster=""
+          />
+        </div>
+
+        {/* JW Player Container */}
+        <div 
+            ref={jwPlayerContainerRef}
+            id={`jwplayer-container-${Date.now()}`}
+            className={`w-full h-full ${isJWP ? 'block' : 'hidden'}`}
+        />
+
+        {/* YouTube Player Container */}
+        {isYoutube && (
           <>
             {showStreamSelector && channel.youtubeChannelId ? (
               <StreamSelector
@@ -235,27 +213,17 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
               />
             )}
           </>
-        ) : (
-          <div 
-            ref={containerRef}
-            className="relative w-full h-full"
-            style={{ '--shaka-primary-color': 'hsl(var(--primary))' } as any}
-          >
-            <video
-              ref={videoRef}
-              className="w-full h-full"
-              poster=""
-            />
-            {isLoading && (
-              <div className="absolute inset-0 bg-black/80 flex items-center justify-center animate-fade-in z-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              </div>
-            )}
-            {error && (
-              <div className="absolute inset-0 bg-black/80 flex items-center justify-center animate-fade-in z-20">
-                <p className="text-white text-center p-4">{error}</p>
-              </div>
-            )}
+        )}
+
+        {/* Loading and Error Overlays */}
+        {isLoading && (
+          <div className="absolute inset-0 bg-black/80 flex items-center justify-center animate-fade-in z-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        )}
+        {error && (
+          <div className="absolute inset-0 bg-black/80 flex items-center justify-center animate-fade-in z-20">
+            <p className="text-white text-center p-4">{error}</p>
           </div>
         )}
 
@@ -267,7 +235,7 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
         >
           ✕
         </Button>
-        {channel.type === 'youtube' && channel.hasMultipleStreams && channel.youtubeChannelId && !showStreamSelector && (
+        {isYoutube && channel.hasMultipleStreams && channel.youtubeChannelId && !showStreamSelector && (
            <Button
               variant="ghost"
               size="sm"
