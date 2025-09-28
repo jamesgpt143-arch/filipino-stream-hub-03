@@ -37,7 +37,7 @@ const Placeholder = () => (
 export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const jwPlayerContainerRef = useRef<HTMLDivElement>(null); // BAGONG REF para sa JW Player
+  const jwPlayerContainerRef = useRef<HTMLDivElement>(null);
 
   // Player instances
   const playerRef = useRef<any>(null); // Shaka Player
@@ -50,7 +50,6 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
 
   // Cleanup effect to destroy players when component unmounts
   useEffect(() => {
-    // Tinitiyak na ang Shaka player ay available dahil na-load na ito sa index.html
     if (window.shaka) {
       window.shaka.polyfill.installAll();
       if (!window.shaka.Player.isBrowserSupported()) {
@@ -94,8 +93,6 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
       setShowStreamSelector(false);
       setCurrentEmbedUrl('');
 
-
-      // Handle YouTube streams
       if (channel.type === 'youtube') {
         if (channel.hasMultipleStreams && channel.youtubeChannelId) {
           setShowStreamSelector(true);
@@ -106,8 +103,9 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
         return;
       }
       
-      // Handle HLS streams with JW Player
-      if (channel.manifestUri?.includes('.m3u8') && window.jwplayer && jwPlayerContainerRef.current) {
+      const isM3u8 = channel.manifestUri?.includes('.m3u8');
+
+      if (isM3u8 && window.jwplayer && jwPlayerContainerRef.current) {
         try {
           const player = window.jwplayer(jwPlayerContainerRef.current.id).setup({
             file: channel.manifestUri,
@@ -122,7 +120,6 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
           setError(`Failed to load ${channel.name}`);
         }
       } 
-      // Handle MPD streams with Shaka Player
       else if (videoRef.current && containerRef.current) {
         try {
           const player = new window.shaka.Player(videoRef.current);
@@ -141,6 +138,15 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
           }
 
           await player.load(channel.manifestUri);
+          
+          // PAGBABAGO: Ibinalik ang logic para sa pag-detect at pag-enable ng captions
+          const textTracks = player.getTextTracks();
+          const englishTrack = textTracks.find((track: any) => track.language === 'en');
+          if (englishTrack) {
+            player.setTextTrackVisibility(true);
+            player.selectTextTrack(englishTrack);
+          }
+          
           setIsLoading(false);
           videoRef.current?.play();
         } catch (err) {
