@@ -6,10 +6,11 @@ import { Card } from './ui/card';
 import { Channel } from '@/data/channels';
 import { StreamSelector } from './StreamSelector';
 
-// Idineklara ang shaka bilang global variable (na-load sa index.html)
+// Idineklara ang shaka at jwplayer bilang global variable (na-load sa index.html)
 declare global {
   interface Window {
     shaka: any;
+    jwplayer: any;
   }
 }
 
@@ -37,6 +38,7 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const uiRef = useRef<any>(null);
+  const jwPlayerRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showStreamSelector, setShowStreamSelector] = useState(false);
@@ -61,6 +63,10 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
         playerRef.current.destroy();
         playerRef.current = null;
       }
+      if (jwPlayerRef.current) {
+        jwPlayerRef.current.remove();
+        jwPlayerRef.current = null;
+      }
     };
   }, []);
 
@@ -69,15 +75,17 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
       // Linisin muna ang dating player instance
       if (uiRef.current) await uiRef.current.destroy();
       if (playerRef.current) await playerRef.current.destroy();
+      if (jwPlayerRef.current) jwPlayerRef.current.remove();
       playerRef.current = null;
       uiRef.current = null;
+      jwPlayerRef.current = null;
       
       if (!channel) return;
 
       setIsLoading(true);
       setError(null);
 
-      // Kung ang channel ay YouTube, huwag nang ituloy ang Shaka player setup
+      // Kung ang channel ay YouTube, huwag nang ituloy ang player setup
       if (channel.type === 'youtube') {
         if (channel.hasMultipleStreams && channel.youtubeChannelId) {
           setShowStreamSelector(true);
@@ -89,55 +97,104 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
         return;
       }
 
-      // Kung HLS/MPD, ituloy ang Shaka player setup
+      // Check kung m3u8 para gamitin ang JW Player
+      const isM3u8 = channel.manifestUri?.includes('.m3u8');
       setShowStreamSelector(false);
-      if (!videoRef.current || !containerRef.current) return;
       
-      try {
-        if (!window.shaka || !window.shaka.ui) {
-          setError('Shaka Player UI not ready');
+      if (isM3u8 && window.jwplayer) {
+        // Gamitin ang JW Player para sa m3u8 streams
+        try {
+          if (!containerRef.current) return;
+          
+          const playerId = `jwplayer-${Date.now()}`;
+          const playerDiv = document.createElement('div');
+          playerDiv.id = playerId;
+          playerDiv.className = 'w-full h-full';
+          
+          // Clear container at ilagay ang player div
+          containerRef.current.innerHTML = '';
+          containerRef.current.appendChild(playerDiv);
+
+          const player = window.jwplayer(playerId).setup({
+            file: channel.manifestUri,
+            width: '100%',
+            height: '100%',
+            autostart: true,
+            mute: false,
+            stretching: 'uniform',
+            primary: 'html5',
+            hlshtml: true,
+            androidhls: true
+          });
+
+          jwPlayerRef.current = player;
+
+          player.on('ready', () => {
+            setIsLoading(false);
+            console.log('JW Player ready for', channel.name);
+          });
+
+          player.on('error', (event: any) => {
+            console.error('JW Player Error:', event);
+            setError(`Player Error: ${event.message || 'Unknown error'}`);
+            setIsLoading(false);
+          });
+
+        } catch (err) {
+          console.error('Error loading JW Player:', err);
+          setError(`Failed to load ${channel.name}: ${err instanceof Error ? err.message : 'Unknown error'}`);
           setIsLoading(false);
-          return;
         }
-
-        const player = new window.shaka.Player(videoRef.current);
-        const ui = new window.shaka.ui.Overlay(player, containerRef.current, videoRef.current);
-        playerRef.current = player;
-        uiRef.current = ui;
-
-        ui.configure({ addBigPlayButton: true });
-
-        player.addEventListener('error', (event: any) => {
-          console.error('Shaka Player Error:', event.detail);
-          setError(`Player Error: ${event.detail.message || 'Unknown error'}`);
-        });
-
-        player.getNetworkingEngine().registerRequestFilter((type: any, request: any) => {
-          request.headers['Referer'] = channel.referer || 'https://example.com';
-        });
-
-        if (channel.clearKey) {
-          player.configure({ drm: { clearKeys: channel.clearKey } });
-        } else if (channel.widevineUrl) {
-          player.configure({ drm: { servers: { 'com.widevine.alpha': channel.widevineUrl } } });
-        }
-
-        await player.load(channel.manifestUri);
-
-        const textTracks = player.getTextTracks();
-        const englishTrack = textTracks.find((track: any) => track.language === 'en');
-        if (englishTrack) {
-          player.setTextTrackVisibility(true);
-          player.selectTextTrack(englishTrack);
-        }
+      } else {
+        // Gamitin ang Shaka Player para sa iba pang formats
+        if (!videoRef.current || !containerRef.current) return;
         
-        setIsLoading(false);
-        videoRef.current?.play();
+        try {
+          if (!window.shaka || !window.shaka.ui) {
+            setError('Shaka Player UI not ready');
+            setIsLoading(false);
+            return;
+          }
 
-      } catch (err) {
-        console.error('Error loading channel:', err);
-        setError(`Failed to load ${channel.name}: ${err instanceof Error ? err.message : 'Unknown error'}`);
-        setIsLoading(false);
+          const player = new window.shaka.Player(videoRef.current);
+          const ui = new window.shaka.ui.Overlay(player, containerRef.current, videoRef.current);
+          playerRef.current = player;
+          uiRef.current = ui;
+
+          ui.configure({ addBigPlayButton: true });
+
+          player.addEventListener('error', (event: any) => {
+            console.error('Shaka Player Error:', event.detail);
+            setError(`Player Error: ${event.detail.message || 'Unknown error'}`);
+          });
+
+          player.getNetworkingEngine().registerRequestFilter((type: any, request: any) => {
+            request.headers['Referer'] = channel.referer || 'https://example.com';
+          });
+
+          if (channel.clearKey) {
+            player.configure({ drm: { clearKeys: channel.clearKey } });
+          } else if (channel.widevineUrl) {
+            player.configure({ drm: { servers: { 'com.widevine.alpha': channel.widevineUrl } } });
+          }
+
+          await player.load(channel.manifestUri);
+
+          const textTracks = player.getTextTracks();
+          const englishTrack = textTracks.find((track: any) => track.language === 'en');
+          if (englishTrack) {
+            player.setTextTrackVisibility(true);
+            player.selectTextTrack(englishTrack);
+          }
+          
+          setIsLoading(false);
+          videoRef.current?.play();
+
+        } catch (err) {
+          console.error('Error loading channel:', err);
+          setError(`Failed to load ${channel.name}: ${err instanceof Error ? err.message : 'Unknown error'}`);
+          setIsLoading(false);
+        }
       }
     };
 
