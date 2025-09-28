@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from 'react';
 import { Button } from './ui/button';
 import { List } from 'lucide-react';
@@ -69,56 +70,15 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
     };
   }, []);
 
-  const cleanupPlayers = async () => {
-    // Linisin ang JW Player
-    if (jwPlayerRef.current) {
-      try {
-        jwPlayerRef.current.remove();
-      } catch (err) {
-        console.warn('Error removing JW Player:', err);
-      }
-      jwPlayerRef.current = null;
-    }
-
-    // Linisin ang Shaka Player
-    if (uiRef.current) {
-      try {
-        await uiRef.current.destroy();
-      } catch (err) {
-        console.warn('Error destroying Shaka UI:', err);
-      }
-      uiRef.current = null;
-    }
-    if (playerRef.current) {
-      try {
-        await playerRef.current.destroy();
-      } catch (err) {
-        console.warn('Error destroying Shaka Player:', err);
-      }
-      playerRef.current = null;
-    }
-  };
-
-  const resetContainer = () => {
-    if (!containerRef.current) return;
-    
-    // Clear ang lahat ng content sa container
-    containerRef.current.innerHTML = '';
-    
-    // Recreate ang video element para sa Shaka Player
-    const videoElement = document.createElement('video');
-    videoElement.className = 'w-full h-full';
-    videoElement.poster = '';
-    containerRef.current.appendChild(videoElement);
-    
-    // Update ang video ref para mag-point sa bagong element
-    (videoRef as any).current = videoElement;
-  };
-
   useEffect(() => {
     const loadChannel = async () => {
-      // Linisin muna ang dating player instances
-      await cleanupPlayers();
+      // Linisin muna ang dating player instance
+      if (uiRef.current) await uiRef.current.destroy();
+      if (playerRef.current) await playerRef.current.destroy();
+      if (jwPlayerRef.current) jwPlayerRef.current.remove();
+      playerRef.current = null;
+      uiRef.current = null;
+      jwPlayerRef.current = null;
       
       if (!channel) return;
 
@@ -142,9 +102,6 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
       setShowStreamSelector(false);
       
       if (isM3u8 && window.jwplayer) {
-        // Reset container at setup para sa JW Player
-        resetContainer();
-        
         // Gamitin ang JW Player para sa m3u8 streams
         try {
           if (!containerRef.current) return;
@@ -189,20 +146,10 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
           setIsLoading(false);
         }
       } else {
-        // Reset container at setup para sa Shaka Player
-        resetContainer();
-        
         // Gamitin ang Shaka Player para sa iba pang formats
+        if (!videoRef.current || !containerRef.current) return;
+        
         try {
-          // Wait for container reset to complete
-          await new Promise(resolve => setTimeout(resolve, 100));
-          
-          if (!videoRef.current || !containerRef.current) {
-            setError('Video element not ready');
-            setIsLoading(false);
-            return;
-          }
-          
           if (!window.shaka || !window.shaka.ui) {
             setError('Shaka Player UI not ready');
             setIsLoading(false);
