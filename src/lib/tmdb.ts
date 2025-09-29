@@ -118,5 +118,17 @@ export const tmdbApi = {
   // Get TV show episode stream URL (deprecated - use getTVEpisodeStreamUrls)
   getTVEpisodeStreamUrl: (showId: number, season: number, episode: number) => {
     return `https://vidlink.pro/tv/${showId}/${season}/${episode}`;
+  },
+
+  // Get movie recommendations
+  getMovieRecommendations: async (movieId: number, page = 1): Promise<{ results: Movie[]; total_pages: number }> => {
+    const response = await fetch(`${API_BASE_URL}/movie/${movieId}/recommendations?api_key=${API_KEY}&page=${page}`);
+    return response.json();
+  },
+
+  // Get TV show recommendations
+  getTVShowRecommendations: async (showId: number, page = 1): Promise<{ results: TVShow[]; total_pages: number }> => {
+    const response = await fetch(`${API_BASE_URL}/tv/${showId}/recommendations?api_key=${API_KEY}&page=${page}`);
+    return response.json();
   }
 };

@@ -28,9 +28,21 @@ const MovieDetail = () => {
         const movieData = await tmdbApi.getMovieDetails(Number(id));
         setMovie(movieData);
         
-        // Load recommended movies (popular movies for now)
-        const popularMovies = await tmdbApi.getPopularMovies(1);
-        setRecommendedMovies(popularMovies.results.slice(0, 8));
+        // Load recommended movies based on this movie
+        try {
+          const recommendations = await tmdbApi.getMovieRecommendations(Number(id), 1);
+          if (recommendations.results.length > 0) {
+            setRecommendedMovies(recommendations.results.slice(0, 8));
+          } else {
+            // Fallback to popular movies if no recommendations
+            const popularMovies = await tmdbApi.getPopularMovies(1);
+            setRecommendedMovies(popularMovies.results.slice(0, 8));
+          }
+        } catch (error) {
+          // Fallback to popular movies on error
+          const popularMovies = await tmdbApi.getPopularMovies(1);
+          setRecommendedMovies(popularMovies.results.slice(0, 8));
+        }
       } catch (error) {
         console.error('Error loading movie data:', error);
       } finally {

@@ -28,9 +28,21 @@ const TVSeriesDetail = () => {
         const showData = await tmdbApi.getTVShowDetails(Number(id));
         setShow(showData);
         
-        // Load recommended TV shows (popular shows for now)
-        const popularShows = await tmdbApi.getPopularTVShows(1);
-        setRecommendedShows(popularShows.results.slice(0, 8));
+        // Load recommended TV shows based on this show
+        try {
+          const recommendations = await tmdbApi.getTVShowRecommendations(Number(id), 1);
+          if (recommendations.results.length > 0) {
+            setRecommendedShows(recommendations.results.slice(0, 8));
+          } else {
+            // Fallback to popular shows if no recommendations
+            const popularShows = await tmdbApi.getPopularTVShows(1);
+            setRecommendedShows(popularShows.results.slice(0, 8));
+          }
+        } catch (error) {
+          // Fallback to popular shows on error
+          const popularShows = await tmdbApi.getPopularTVShows(1);
+          setRecommendedShows(popularShows.results.slice(0, 8));
+        }
       } catch (error) {
         console.error('Error loading TV show data:', error);
       } finally {
