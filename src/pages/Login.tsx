@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
 
@@ -35,12 +36,12 @@ const Login = () => {
 
     setIsLoading(true);
     
-    try {
-      login(username.trim());
-      toast({
-        title: "Welcome!",
-        description: `Logged in as ${username.trim()}`,
-      });
+      try {
+        login(username.trim());
+        toast({
+          title: isSignUp ? "Account Created!" : "Welcome!",
+          description: isSignUp ? `Account created for ${username.trim()}` : `Logged in as ${username.trim()}`,
+        });
     } catch (error) {
       toast({
         title: "Error",
@@ -58,7 +59,7 @@ const Login = () => {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Welcome to FlameIPTV</CardTitle>
           <CardDescription>
-            Enter your username to access the platform
+            {isSignUp ? 'Create a new account' : 'Enter your username to access the platform'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -80,10 +81,21 @@ const Login = () => {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? 'Logging in...' : 'Login'}
+              {isLoading ? (isSignUp ? 'Creating Account...' : 'Logging in...') : (isSignUp ? 'Sign Up' : 'Login')}
             </Button>
           </form>
-          <div className="mt-4 text-center text-sm text-muted-foreground">
+          
+          <div className="mt-4 text-center">
+            <Button 
+              variant="link" 
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm"
+            >
+              {isSignUp ? 'Already have an account? Login' : "Don't have an account? Sign Up"}
+            </Button>
+          </div>
+          
+          <div className="mt-2 text-center text-sm text-muted-foreground">
             <p>No password required - just enter any username</p>
           </div>
         </CardContent>
