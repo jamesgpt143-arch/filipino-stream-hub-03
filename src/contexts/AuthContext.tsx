@@ -1,11 +1,16 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
-  username: string | null;
+  user: User | null;
+  session: Session | null;
   isAdmin: boolean;
-  login: (username: string) => void;
-  logout: () => void;
+  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signOut: () => Promise<void>;
   isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,39 +28,68 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [username, setUsername] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session on mount
-    const savedUsername = localStorage.getItem('flameiptv_username');
-    if (savedUsername) {
-      setUsername(savedUsername);
-    }
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsLoading(false);
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = (username: string) => {
-    const trimmedUsername = username.trim();
-    if (trimmedUsername) {
-      setUsername(trimmedUsername);
-      localStorage.setItem('flameiptv_username', trimmedUsername);
-    }
+  const signUp = async (email: string, password: string) => {
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl
+      }
+    });
+    return { error };
   };
 
-  const logout = () => {
-    setUsername(null);
-    localStorage.removeItem('flameiptv_username');
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    return { error };
   };
 
-  const isAdmin = username === 'flame143';
-  const isAuthenticated = Boolean(username);
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
+  const isAdmin = user?.email === 'jamesbenavides617@gmail.com';
+  const isAuthenticated = Boolean(user);
 
   return (
     <AuthContext.Provider value={{
-      username,
+      user,
+      session,
       isAdmin,
-      login,
-      logout,
-      isAuthenticated
+      signUp,
+      signIn,
+      signOut,
+      isAuthenticated,
+      isLoading
     }}>
       {children}
     </AuthContext.Provider>

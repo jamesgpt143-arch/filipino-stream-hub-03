@@ -34,7 +34,7 @@ const Comments = () => {
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
   const [totalViews, setTotalViews] = useState<number>(0);
   const { toast } = useToast();
-  const { username, isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
 
   useEffect(() => {
     loadComments();
@@ -85,7 +85,7 @@ const Comments = () => {
     const channel = supabase.channel('comments-page', {
       config: {
         presence: {
-          key: username || 'anonymous_' + Math.random().toString(36).substr(2, 9)
+          key: user?.email || 'anonymous_' + Math.random().toString(36).substr(2, 9)
         }
       }
     });
@@ -106,7 +106,7 @@ const Comments = () => {
         if (status === 'SUBSCRIBED') {
           await channel.track({
             online_at: new Date().toISOString(),
-            username: username || 'Anonymous'
+            username: user?.email || 'Anonymous'
           });
         }
       });
@@ -178,10 +178,10 @@ const Comments = () => {
       const { error } = await supabase
         .from('comments')
         .insert({
-          name: username || 'Anonymous',
+          name: user?.email || 'Anonymous',
           message: newComment.message.trim(),
           facebook_link: newComment.facebook_link.trim() || null,
-          creator_username: username || 'anonymous'
+        creator_username: user?.email || 'anonymous'
         });
 
       if (error) {
@@ -229,9 +229,9 @@ const Comments = () => {
       const { error } = await supabase
         .from('comments')
         .insert({
-          name: username || 'Anonymous',
+          name: user?.email || 'Anonymous',
           message: replyMessage.trim(),
-          creator_username: username || 'anonymous',
+          creator_username: user?.email || 'anonymous',
           reply_to: parentId
         });
 
@@ -267,7 +267,7 @@ const Comments = () => {
 
   const handleDelete = async (commentId: string, commentUsername: string) => {
     // Check permissions
-    if (commentUsername !== username && !isAdmin) {
+    if (commentUsername !== user?.email && !isAdmin) {
       toast({
         title: "Permission Denied",
         description: "You can only delete your own comments",
@@ -369,7 +369,7 @@ const Comments = () => {
                 </Button>
               )}
               
-              {(comment.creator_username === username || isAdmin) && (
+              {(comment.creator_username === user?.email || isAdmin) && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -458,7 +458,7 @@ const Comments = () => {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-xl">Leave a Comment</CardTitle>
-            <p className="text-sm text-muted-foreground">Posting as: {username}</p>
+            <p className="text-sm text-muted-foreground">Posting as: {user?.email || 'Anonymous'}</p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
