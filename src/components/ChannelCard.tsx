@@ -53,6 +53,11 @@ export const ChannelCard = ({ channel, onClick, onToggleHide, onDelete, isHidden
                 {channel.category}
               </p>
             )}
+            {channel.creatorUsername && (
+              <p className="text-xs text-muted-foreground/80 mt-1">
+                Added by: {channel.creatorUsername}
+              </p>
+            )}
           </div>
 
           {/* Action Buttons */}
