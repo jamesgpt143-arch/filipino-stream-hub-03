@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigation } from "./components/Navigation";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Homepage from "./pages/Homepage";
 import Channels from "./pages/Channels";
 import CustomChannels from "./pages/CustomChannels";
@@ -12,10 +13,36 @@ import MovieDetail from "./pages/MovieDetail";
 import TVSeries from "./pages/TVSeries";
 import TVSeriesDetail from "./pages/TVSeriesDetail";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
 import { disableDevTools } from "./utils/disableDevTools";
 import { useEffect } from "react";
 
 const queryClient = new QueryClient();
+
+const AppContent = () => {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Login />;
+  }
+
+  return (
+    <>
+      <Navigation />
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        <Route path="/channels" element={<Channels />} />
+        <Route path="/custom-channels" element={<CustomChannels />} />
+        <Route path="/movies" element={<Movies />} />
+        <Route path="/movie/:id" element={<MovieDetail />} />
+        <Route path="/tv-series" element={<TVSeries />} />
+        <Route path="/tv-series/:id" element={<TVSeriesDetail />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
+  );
+};
 
 const App = () => {
   useEffect(() => {
@@ -24,26 +51,17 @@ const App = () => {
   }, []);
 
   return (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/channels" element={<Channels />} />
-          <Route path="/custom-channels" element={<CustomChannels />} />
-          <Route path="/movies" element={<Movies />} />
-          <Route path="/movie/:id" element={<MovieDetail />} />
-          <Route path="/tv-series" element={<TVSeries />} />
-          <Route path="/tv-series/:id" element={<TVSeriesDetail />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <AuthProvider>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 };
 
