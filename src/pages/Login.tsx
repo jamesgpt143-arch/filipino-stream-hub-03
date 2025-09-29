@@ -7,38 +7,28 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
-  const { signUp, signIn } = useAuth();
+  const { login } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email.trim()) {
+    if (!username.trim()) {
       toast({
         title: "Error",
-        description: "Please enter your email",
+        description: "Please enter a username",
         variant: "destructive"
       });
       return;
     }
 
-    if (!password.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter your password",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (password.length < 6) {
+    if (username.trim().length < 3) {
       toast({
         title: "Error", 
-        description: "Password must be at least 6 characters long",
+        description: "Username must be at least 3 characters long",
         variant: "destructive"
       });
       return;
@@ -46,23 +36,12 @@ const Login = () => {
 
     setIsLoading(true);
     
-    try {
-      const { error } = isSignUp 
-        ? await signUp(email.trim(), password)
-        : await signIn(email.trim(), password);
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
+      try {
+        login(username.trim());
         toast({
           title: isSignUp ? "Account Created!" : "Welcome!",
-          description: isSignUp ? "Please check your email to confirm your account" : "Successfully logged in",
+          description: isSignUp ? `Account created for ${username.trim()}` : `Logged in as ${username.trim()}`,
         });
-      }
     } catch (error) {
       toast({
         title: "Error",
@@ -86,26 +65,15 @@ const Login = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Username</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="username"
+                type="text"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 disabled={isLoading}
                 autoFocus
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
               />
             </div>
             <Button 
@@ -125,6 +93,10 @@ const Login = () => {
             >
               {isSignUp ? 'Already have an account? Login' : "Don't have an account? Sign Up"}
             </Button>
+          </div>
+          
+          <div className="mt-2 text-center text-sm text-muted-foreground">
+            <p>No password required - just enter any username</p>
           </div>
         </CardContent>
       </Card>

@@ -9,11 +9,11 @@ import { useToast } from '@/hooks/use-toast';
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { user, isAdmin, signOut } = useAuth();
+  const { username, isAdmin, logout } = useAuth();
   const { toast } = useToast();
 
-  const handleLogout = async () => {
-    await signOut();
+  const handleLogout = () => {
+    logout();
     toast({
       title: "Logged out",
       description: "You have been logged out successfully",
@@ -79,7 +79,7 @@ export const Navigation = () => {
                 <User className="w-4 h-4 text-primary-foreground/80" />
               )}
               <span className="text-sm font-medium text-primary-foreground">
-                {user?.email} {isAdmin && '(Admin)'}
+                {username} {isAdmin && '(Admin)'}
               </span>
             </div>
             
@@ -141,7 +141,7 @@ export const Navigation = () => {
                   <User className="w-4 h-4 text-primary-foreground/80" />
                 )}
                 <span className="text-sm font-medium text-primary-foreground">
-                  {user?.email} {isAdmin && '(Admin)'}
+                  {username} {isAdmin && '(Admin)'}
                 </span>
               </div>
               

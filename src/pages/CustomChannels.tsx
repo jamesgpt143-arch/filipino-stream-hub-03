@@ -20,7 +20,7 @@ const CustomChannels = () => {
   const [customChannels, setCustomChannels] = useState<Channel[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const { toast } = useToast();
-  const { user, isAdmin } = useAuth();
+  const { username, isAdmin } = useAuth();
 
   // Load custom channels from Supabase on mount
   useEffect(() => {
@@ -126,7 +126,7 @@ const CustomChannels = () => {
     }
 
     // Check if user can delete (their own channel or admin)
-    if (channelToDelete.creatorUsername !== user?.email && !isAdmin) {
+    if (channelToDelete.creatorUsername !== username && !isAdmin) {
       toast({
         title: "Permission Denied",
         description: "You can only delete channels you created. Only admin can delete any channel.",
@@ -232,7 +232,7 @@ const CustomChannels = () => {
 
           {showAddForm && (
             <div className="mt-4">
-              <AddChannelForm onChannelAdded={handleChannelAdded} username={user?.email || 'anonymous'} />
+              <AddChannelForm onChannelAdded={handleChannelAdded} username={username!} />
             </div>
           )}
 
@@ -326,7 +326,7 @@ const CustomChannels = () => {
                   onDelete={handleDeleteChannel}
                   hiddenChannels={hiddenChannels}
                   customChannels={customChannels}
-                  currentUsername={user?.email}
+                  currentUsername={username}
                   isAdmin={isAdmin}
                 />
               </div>
