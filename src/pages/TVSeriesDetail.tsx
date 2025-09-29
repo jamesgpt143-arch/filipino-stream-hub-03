@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { VideoModal } from '@/components/VideoModal';
+import { SeasonEpisodeSelector } from '@/components/SeasonEpisodeSelector';
 import { TVShowCard } from '@/components/TVShowCard';
 import { DonateButton } from '@/components/DonateButton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -18,6 +19,10 @@ const TVSeriesDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedShow, setSelectedShow] = useState<TVShow | null>(null);
   const [selectedServer, setSelectedServer] = useState<string>('');
+  const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
+  const [selectedEpisode, setSelectedEpisode] = useState<number | null>(null);
+  const [episodeTitle, setEpisodeTitle] = useState<string>('');
+  const [showSeasonSelector, setShowSeasonSelector] = useState(false);
 
   useEffect(() => {
     const loadShowData = async () => {
@@ -56,11 +61,30 @@ const TVSeriesDetail = () => {
   const handlePlayShow = (show: TVShow, server: string) => {
     setSelectedShow(show);
     setSelectedServer(server);
+    setShowSeasonSelector(true);
+  };
+
+  const handleEpisodeSelect = (season: number, episode: number, episodeTitle: string) => {
+    setSelectedSeason(season);
+    setSelectedEpisode(episode);
+    setEpisodeTitle(episodeTitle);
+    setShowSeasonSelector(false);
   };
 
   const handleClosePlayer = () => {
     setSelectedShow(null);
     setSelectedServer('');
+    setSelectedSeason(null);
+    setSelectedEpisode(null);
+    setEpisodeTitle('');
+    setShowSeasonSelector(false);
+  };
+
+  const handleBackToServerSelection = () => {
+    setShowSeasonSelector(false);
+    setSelectedSeason(null);
+    setSelectedEpisode(null);
+    setEpisodeTitle('');
   };
 
   if (loading) {
@@ -184,12 +208,26 @@ const TVSeriesDetail = () => {
         </div>
       </div>
 
+      {/* Season/Episode Selector Modal */}
+      {selectedShow && showSeasonSelector && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-2xl">
+            <SeasonEpisodeSelector
+              show={selectedShow}
+              server={selectedServer}
+              onEpisodeSelect={handleEpisodeSelect}
+              onBack={handleBackToServerSelection}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Video Modal */}
-      {selectedShow && (
+      {selectedShow && selectedSeason !== null && selectedEpisode !== null && (
         <VideoModal
-          isOpen={!!selectedShow}
-          title={selectedShow.name}
-          videoUrl={tmdbApi.getTVEpisodeStreamUrls(selectedShow.id, 1, 1)[selectedServer]}
+          isOpen={!showSeasonSelector && !!selectedShow && selectedSeason !== null && selectedEpisode !== null}
+          title={`${selectedShow.name} - S${selectedSeason}E${selectedEpisode}: ${episodeTitle}`}
+          videoUrl={tmdbApi.getTVEpisodeStreamUrls(selectedShow.id, selectedSeason, selectedEpisode)[selectedServer]}
           onClose={handleClosePlayer}
         />
       )}

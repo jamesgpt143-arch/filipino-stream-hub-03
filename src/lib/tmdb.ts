@@ -21,6 +21,7 @@ export interface TVShow {
   first_air_date: string;
   vote_average: number;
   genre_ids: number[];
+  seasons?: Season[];
 }
 
 export interface Season {
@@ -28,7 +29,10 @@ export interface Season {
   name: string;
   season_number: number;
   episode_count: number;
-  poster_path: string;
+  poster_path: string | null;
+  air_date: string;
+  overview: string;
+  episodes?: Episode[];
 }
 
 export interface Episode {
@@ -36,8 +40,9 @@ export interface Episode {
   name: string;
   episode_number: number;
   overview: string;
-  still_path: string;
+  still_path: string | null;
   air_date: string;
+  runtime: number | null;
 }
 
 export const tmdbApi = {
@@ -74,6 +79,12 @@ export const tmdbApi = {
   // Get TV show details
   getTVShowDetails: async (showId: number): Promise<TVShow> => {
     const response = await fetch(`${API_BASE_URL}/tv/${showId}?api_key=${API_KEY}`);
+    return response.json();
+  },
+
+  // Get TV season details
+  getTVSeasonDetails: async (showId: number, seasonNumber: number): Promise<Season> => {
+    const response = await fetch(`${API_BASE_URL}/tv/${showId}/season/${seasonNumber}?api_key=${API_KEY}`);
     return response.json();
   },
 
