@@ -1,8 +1,6 @@
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { Button } from './ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
-import { Star, Play, ChevronDown } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { TVShow, tmdbApi } from '@/lib/tmdb';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,32 +25,6 @@ export const TVShowCard = ({ show, onPlay }: TVShowCardProps) => {
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                className="opacity-0 group-hover:opacity-100 bg-primary text-primary-foreground transform scale-75 group-hover:scale-100 transition-all duration-300 hover:bg-primary/90"
-                size="sm"
-              >
-                <Play className="w-4 h-4 mr-1 fill-current" />
-                Play
-                <ChevronDown className="w-3 h-3 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-background border-border">
-              {Object.keys(servers).map((server) => (
-                <DropdownMenuItem
-                  key={server}
-                  onClick={() => onPlay(show, server)}
-                  className="cursor-pointer hover:bg-muted"
-                >
-                  <Play className="w-4 h-4 mr-2" />
-                  {server}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
         <div className="absolute top-2 right-2">
           <Badge variant="secondary" className="bg-background/80 text-foreground">
             <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
