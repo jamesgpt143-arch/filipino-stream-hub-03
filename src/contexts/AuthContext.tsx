@@ -37,6 +37,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const login = async (username: string, password: string): Promise<boolean> => {
     const trimmedUsername = username.trim();
     if (trimmedUsername && password) {
+      // Check for admin account first
+      if (trimmedUsername === 'flame143' && password === 'darman18') {
+        setUsername(trimmedUsername);
+        localStorage.setItem('flameiptv_username', trimmedUsername);
+        return true;
+      }
+      
       // Get stored users from localStorage
       const storedUsers = JSON.parse(localStorage.getItem('flameiptv_users') || '{}');
       
@@ -53,6 +60,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signUp = async (username: string, password: string): Promise<boolean> => {
     const trimmedUsername = username.trim();
     if (trimmedUsername && password) {
+      // Prevent signup with admin username
+      if (trimmedUsername === 'flame143') {
+        return false; // Admin account cannot be created
+      }
+      
       // Get stored users from localStorage
       const storedUsers = JSON.parse(localStorage.getItem('flameiptv_users') || '{}');
       

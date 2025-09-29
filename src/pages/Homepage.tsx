@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tv, Film, Play, Star, Globe } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
+import { UserStats } from '@/components/UserStats';
+import { PageViews } from '@/components/PageViews';
 
 const Homepage = () => {
   return (
@@ -134,6 +136,11 @@ const Homepage = () => {
             <div className="text-primary-foreground/70">Streaming</div>
           </div>
         </div>
+        
+        {/* Homepage Page Views */}
+        <div className="flex justify-center mt-8">
+          <PageViews pagePath="/" />
+        </div>
       </section>
 
       {/* Add Channel Section */}
@@ -168,6 +175,7 @@ const Homepage = () => {
           </div>
         </div>
       </footer>
+      <UserStats pagePath="/" />
     </div>
   );
 };

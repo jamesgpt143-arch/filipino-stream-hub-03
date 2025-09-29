@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Info } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
+import { UserStats } from '@/components/UserStats';
 
 const TVSeries = () => {
   const [shows, setShows] = useState<TVShow[]>([]);
@@ -297,6 +298,7 @@ const TVSeries = () => {
           </div>
         </div>
       </footer>
+      <UserStats pagePath="/tv-series" />
     </div>
   );
 };

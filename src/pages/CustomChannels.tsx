@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search, Eye, EyeOff, Plus } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
+import { UserStats } from '@/components/UserStats';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -346,6 +347,7 @@ const CustomChannels = () => {
           </div>
         </div>
       </footer>
+      <UserStats pagePath="/custom-channels" />
     </div>
   );
 };

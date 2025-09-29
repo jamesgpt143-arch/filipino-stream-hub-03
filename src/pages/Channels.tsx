@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Eye, EyeOff } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
+import { UserStats } from '@/components/UserStats';
 
 const Channels = () => {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
@@ -157,6 +158,7 @@ const Channels = () => {
           </div>
         </div>
       </footer>
+      <UserStats pagePath="/channels" />
     </div>
   );
 };
