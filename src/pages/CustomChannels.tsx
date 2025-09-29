@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Search, Eye, EyeOff, Plus } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 const CustomChannels = () => {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
@@ -19,6 +20,7 @@ const CustomChannels = () => {
   const [customChannels, setCustomChannels] = useState<Channel[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const { toast } = useToast();
+  const { username, isAdmin } = useAuth();
 
   // Load custom channels from Supabase on mount
   useEffect(() => {
@@ -46,6 +48,7 @@ const CustomChannels = () => {
           type: channel.type as 'mpd' | 'hls' | 'youtube',
           logo: channel.logo,
           category: channel.category || 'Custom',
+          creatorUsername: channel.creator_username,
           ...(channel.clear_key ? { clearKey: channel.clear_key as Record<string, string> } : {}),
           ...(channel.embed_url ? { embedUrl: channel.embed_url } : {}),
           ...(channel.youtube_channel_id ? { youtubeChannelId: channel.youtube_channel_id } : {}),
@@ -110,6 +113,28 @@ const CustomChannels = () => {
   };
 
   const handleDeleteChannel = async (channelName: string) => {
+    // Get the channel to check if user can delete it
+    const channelToDelete = customChannels.find(ch => ch.name === channelName);
+    
+    if (!channelToDelete) {
+      toast({
+        title: "Error",
+        description: "Channel not found",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check if user can delete (their own channel or admin)
+    if (channelToDelete.creatorUsername !== username && !isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "You can only delete channels you created. Only admin can delete any channel.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('custom_channels')
@@ -120,7 +145,7 @@ const CustomChannels = () => {
         console.error('Error deleting channel:', error);
         toast({
           title: "Error",
-          description: "Failed to delete channel. You can only delete channels you created.",
+          description: "Failed to delete channel. Please try again.",
           variant: "destructive"
         });
         return;
@@ -171,6 +196,7 @@ const CustomChannels = () => {
         type: channel.type as 'mpd' | 'hls' | 'youtube',
         logo: channel.logo,
         category: channel.category || 'Custom',
+        creatorUsername: channel.creator_username,
         ...(channel.clear_key ? { clearKey: channel.clear_key as Record<string, string> } : {}),
         ...(channel.embed_url ? { embedUrl: channel.embed_url } : {}),
         ...(channel.youtube_channel_id ? { youtubeChannelId: channel.youtube_channel_id } : {}),
@@ -206,7 +232,7 @@ const CustomChannels = () => {
 
           {showAddForm && (
             <div className="mt-4">
-              <AddChannelForm onChannelAdded={handleChannelAdded} />
+              <AddChannelForm onChannelAdded={handleChannelAdded} username={username!} />
             </div>
           )}
 
@@ -300,6 +326,8 @@ const CustomChannels = () => {
                   onDelete={handleDeleteChannel}
                   hiddenChannels={hiddenChannels}
                   customChannels={customChannels}
+                  currentUsername={username}
+                  isAdmin={isAdmin}
                 />
               </div>
             </div>

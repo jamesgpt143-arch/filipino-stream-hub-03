@@ -11,9 +11,10 @@ interface ChannelCardProps {
   onDelete?: (channelName: string) => void;
   isHidden?: boolean;
   isCustom?: boolean;
+  canDelete?: boolean;
 }
 
-export const ChannelCard = ({ channel, onClick, onToggleHide, onDelete, isHidden, isCustom }: ChannelCardProps) => {
+export const ChannelCard = ({ channel, onClick, onToggleHide, onDelete, isHidden, isCustom, canDelete }: ChannelCardProps) => {
   return (
     <Card 
       className="bg-gradient-card hover:shadow-glow border-border/30 cursor-pointer group transition-spring overflow-hidden backdrop-blur-sm hover:border-primary/30"
@@ -86,7 +87,7 @@ export const ChannelCard = ({ channel, onClick, onToggleHide, onDelete, isHidden
             )}
             
             {/* Delete Button (only for custom channels) */}
-            {isCustom && onDelete && (
+            {isCustom && onDelete && canDelete && (
               <Button
                 variant="ghost"
                 size="sm"

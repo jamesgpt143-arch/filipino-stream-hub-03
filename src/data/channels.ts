@@ -11,6 +11,7 @@ export interface Channel {
   youtubeChannelId?: string; // For detecting multiple streams
   hasMultipleStreams?: boolean; // Flag to indicate if channel has multiple streams
   referer?: string; // Custom referer header for requests
+  creatorUsername?: string;
 }
 
 export const channels: Channel[] = [

@@ -8,9 +8,20 @@ interface ChannelGridProps {
   onDelete?: (channelName: string) => void;
   hiddenChannels?: Set<string>;
   customChannels?: Channel[];
+  currentUsername?: string;
+  isAdmin?: boolean;
 }
 
-export const ChannelGrid = ({ channels, onChannelSelect, onToggleHide, onDelete, hiddenChannels, customChannels = [] }: ChannelGridProps) => {
+export const ChannelGrid = ({ 
+  channels, 
+  onChannelSelect, 
+  onToggleHide, 
+  onDelete, 
+  hiddenChannels, 
+  customChannels = [],
+  currentUsername,
+  isAdmin = false
+}: ChannelGridProps) => {
   if (channels.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -54,6 +65,8 @@ export const ChannelGrid = ({ channels, onChannelSelect, onToggleHide, onDelete,
             onDelete={onDelete}
             isHidden={hiddenChannels?.has(channel.name)}
             isCustom={customChannels.some(customChannel => customChannel.name === channel.name)}
+            canDelete={customChannels.some(customChannel => customChannel.name === channel.name) && 
+                      (channel.creatorUsername === currentUsername || isAdmin)}
           />
         </div>
       ))}

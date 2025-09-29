@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tv, Film, Play, Star, Globe } from 'lucide-react';
-import { AddChannelForm } from '@/components/AddChannelForm';
 import { DonateButton } from '@/components/DonateButton';
 
 const Homepage = () => {
@@ -144,12 +143,17 @@ const Homepage = () => {
             Add Your Own Channels
           </h2>
           <p className="text-primary-foreground/70 text-lg max-w-2xl mx-auto">
-            Expand your viewing experience by adding custom IPTV channels
+            Expand your viewing experience by adding custom IPTV channels. Login to start adding channels.
           </p>
         </div>
         
-        <div className="max-w-4xl mx-auto">
-          <AddChannelForm />
+        <div className="max-w-4xl mx-auto text-center">
+          <Button asChild size="lg" className="bg-accent text-accent-foreground shadow-glow hover:shadow-glow-intense">
+            <Link to="/custom-channels" className="flex items-center gap-2">
+              <Tv className="w-5 h-5" />
+              Manage Custom Channels
+            </Link>
+          </Button>
         </div>
       </section>
 

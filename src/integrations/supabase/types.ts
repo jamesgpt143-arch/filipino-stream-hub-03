@@ -50,33 +50,33 @@ export type Database = {
       comments: {
         Row: {
           created_at: string
+          creator_username: string
           facebook_link: string | null
           id: string
           message: string
           name: string
           reply_to: string | null
           updated_at: string
-          user_id: string
         }
         Insert: {
           created_at?: string
+          creator_username?: string
           facebook_link?: string | null
           id?: string
           message: string
           name: string
           reply_to?: string | null
           updated_at?: string
-          user_id: string
         }
         Update: {
           created_at?: string
+          creator_username?: string
           facebook_link?: string | null
           id?: string
           message?: string
           name?: string
           reply_to?: string | null
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -93,6 +93,7 @@ export type Database = {
           category: string | null
           clear_key: Json | null
           created_at: string
+          creator_username: string
           embed_url: string | null
           has_multiple_streams: boolean | null
           id: string
@@ -101,13 +102,13 @@ export type Database = {
           name: string
           type: string
           updated_at: string
-          user_id: string
           youtube_channel_id: string | null
         }
         Insert: {
           category?: string | null
           clear_key?: Json | null
           created_at?: string
+          creator_username?: string
           embed_url?: string | null
           has_multiple_streams?: boolean | null
           id?: string
@@ -116,13 +117,13 @@ export type Database = {
           name: string
           type: string
           updated_at?: string
-          user_id: string
           youtube_channel_id?: string | null
         }
         Update: {
           category?: string | null
           clear_key?: Json | null
           created_at?: string
+          creator_username?: string
           embed_url?: string | null
           has_multiple_streams?: boolean | null
           id?: string
@@ -131,7 +132,6 @@ export type Database = {
           name?: string
           type?: string
           updated_at?: string
-          user_id?: string
           youtube_channel_id?: string | null
         }
         Relationships: []

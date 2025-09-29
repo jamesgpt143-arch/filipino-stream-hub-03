@@ -34,10 +34,11 @@ interface Channel {
 }
 
 interface AddChannelFormProps {
-  onChannelAdded?: (channel: Channel) => void;
+  onChannelAdded: () => void;
+  username: string;
 }
 
-const AddChannelForm = ({ onChannelAdded }: AddChannelFormProps) => {
+const AddChannelForm = ({ onChannelAdded, username }: AddChannelFormProps) => {
   const [formData, setFormData] = useState<ChannelFormData>({
     name: '',
     manifestUri: '',
@@ -131,22 +132,10 @@ const AddChannelForm = ({ onChannelAdded }: AddChannelFormProps) => {
 
     // Save to Supabase
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "You need to be logged in to add channels. Please sign up or log in.",
-          variant: "destructive"
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
       const { error } = await supabase
         .from('custom_channels')
         .insert({
-          user_id: user.id,
+          creator_username: username,
           name: newChannel.name,
           manifest_uri: newChannel.manifestUri,
           type: newChannel.type,
@@ -172,9 +161,9 @@ const AddChannelForm = ({ onChannelAdded }: AddChannelFormProps) => {
       console.log('Saved channel to Supabase:', newChannel);
       
       if (onChannelAdded) {
-        onChannelAdded(newChannel);
+        onChannelAdded();
       }
-      
+  
       toast({
         title: "Channel Added Successfully!",
         description: `${formData.name} has been added and is now visible to everyone!`,
