@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigation } from "./components/Navigation";
 import Homepage from "./pages/Homepage";
 import Channels from "./pages/Channels";
+import CustomChannels from "./pages/CustomChannels";
 import Movies from "./pages/Movies";
 import MovieDetail from "./pages/MovieDetail";
 import TVSeries from "./pages/TVSeries";
@@ -32,6 +33,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/channels" element={<Channels />} />
+          <Route path="/custom-channels" element={<CustomChannels />} />
           <Route path="/movies" element={<Movies />} />
           <Route path="/movie/:id" element={<MovieDetail />} />
           <Route path="/tv-series" element={<TVSeries />} />

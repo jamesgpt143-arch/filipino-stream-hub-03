@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { ChannelGrid } from '@/components/ChannelGrid';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { channels, Channel } from '@/data/channels';
@@ -13,25 +13,12 @@ const Channels = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [hiddenChannels, setHiddenChannels] = useState<Set<string>>(new Set());
   const [showHidden, setShowHidden] = useState(false);
-  const [customChannels, setCustomChannels] = useState<Channel[]>([]);
   const { toast } = useToast();
 
-  // Load custom channels from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('customChannels');
-      if (saved) {
-        setCustomChannels(JSON.parse(saved));
-      }
-    } catch (error) {
-      console.error('Error loading custom channels:', error);
-    }
-  }, []);
-
-  // Combine static and custom channels
+  // Only show static IPTV channels
   const allChannels = useMemo(() => {
-    return [...channels, ...customChannels];
-  }, [customChannels]);
+    return channels;
+  }, []);
 
   const filteredChannels = useMemo(() => {
     return allChannels.filter(channel => {
@@ -77,29 +64,8 @@ const Channels = () => {
   };
 
   const handleDeleteChannel = (channelName: string) => {
-    try {
-      const updatedCustomChannels = customChannels.filter(channel => channel.name !== channelName);
-      localStorage.setItem('customChannels', JSON.stringify(updatedCustomChannels));
-      setCustomChannels(updatedCustomChannels);
-      
-      // Also remove from hidden channels if it was hidden
-      if (hiddenChannels.has(channelName)) {
-        const newHiddenChannels = new Set(hiddenChannels);
-        newHiddenChannels.delete(channelName);
-        setHiddenChannels(newHiddenChannels);
-      }
-      
-      toast({
-        title: "Channel Deleted",
-        description: `${channelName} has been removed from your channels`,
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete channel. Please try again.",
-        variant: "destructive"
-      });
-    }
+    // This function is not used for IPTV channels as they cannot be deleted
+    console.log('Delete not available for IPTV channels:', channelName);
   };
 
   return (
@@ -158,7 +124,7 @@ const Channels = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-foreground">
-                  All Channels
+                  IPTV Channels
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   {filteredChannels.length} channel{filteredChannels.length !== 1 ? 's' : ''} available
@@ -167,14 +133,14 @@ const Channels = () => {
             </div>
 
             <div className="overflow-y-auto max-h-[calc(100vh-250px)]">
-              <ChannelGrid
-                channels={filteredChannels}
-                onChannelSelect={handleChannelSelect}
-                onToggleHide={handleToggleHide}
-                onDelete={handleDeleteChannel}
-                hiddenChannels={hiddenChannels}
-                customChannels={customChannels}
-              />
+                <ChannelGrid
+                  channels={filteredChannels}
+                  onChannelSelect={handleChannelSelect}
+                  onToggleHide={handleToggleHide}
+                  onDelete={handleDeleteChannel}
+                  hiddenChannels={hiddenChannels}
+                  customChannels={[]}
+                />
             </div>
           </div>
         </div>
