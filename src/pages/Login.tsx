@@ -8,9 +8,10 @@ import { useToast } from '@/hooks/use-toast';
 
 const Login = () => {
   const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
-  const { login } = useAuth();
+  const { login, signUp } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,6 +26,15 @@ const Login = () => {
       return;
     }
 
+    if (!password.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a password",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (username.trim().length < 3) {
       toast({
         title: "Error", 
@@ -34,14 +44,49 @@ const Login = () => {
       return;
     }
 
+    if (password.length < 4) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 4 characters long",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     
-      try {
-        login(username.trim());
-        toast({
-          title: isSignUp ? "Account Created!" : "Welcome!",
-          description: isSignUp ? `Account created for ${username.trim()}` : `Logged in as ${username.trim()}`,
-        });
+    try {
+      let success = false;
+      
+      if (isSignUp) {
+        success = await signUp(username.trim(), password);
+        if (success) {
+          toast({
+            title: "Account Created!",
+            description: `Account created for ${username.trim()}`,
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Username already exists. Please choose a different username.",
+            variant: "destructive"
+          });
+        }
+      } else {
+        success = await login(username.trim(), password);
+        if (success) {
+          toast({
+            title: "Welcome!",
+            description: `Logged in as ${username.trim()}`,
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Invalid username or password.",
+            variant: "destructive"
+          });
+        }
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -76,6 +121,17 @@ const Login = () => {
                 autoFocus
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
             <Button 
               type="submit" 
               className="w-full"
@@ -96,7 +152,7 @@ const Login = () => {
           </div>
           
           <div className="mt-2 text-center text-sm text-muted-foreground">
-            <p>No password required - just enter any username</p>
+            <p>Enter your username and password to continue</p>
           </div>
         </CardContent>
       </Card>

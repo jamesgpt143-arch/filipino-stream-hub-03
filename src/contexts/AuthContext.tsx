@@ -3,7 +3,8 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 interface AuthContextType {
   username: string | null;
   isAdmin: boolean;
-  login: (username: string) => void;
+  login: (username: string, password: string) => Promise<boolean>;
+  signUp: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -33,12 +34,43 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, []);
 
-  const login = (username: string) => {
+  const login = async (username: string, password: string): Promise<boolean> => {
     const trimmedUsername = username.trim();
-    if (trimmedUsername) {
+    if (trimmedUsername && password) {
+      // Get stored users from localStorage
+      const storedUsers = JSON.parse(localStorage.getItem('flameiptv_users') || '{}');
+      
+      // Check if user exists and password matches
+      if (storedUsers[trimmedUsername] && storedUsers[trimmedUsername] === password) {
+        setUsername(trimmedUsername);
+        localStorage.setItem('flameiptv_username', trimmedUsername);
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const signUp = async (username: string, password: string): Promise<boolean> => {
+    const trimmedUsername = username.trim();
+    if (trimmedUsername && password) {
+      // Get stored users from localStorage
+      const storedUsers = JSON.parse(localStorage.getItem('flameiptv_users') || '{}');
+      
+      // Check if user already exists
+      if (storedUsers[trimmedUsername]) {
+        return false; // User already exists
+      }
+      
+      // Create new user
+      storedUsers[trimmedUsername] = password;
+      localStorage.setItem('flameiptv_users', JSON.stringify(storedUsers));
+      
+      // Auto login after signup
       setUsername(trimmedUsername);
       localStorage.setItem('flameiptv_username', trimmedUsername);
+      return true;
     }
+    return false;
   };
 
   const logout = () => {
@@ -54,6 +86,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       username,
       isAdmin,
       login,
+      signUp,
       logout,
       isAuthenticated
     }}>
