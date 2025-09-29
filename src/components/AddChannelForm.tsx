@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Link, Play } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ChannelFormData {
   name: string;
@@ -128,13 +129,47 @@ const AddChannelForm = ({ onChannelAdded }: AddChannelFormProps) => {
       } : {})
     };
 
-    // Save to localStorage
+    // Save to Supabase
     try {
-      const existingChannels = JSON.parse(localStorage.getItem('customChannels') || '[]');
-      const updatedChannels = [...existingChannels, newChannel];
-      localStorage.setItem('customChannels', JSON.stringify(updatedChannels));
+      const { data: { user } } = await supabase.auth.getUser();
       
-      console.log('Saved channel to localStorage:', newChannel);
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "You need to be logged in to add channels. Please sign up or log in.",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const { error } = await supabase
+        .from('custom_channels')
+        .insert({
+          user_id: user.id,
+          name: newChannel.name,
+          manifest_uri: newChannel.manifestUri,
+          type: newChannel.type,
+          logo: newChannel.logo,
+          category: newChannel.category,
+          ...(processedClearKey ? { clear_key: processedClearKey } : {}),
+          ...(embedUrl ? { embed_url: embedUrl } : {}),
+          ...(youtubeChannelId ? { youtube_channel_id: youtubeChannelId } : {}),
+          ...(hasMultipleStreams !== undefined ? { has_multiple_streams: hasMultipleStreams } : {})
+        });
+
+      if (error) {
+        console.error('Error saving channel to Supabase:', error);
+        toast({
+          title: "Error Adding Channel", 
+          description: "Failed to save channel to database. Please try again.",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      
+      console.log('Saved channel to Supabase:', newChannel);
       
       if (onChannelAdded) {
         onChannelAdded(newChannel);
@@ -142,7 +177,7 @@ const AddChannelForm = ({ onChannelAdded }: AddChannelFormProps) => {
       
       toast({
         title: "Channel Added Successfully!",
-        description: `${formData.name} has been added to your channels`,
+        description: `${formData.name} has been added and is now visible to everyone!`,
       });
       
       // Reset form
@@ -155,6 +190,7 @@ const AddChannelForm = ({ onChannelAdded }: AddChannelFormProps) => {
         clearKey: ''
       });
     } catch (error) {
+      console.error('Error adding channel:', error);
       toast({
         title: "Error Adding Channel",
         description: "Failed to save channel. Please try again.",

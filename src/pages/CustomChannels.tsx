@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search, Eye, EyeOff, Plus } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
+import { supabase } from '@/integrations/supabase/client';
 
 const CustomChannels = () => {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
@@ -19,17 +20,51 @@ const CustomChannels = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const { toast } = useToast();
 
-  // Load custom channels from localStorage on mount
+  // Load custom channels from Supabase on mount
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('customChannels');
-      if (saved) {
-        setCustomChannels(JSON.parse(saved));
+    const loadChannels = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('custom_channels')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error loading custom channels:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load channels. Please refresh the page.",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        // Convert Supabase data to Channel format
+        const channels: Channel[] = data.map(channel => ({
+          name: channel.name,
+          manifestUri: channel.manifest_uri,
+          type: channel.type as 'mpd' | 'hls' | 'youtube',
+          logo: channel.logo,
+          category: channel.category || 'Custom',
+          ...(channel.clear_key ? { clearKey: channel.clear_key as Record<string, string> } : {}),
+          ...(channel.embed_url ? { embedUrl: channel.embed_url } : {}),
+          ...(channel.youtube_channel_id ? { youtubeChannelId: channel.youtube_channel_id } : {}),
+          ...(channel.has_multiple_streams !== null ? { hasMultipleStreams: channel.has_multiple_streams } : {})
+        }));
+
+        setCustomChannels(channels);
+      } catch (error) {
+        console.error('Error loading custom channels:', error);
+        toast({
+          title: "Error", 
+          description: "Failed to load channels. Please try again.",
+          variant: "destructive"
+        });
       }
-    } catch (error) {
-      console.error('Error loading custom channels:', error);
-    }
-  }, []);
+    };
+
+    loadChannels();
+  }, [toast]);
 
   const filteredChannels = useMemo(() => {
     return customChannels.filter(channel => {
@@ -74,10 +109,25 @@ const CustomChannels = () => {
     setHiddenChannels(newHiddenChannels);
   };
 
-  const handleDeleteChannel = (channelName: string) => {
+  const handleDeleteChannel = async (channelName: string) => {
     try {
+      const { error } = await supabase
+        .from('custom_channels')
+        .delete()
+        .eq('name', channelName);
+
+      if (error) {
+        console.error('Error deleting channel:', error);
+        toast({
+          title: "Error",
+          description: "Failed to delete channel. You can only delete channels you created.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Update local state
       const updatedCustomChannels = customChannels.filter(channel => channel.name !== channelName);
-      localStorage.setItem('customChannels', JSON.stringify(updatedCustomChannels));
       setCustomChannels(updatedCustomChannels);
       
       // Also remove from hidden channels if it was hidden
@@ -89,9 +139,10 @@ const CustomChannels = () => {
       
       toast({
         title: "Channel Deleted",
-        description: `${channelName} has been removed from your channels`,
+        description: `${channelName} has been removed`,
       });
     } catch (error) {
+      console.error('Error deleting channel:', error);
       toast({
         title: "Error",
         description: "Failed to delete channel. Please try again.",
@@ -100,13 +151,33 @@ const CustomChannels = () => {
     }
   };
 
-  const handleChannelAdded = () => {
-    // Reload custom channels from localStorage
+  const handleChannelAdded = async () => {
+    // Reload custom channels from Supabase
     try {
-      const saved = localStorage.getItem('customChannels');
-      if (saved) {
-        setCustomChannels(JSON.parse(saved));
+      const { data, error } = await supabase
+        .from('custom_channels')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error reloading custom channels:', error);
+        return;
       }
+
+      // Convert Supabase data to Channel format
+      const channels: Channel[] = data.map(channel => ({
+        name: channel.name,
+        manifestUri: channel.manifest_uri,
+        type: channel.type as 'mpd' | 'hls' | 'youtube',
+        logo: channel.logo,
+        category: channel.category || 'Custom',
+        ...(channel.clear_key ? { clearKey: channel.clear_key as Record<string, string> } : {}),
+        ...(channel.embed_url ? { embedUrl: channel.embed_url } : {}),
+        ...(channel.youtube_channel_id ? { youtubeChannelId: channel.youtube_channel_id } : {}),
+        ...(channel.has_multiple_streams !== null ? { hasMultipleStreams: channel.has_multiple_streams } : {})
+      }));
+
+      setCustomChannels(channels);
       setShowAddForm(false);
     } catch (error) {
       console.error('Error reloading custom channels:', error);
