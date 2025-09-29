@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { MessageCircle, Send, User, Clock, Reply, Trash2 } from 'lucide-react';
+import { MessageCircle, Send, User, Clock, Reply, Trash2, Users, Eye } from 'lucide-react';
 
 interface Comment {
   id: string;
@@ -31,12 +31,90 @@ const Comments = () => {
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyMessage, setReplyMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState<number>(0);
+  const [totalViews, setTotalViews] = useState<number>(0);
   const { toast } = useToast();
   const { username, isAdmin } = useAuth();
 
   useEffect(() => {
     loadComments();
+    trackPageVisit();
+    loadPageViews();
+    setupPresence();
   }, []);
+
+  const trackPageVisit = async () => {
+    try {
+      const visitorId = localStorage.getItem('visitor_id') || generateVisitorId();
+      localStorage.setItem('visitor_id', visitorId);
+
+      await supabase.functions.invoke('track-visit', {
+        body: {
+          page_path: '/comments',
+          visitor_id: visitorId
+        }
+      });
+    } catch (error) {
+      console.error('Error tracking visit:', error);
+    }
+  };
+
+  const generateVisitorId = () => {
+    return 'visitor_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+  };
+
+  const loadPageViews = async () => {
+    try {
+      const { count, error } = await supabase
+        .from('visits')
+        .select('*', { count: 'exact', head: true })
+        .eq('page_path', '/comments');
+
+      if (error) {
+        console.error('Error loading page views:', error);
+        return;
+      }
+
+      setTotalViews(count || 0);
+    } catch (error) {
+      console.error('Error loading page views:', error);
+    }
+  };
+
+  const setupPresence = () => {
+    const channel = supabase.channel('comments-page', {
+      config: {
+        presence: {
+          key: username || 'anonymous_' + Math.random().toString(36).substr(2, 9)
+        }
+      }
+    });
+
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState();
+        const users = Object.keys(state).length;
+        setOnlineUsers(users);
+      })
+      .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+        console.log('User joined:', key, newPresences);
+      })
+      .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+        console.log('User left:', key, leftPresences);
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({
+            online_at: new Date().toISOString(),
+            username: username || 'Anonymous'
+          });
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  };
 
   const loadComments = async () => {
     try {
@@ -354,11 +432,26 @@ const Comments = () => {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
-            <MessageCircle className="w-8 h-8 text-primary" />
-            Comments
-          </h1>
-          <p className="text-muted-foreground">Share your thoughts and connect with other viewers</p>
+          <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
+                <MessageCircle className="w-8 h-8 text-primary" />
+                Comments
+              </h1>
+              <p className="text-muted-foreground">Share your thoughts and connect with other viewers</p>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg">
+                <Users className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium">{onlineUsers} Online</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-secondary/50 rounded-lg">
+                <Eye className="w-4 h-4 text-secondary-foreground" />
+                <span className="text-sm font-medium">{totalViews.toLocaleString()} Views</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Comment Form */}
