@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import { disableDevTools } from "./utils/disableDevTools";
 import { useEffect } from "react";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,13 @@ const App = () => {
   useEffect(() => {
     // Initialize developer tools protection
     disableDevTools();
+    
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
   }, []);
 
   return (
@@ -57,6 +65,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <PWAInstallPrompt />
         <AuthProvider>
           <BrowserRouter>
             <AppContent />
