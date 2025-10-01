@@ -11,9 +11,9 @@ const Homepage = () => {
   const [totalUsers, setTotalUsers] = useState(0);
 
   useEffect(() => {
-    // Count users from localStorage
+    // Count users from localStorage + admin account (flame143)
     const storedUsers = JSON.parse(localStorage.getItem('flameiptv_users') || '{}');
-    const userCount = Object.keys(storedUsers).length;
+    const userCount = Object.keys(storedUsers).length + 1; // +1 for admin
     setTotalUsers(userCount);
   }, []);
 
