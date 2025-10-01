@@ -28,11 +28,11 @@ export const Header = ({
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="bg-accent p-2 lg:p-3 rounded-lg shadow-glow">
-              <Tv className="w-6 h-6 lg:w-8 lg:h-8 text-accent-foreground" />
+            <div className="bg-accent p-2 rounded-lg shadow-glow">
+              <Tv className="w-6 h-6 text-accent-foreground" />
             </div>
             <div>
-              <h1 className="text-xl lg:text-3xl font-bold text-primary-foreground">
+              <h1 className="text-xl font-bold text-primary-foreground">
                 flameiptv
               </h1>
               <Clock />
@@ -40,14 +40,14 @@ export const Header = ({
           </div>
 
           {/* Search */}
-          <div className="flex-1 max-w-md lg:max-w-2xl">
+          <div className="flex-1 max-w-md">
             <div className="relative">
-              <Search className="absolute left-3 lg:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 lg:w-6 lg:h-6 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Search channels..."
                 value={searchTerm}
                 onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-10 lg:pl-14 lg:h-14 lg:text-lg bg-background/50 border-border/50 focus:bg-background transition-all"
+                className="pl-10 bg-background/50 border-border/50 focus:bg-background transition-all"
               />
             </div>
           </div>
@@ -65,12 +65,12 @@ export const Header = ({
 
         {/* Categories Row */}
         <div className={`mt-4 ${showCategories ? 'block' : 'hidden md:block'}`}>
-          <div className="flex flex-wrap gap-2 lg:gap-3">
+          <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
               <Badge
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}
-                className={`cursor-pointer transition-all lg:text-lg lg:px-4 lg:py-2 ${
+                className={`cursor-pointer transition-all ${
                   selectedCategory === category
                     ? 'bg-accent text-accent-foreground shadow-glow'
                     : 'bg-background/50 text-foreground hover:bg-accent/20 border-border/50'
@@ -78,14 +78,6 @@ export const Header = ({
                 onClick={() => {
                   onCategoryChange(category);
                   setShowCategories(false);
-                }}
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onCategoryChange(category);
-                    setShowCategories(false);
-                  }
                 }}
               >
                 {category}

@@ -18,7 +18,6 @@ import Login from "./pages/Login";
 import { disableDevTools } from "./utils/disableDevTools";
 import { useEffect } from "react";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
-import { TVModeIndicator } from "./components/TVModeIndicator";
 
 const queryClient = new QueryClient();
 
@@ -32,7 +31,6 @@ const AppContent = () => {
   return (
     <>
       <Navigation />
-      <TVModeIndicator />
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/channels" element={<Channels />} />

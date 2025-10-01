@@ -51,7 +51,7 @@ export const ChannelGrid = ({
   }
 
   return (
-    <div className="space-y-4 lg:space-y-5">
+    <div className="space-y-3">
       {channels.map((channel, index) => (
         <div 
           key={`${channel.name}-${index}`}
