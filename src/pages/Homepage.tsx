@@ -1,12 +1,22 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tv, Film, Play, Star, Globe } from 'lucide-react';
+import { Tv, Film, Play, Star, Globe, Users } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
 import { UserStats } from '@/components/UserStats';
 import { PageViews } from '@/components/PageViews';
 
 const Homepage = () => {
+  const [totalUsers, setTotalUsers] = useState(0);
+
+  useEffect(() => {
+    // Count users from localStorage
+    const storedUsers = JSON.parse(localStorage.getItem('flameiptv_users') || '{}');
+    const userCount = Object.keys(storedUsers).length;
+    setTotalUsers(userCount);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-hero">
       {/* Hero Section */}
@@ -122,7 +132,7 @@ const Homepage = () => {
 
       {/* Stats Section */}
       <section className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-3 gap-8 text-center">
+        <div className="grid md:grid-cols-4 gap-8 text-center">
           <div className="space-y-2">
             <div className="text-4xl font-bold text-accent">500+</div>
             <div className="text-primary-foreground/70">Live Channels</div>
@@ -134,6 +144,13 @@ const Homepage = () => {
           <div className="space-y-2">
             <div className="text-4xl font-bold text-accent">24/7</div>
             <div className="text-primary-foreground/70">Streaming</div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-center gap-2">
+              <Users className="w-8 h-8 text-accent" />
+              <div className="text-4xl font-bold text-accent">{totalUsers}</div>
+            </div>
+            <div className="text-primary-foreground/70">Registered Users</div>
           </div>
         </div>
         
