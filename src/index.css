@@ -130,6 +130,25 @@ All colors MUST be HSL.
     @apply bg-background text-foreground font-sans antialiased;
   }
   
+  /* TV Mode - Larger UI for viewing from distance */
+  @media (min-width: 1280px) {
+    body {
+      font-size: 1.125rem;
+    }
+  }
+  
+  /* Focus styles for TV navigation */
+  *:focus-visible {
+    @apply outline-none ring-4 ring-accent ring-offset-4 ring-offset-background;
+  }
+  
+  button:focus-visible,
+  a:focus-visible,
+  [tabindex]:focus-visible {
+    @apply scale-105 shadow-glow;
+    transition: var(--transition-smooth);
+  }
+  
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
@@ -181,5 +200,17 @@ All colors MUST be HSL.
   
   .transition-spring {
     transition: var(--transition-spring);
+  }
+  
+  /* TV-optimized grid layouts */
+  @media (min-width: 1280px) {
+    .movie-grid {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 2rem;
+    }
+    
+    .channel-list {
+      gap: 1.5rem;
+    }
   }
 }

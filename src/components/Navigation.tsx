@@ -34,12 +34,12 @@ export const Navigation = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <div className="bg-accent p-2 rounded-lg shadow-glow">
-              <Tv className="w-6 h-6 text-accent-foreground" />
+          <Link to="/" className="flex items-center gap-3 focus:outline-none focus-visible:ring-4 focus-visible:ring-accent rounded-lg p-2 -m-2">
+            <div className="bg-accent p-2 lg:p-3 rounded-lg shadow-glow">
+              <Tv className="w-6 h-6 lg:w-8 lg:h-8 text-accent-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-primary-foreground">
+              <h1 className="text-xl lg:text-3xl font-bold text-primary-foreground">
                 flameiptv
               </h1>
               <Clock />
@@ -47,7 +47,7 @@ export const Navigation = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2 lg:gap-3">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -57,14 +57,14 @@ export const Navigation = () => {
                   key={item.path}
                   asChild
                   variant={isActive ? "default" : "ghost"}
-                  className={`${
+                  className={`lg:text-lg lg:px-6 lg:py-6 ${
                     isActive 
                       ? 'bg-accent text-accent-foreground shadow-glow' 
                       : 'text-primary-foreground hover:bg-primary-foreground/10'
                   }`}
                 >
                   <Link to={item.path} className="flex items-center gap-2">
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-4 h-4 lg:w-5 lg:h-5" />
                     {item.label}
                   </Link>
                 </Button>
@@ -72,13 +72,13 @@ export const Navigation = () => {
             })}
             
             {/* User Info */}
-            <div className="flex items-center gap-2 ml-4 px-3 py-2 bg-primary-foreground/10 rounded-lg">
+            <div className="flex items-center gap-2 ml-4 px-3 py-2 lg:px-4 lg:py-3 bg-primary-foreground/10 rounded-lg">
               {isAdmin ? (
-                <Shield className="w-4 h-4 text-accent" />
+                <Shield className="w-4 h-4 lg:w-5 lg:h-5 text-accent" />
               ) : (
-                <User className="w-4 h-4 text-primary-foreground/80" />
+                <User className="w-4 h-4 lg:w-5 lg:h-5 text-primary-foreground/80" />
               )}
-              <span className="text-sm font-medium text-primary-foreground">
+              <span className="text-sm lg:text-base font-medium text-primary-foreground">
                 {username} {isAdmin && '(Admin)'}
               </span>
             </div>
@@ -87,9 +87,9 @@ export const Navigation = () => {
               variant="outline" 
               size="sm" 
               onClick={handleLogout}
-              className="flex items-center gap-2 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
+              className="flex items-center gap-2 lg:text-lg lg:px-6 lg:py-6 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4 lg:w-5 lg:h-5" />
               Logout
             </Button>
           </div>

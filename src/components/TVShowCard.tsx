@@ -13,16 +13,29 @@ export const TVShowCard = ({ show, onPlay }: TVShowCardProps) => {
   const servers = tmdbApi.getTVEpisodeStreamUrls(show.id, 1, 1); // Sample for server list
   const navigate = useNavigate();
   
+  const handleClick = () => {
+    navigate(`/tv-series/${show.id}`);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+  
   return (
-    <Card className="group cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg bg-card border-border overflow-hidden">
-      <div 
-        className="relative aspect-[2/3] overflow-hidden"
-        onClick={() => navigate(`/tv-series/${show.id}`)}
-      >
+    <Card 
+      className="group cursor-pointer hover:scale-105 focus-within:scale-105 transition-all duration-300 hover:shadow-glow focus-within:shadow-glow bg-card border-border overflow-hidden"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      onClick={handleClick}
+    >
+      <div className="relative aspect-[2/3] overflow-hidden">
         <img
           src={tmdbApi.getImageUrl(show.poster_path)}
           alt={show.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-110 group-focus-within:scale-110 transition-transform duration-300"
           loading="lazy"
         />
         <div className="absolute top-2 right-2">
@@ -32,11 +45,11 @@ export const TVShowCard = ({ show, onPlay }: TVShowCardProps) => {
           </Badge>
         </div>
       </div>
-      <CardContent className="p-4">
-        <h3 className="font-semibold text-foreground line-clamp-2 mb-2">
+      <CardContent className="p-4 lg:p-5">
+        <h3 className="font-semibold text-foreground lg:text-lg line-clamp-2 mb-2">
           {show.name}
         </h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm lg:text-base text-muted-foreground">
           {new Date(show.first_air_date).getFullYear()}
         </p>
       </CardContent>

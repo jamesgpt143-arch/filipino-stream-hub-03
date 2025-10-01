@@ -1,12 +1,13 @@
 {
   "name": "FlameIPTV",
   "short_name": "FlameIPTV",
-  "description": "Live streaming platform",
+  "description": "Live streaming platform - Optimized for Smart TV",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#ef4444",
-  "orientation": "portrait-primary",
+  "orientation": "landscape-primary",
+  "categories": ["entertainment", "video"],
   "icons": [
     {
       "src": "/favicon.ico",

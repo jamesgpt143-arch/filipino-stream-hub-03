@@ -15,15 +15,27 @@ interface ChannelCardProps {
 }
 
 export const ChannelCard = ({ channel, onClick, onToggleHide, onDelete, isHidden, isCustom, canDelete }: ChannelCardProps) => {
+  const handleClick = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    onClick();
+  };
+
   return (
     <Card 
-      className="bg-gradient-card hover:shadow-glow border-border/30 cursor-pointer group transition-spring overflow-hidden backdrop-blur-sm hover:border-primary/30"
-      onClick={onClick}
+      className="bg-gradient-card hover:shadow-glow focus-within:shadow-glow border-border/30 cursor-pointer group transition-spring overflow-hidden backdrop-blur-sm hover:border-primary/30 focus-within:border-primary/50"
+      onClick={handleClick}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
     >
       <CardContent className="p-0">
         <div className="flex items-center gap-4 p-4">
           {/* Channel Logo */}
-          <div className="relative w-16 h-16 bg-gradient-to-br from-muted to-muted/50 rounded-lg overflow-hidden flex-shrink-0">
+          <div className="relative w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-muted to-muted/50 rounded-lg overflow-hidden flex-shrink-0">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             <img
@@ -45,11 +57,11 @@ export const ChannelCard = ({ channel, onClick, onToggleHide, onDelete, isHidden
 
           {/* Channel Info */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-foreground text-base leading-tight truncate group-hover:text-accent transition-colors duration-300">
+            <h3 className="font-bold text-foreground text-base lg:text-xl leading-tight truncate group-hover:text-accent transition-colors duration-300">
               {channel.name}
             </h3>
             {channel.category && (
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm lg:text-base text-muted-foreground mt-1">
                 {channel.category}
               </p>
             )}
