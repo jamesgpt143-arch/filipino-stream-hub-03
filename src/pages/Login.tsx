@@ -104,17 +104,19 @@ const Login = () => {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Welcome to FlameIPTV</CardTitle>
           <CardDescription>
-            {isSignUp ? 'Create a new account' : 'Enter your username to access the platform'}
+            {isSignUp ? 'Create a new account with username' : 'Login with email or username'}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">
+                {isSignUp ? 'Username' : 'Email or Username'}
+              </Label>
               <Input
                 id="username"
                 type="text"
-                placeholder="Enter your username"
+                placeholder={isSignUp ? "Enter your username" : "Enter email or username"}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={isLoading}
@@ -152,7 +154,7 @@ const Login = () => {
           </div>
           
           <div className="mt-2 text-center text-sm text-muted-foreground">
-            <p>Enter your username and password to continue</p>
+            <p>{isSignUp ? 'Enter username (no email format)' : 'Admin: use email, Users: use username'}</p>
           </div>
         </CardContent>
       </Card>

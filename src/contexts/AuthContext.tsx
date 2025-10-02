@@ -76,8 +76,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
-      // Use username as email for Supabase (username@flameiptv.local)
-      const email = `${username.trim()}@flameiptv.local`;
+      // Check if it's an email (admin) or username (regular user)
+      const isEmail = username.includes('@');
+      const email = isEmail ? username.trim() : `${username.trim()}@flameiptv.app`;
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -95,8 +96,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signUp = async (username: string, password: string): Promise<boolean> => {
     try {
-      // Use username as email for Supabase (username@flameiptv.local)
-      const email = `${username.trim()}@flameiptv.local`;
+      // Check if it's an email (admin) or username (regular user)
+      const isEmail = username.includes('@');
+      
+      if (isEmail) {
+        // Don't allow signup with email format, only admin should login with email
+        return false;
+      }
+      
+      const email = `${username.trim()}@flameiptv.app`;
       
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -125,7 +133,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setSession(null);
   };
 
-  const isAdmin = username === 'flame143';
+  const isAdmin = username === 'jamesbenavides617' || session?.user?.email === 'jamesbenavides617@gmail.com';
   const isAuthenticated = !!user;
 
   return (
