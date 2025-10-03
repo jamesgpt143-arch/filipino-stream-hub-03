@@ -1,7 +1,11 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import type { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   username: string | null;
+  user: User | null;
+  session: Session | null;
   isAdmin: boolean;
   login: (username: string, password: string) => Promise<boolean>;
   signUp: (username: string, password: string) => Promise<boolean>;
@@ -25,77 +29,118 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [username, setUsername] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    // Check for existing session on mount
-    const savedUsername = localStorage.getItem('flameiptv_username');
-    if (savedUsername) {
-      setUsername(savedUsername);
-    }
+    // Set up auth state listener first
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Get profile to set username
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('display_name')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
+          
+          setUsername(profile?.display_name || session.user.email?.split('@')[0] || null);
+        } else {
+          setUsername(null);
+        }
+      }
+    );
+
+    // Then check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('user_id', session.user.id)
+          .maybeSingle()
+          .then(({ data: profile }) => {
+            setUsername(profile?.display_name || session.user.email?.split('@')[0] || null);
+          });
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (username: string, password: string): Promise<boolean> => {
-    const trimmedUsername = username.trim();
-    if (trimmedUsername && password) {
-      // Check for admin account first
-      if (trimmedUsername === 'flame143' && password === 'darman18') {
-        setUsername(trimmedUsername);
-        localStorage.setItem('flameiptv_username', trimmedUsername);
-        return true;
-      }
+    try {
+      // Check if it's an email (admin) or username (regular user)
+      const isEmail = username.includes('@');
+      const email = isEmail ? username.trim() : `${username.trim()}@flameiptv.app`;
       
-      // Get stored users from localStorage
-      const storedUsers = JSON.parse(localStorage.getItem('flameiptv_users') || '{}');
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
       
-      // Check if user exists and password matches
-      if (storedUsers[trimmedUsername] && storedUsers[trimmedUsername] === password) {
-        setUsername(trimmedUsername);
-        localStorage.setItem('flameiptv_username', trimmedUsername);
-        return true;
-      }
+      return !!data.user;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
     }
-    return false;
   };
 
   const signUp = async (username: string, password: string): Promise<boolean> => {
-    const trimmedUsername = username.trim();
-    if (trimmedUsername && password) {
-      // Prevent signup with admin username
-      if (trimmedUsername === 'flame143') {
-        return false; // Admin account cannot be created
+    try {
+      // Check if it's an email (admin) or username (regular user)
+      const isEmail = username.includes('@');
+      
+      if (isEmail) {
+        // Don't allow signup with email format, only admin should login with email
+        return false;
       }
       
-      // Get stored users from localStorage
-      const storedUsers = JSON.parse(localStorage.getItem('flameiptv_users') || '{}');
+      const email = `${username.trim()}@flameiptv.app`;
       
-      // Check if user already exists
-      if (storedUsers[trimmedUsername]) {
-        return false; // User already exists
-      }
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            display_name: username.trim()
+          }
+        }
+      });
+
+      if (error) throw error;
       
-      // Create new user
-      storedUsers[trimmedUsername] = password;
-      localStorage.setItem('flameiptv_users', JSON.stringify(storedUsers));
-      
-      // Auto login after signup
-      setUsername(trimmedUsername);
-      localStorage.setItem('flameiptv_username', trimmedUsername);
-      return true;
+      return !!data.user;
+    } catch (error) {
+      console.error('Signup error:', error);
+      return false;
     }
-    return false;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await supabase.auth.signOut();
     setUsername(null);
-    localStorage.removeItem('flameiptv_username');
+    setUser(null);
+    setSession(null);
   };
 
-  const isAdmin = username === 'flame143';
-  const isAuthenticated = Boolean(username);
+  const isAdmin = username === 'jamesbenavides617' || session?.user?.email === 'jamesbenavides617@gmail.com';
+  const isAuthenticated = !!user;
 
   return (
     <AuthContext.Provider value={{
       username,
+      user,
+      session,
       isAdmin,
       login,
       signUp,
