@@ -7,11 +7,14 @@ import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Eye, EyeOff, Plus } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Search, Eye, EyeOff, Plus, List } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
 import { UserStats } from '@/components/UserStats';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { PlaylistManager } from '@/components/PlaylistManager';
+import { AddToPlaylistDialog } from '@/components/AddToPlaylistDialog';
 
 const CustomChannels = () => {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
@@ -20,6 +23,8 @@ const CustomChannels = () => {
   const [showHidden, setShowHidden] = useState(false);
   const [customChannels, setCustomChannels] = useState<Channel[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [addToPlaylistChannel, setAddToPlaylistChannel] = useState<Channel | null>(null);
+  const [addToPlaylistType, setAddToPlaylistType] = useState<'iptv' | 'custom'>('custom');
   const { toast } = useToast();
   const { username, isAdmin } = useAuth();
 
@@ -211,6 +216,11 @@ const CustomChannels = () => {
     }
   };
 
+  const handleAddToPlaylist = (channel: Channel) => {
+    setAddToPlaylistChannel(channel);
+    setAddToPlaylistType('custom');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header Section */}
@@ -274,66 +284,88 @@ const CustomChannels = () => {
       </div>
 
       <main className="container mx-auto px-4 py-6">
-        {customChannels.length === 0 ? (
-          <div className="text-center py-12">
-            <Card className="max-w-md mx-auto">
-              <CardHeader>
-                <CardTitle>No Custom Channels Yet</CardTitle>
-                <CardDescription>
-                  Add your first custom channel to get started watching your favorite streams.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  onClick={() => setShowAddForm(true)}
-                  className="w-full"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Your First Channel
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        ) : (
-          <div className="flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-200px)]">
-            {/* Video Player */}
-            <div className="w-full lg:w-2/3 flex-shrink-0">
-              <div className="sticky top-6">
-                <VideoPlayer
-                  channel={selectedChannel}
-                  onClose={handleClosePlayer}
-                />
-              </div>
-            </div>
+        <Tabs defaultValue="channels" className="w-full">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+            <TabsTrigger value="channels">Channels</TabsTrigger>
+            <TabsTrigger value="playlists">
+              <List className="w-4 h-4 mr-2" />
+              Playlists
+            </TabsTrigger>
+          </TabsList>
 
-            {/* Channel List */}
-            <div className="w-full lg:w-1/3 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground">
-                    Your Channels
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    {filteredChannels.length} channel{filteredChannels.length !== 1 ? 's' : ''} available
-                  </p>
+          <TabsContent value="channels">
+            {customChannels.length === 0 ? (
+              <div className="text-center py-12">
+                <Card className="max-w-md mx-auto">
+                  <CardHeader>
+                    <CardTitle>No Custom Channels Yet</CardTitle>
+                    <CardDescription>
+                      Add your first custom channel to get started watching your favorite streams.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button 
+                      onClick={() => setShowAddForm(true)}
+                      className="w-full"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Your First Channel
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-200px)]">
+                {/* Video Player */}
+                <div className="w-full lg:w-2/3 flex-shrink-0">
+                  <div className="sticky top-6">
+                    <VideoPlayer
+                      channel={selectedChannel}
+                      onClose={handleClosePlayer}
+                    />
+                  </div>
+                </div>
+
+                {/* Channel List */}
+                <div className="w-full lg:w-1/3 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-2xl font-bold text-foreground">
+                        Your Channels
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        {filteredChannels.length} channel{filteredChannels.length !== 1 ? 's' : ''} available
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="overflow-y-auto max-h-[calc(100vh-250px)]">
+                    <ChannelGrid
+                      channels={filteredChannels}
+                      onChannelSelect={handleChannelSelect}
+                      onToggleHide={handleToggleHide}
+                      onDelete={handleDeleteChannel}
+                      onAddToPlaylist={handleAddToPlaylist}
+                      hiddenChannels={hiddenChannels}
+                      customChannels={customChannels}
+                      currentUsername={username}
+                      isAdmin={isAdmin}
+                    />
+                  </div>
                 </div>
               </div>
+            )}
+          </TabsContent>
 
-              <div className="overflow-y-auto max-h-[calc(100vh-250px)]">
-                <ChannelGrid
-                  channels={filteredChannels}
-                  onChannelSelect={handleChannelSelect}
-                  onToggleHide={handleToggleHide}
-                  onDelete={handleDeleteChannel}
-                  hiddenChannels={hiddenChannels}
-                  customChannels={customChannels}
-                  currentUsername={username}
-                  isAdmin={isAdmin}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+          <TabsContent value="playlists">
+            <PlaylistManager
+              username={username!}
+              currentUsername={username!}
+              isAdmin={isAdmin}
+              onPlayChannel={handleChannelSelect}
+            />
+          </TabsContent>
+        </Tabs>
       </main>
 
       {/* Footer */}
@@ -348,6 +380,13 @@ const CustomChannels = () => {
         </div>
       </footer>
       <UserStats pagePath="/custom-channels" />
+      
+      <AddToPlaylistDialog
+        open={!!addToPlaylistChannel}
+        onOpenChange={(open) => !open && setAddToPlaylistChannel(null)}
+        channel={addToPlaylistChannel}
+        channelType={addToPlaylistType}
+      />
     </div>
   );
 };

@@ -2,19 +2,20 @@ import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Channel } from '@/data/channels';
-import { Play, EyeOff, Eye, Trash2 } from 'lucide-react';
+import { Play, EyeOff, Eye, Trash2, ListPlus } from 'lucide-react';
 
 interface ChannelCardProps {
   channel: Channel;
   onClick: () => void;
   onToggleHide?: (channelName: string) => void;
   onDelete?: (channelName: string) => void;
+  onAddToPlaylist?: (channel: Channel) => void;
   isHidden?: boolean;
   isCustom?: boolean;
   canDelete?: boolean;
 }
 
-export const ChannelCard = ({ channel, onClick, onToggleHide, onDelete, isHidden, isCustom, canDelete }: ChannelCardProps) => {
+export const ChannelCard = ({ channel, onClick, onToggleHide, onDelete, onAddToPlaylist, isHidden, isCustom, canDelete }: ChannelCardProps) => {
   return (
     <Card 
       className="bg-gradient-card hover:shadow-glow border-border/30 cursor-pointer group transition-spring overflow-hidden backdrop-blur-sm hover:border-primary/30"
@@ -72,6 +73,22 @@ export const ChannelCard = ({ channel, onClick, onToggleHide, onDelete, isHidden
               </Badge>
             )}
             
+            {/* Add to Playlist Button */}
+            {onAddToPlaylist && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddToPlaylist(channel);
+                }}
+                className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary"
+                title="Add to Playlist"
+              >
+                <ListPlus className="w-4 h-4" />
+              </Button>
+            )}
+
             {/* Hide/Show Button */}
             {onToggleHide && (
               <Button
