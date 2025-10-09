@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigation } from "./components/Navigation";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
+import { UpdatePopup } from "./components/UpdatePopup";
 import Homepage from "./pages/Homepage";
 import Channels from "./pages/Channels";
 import CustomChannels from "./pages/CustomChannels";
@@ -17,7 +19,6 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import { disableDevTools } from "./utils/disableDevTools";
 import { useEffect } from "react";
-import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <PWAInstallPrompt />
+        <UpdatePopup />
         <AuthProvider>
           <BrowserRouter>
             <AppContent />
