@@ -67,12 +67,18 @@ export const PlaylistManager = ({ username, currentUsername, isAdmin }: Playlist
       const { data, error } = await supabase
         .from("playlists")
         .select("*")
+        .eq("creator_username", username)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
       setPlaylists(data || []);
     } catch (error) {
       console.error("Error fetching playlists:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load playlists",
+        variant: "destructive",
+      });
     }
   };
 
