@@ -362,7 +362,6 @@ const CustomChannels = () => {
               username={username!}
               currentUsername={username!}
               isAdmin={isAdmin}
-              onPlayChannel={handleChannelSelect}
             />
           </TabsContent>
         </Tabs>

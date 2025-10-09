@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CreatePlaylistDialog } from "./CreatePlaylistDialog";
+import { VideoPlayer } from "./VideoPlayer";
 import { Plus, Trash2, Play, List } from "lucide-react";
 import {
   AlertDialog,
@@ -38,16 +39,17 @@ interface PlaylistManagerProps {
   username: string;
   currentUsername: string;
   isAdmin: boolean;
-  onPlayChannel: (channel: any) => void;
 }
 
-export const PlaylistManager = ({ username, currentUsername, isAdmin, onPlayChannel }: PlaylistManagerProps) => {
+export const PlaylistManager = ({ username, currentUsername, isAdmin }: PlaylistManagerProps) => {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);
   const [playlistItems, setPlaylistItems] = useState<PlaylistItem[]>([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [deletePlaylistId, setDeletePlaylistId] = useState<string | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [selectedChannel, setSelectedChannel] = useState<any>(null);
+  const [showPlayer, setShowPlayer] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -158,8 +160,22 @@ export const PlaylistManager = ({ username, currentUsername, isAdmin, onPlayChan
     return playlist.creator_username === currentUsername || isAdmin;
   };
 
+  const handlePlayChannel = (channel: any) => {
+    setSelectedChannel(channel);
+    setShowPlayer(true);
+  };
+
   return (
     <div className="space-y-6">
+      {showPlayer && selectedChannel && (
+        <VideoPlayer
+          channel={selectedChannel}
+          onClose={() => {
+            setShowPlayer(false);
+            setSelectedChannel(null);
+          }}
+        />
+      )}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -260,7 +276,7 @@ export const PlaylistManager = ({ username, currentUsername, isAdmin, onPlayChan
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          onClick={() => onPlayChannel(item.channel_data)}
+                          onClick={() => handlePlayChannel(item.channel_data)}
                         >
                           <Play className="h-4 w-4" />
                         </Button>
