@@ -45,6 +45,15 @@ export interface Episode {
   runtime: number | null;
 }
 
+export interface Video {
+  id: string;
+  key: string;
+  name: string;
+  site: string;
+  type: string;
+  official: boolean;
+}
+
 export const tmdbApi = {
   // Get popular movies
   getPopularMovies: async (page = 1): Promise<{ results: Movie[]; total_pages: number }> => {
@@ -140,6 +149,18 @@ export const tmdbApi = {
   // Get TV show recommendations
   getTVShowRecommendations: async (showId: number, page = 1): Promise<{ results: TVShow[]; total_pages: number }> => {
     const response = await fetch(`${API_BASE_URL}/tv/${showId}/recommendations?api_key=${API_KEY}&page=${page}`);
+    return response.json();
+  },
+
+  // Get movie trailers
+  getMovieVideos: async (movieId: number): Promise<{ results: Video[] }> => {
+    const response = await fetch(`${API_BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}`);
+    return response.json();
+  },
+
+  // Get TV show trailers
+  getTVShowVideos: async (showId: number): Promise<{ results: Video[] }> => {
+    const response = await fetch(`${API_BASE_URL}/tv/${showId}/videos?api_key=${API_KEY}`);
     return response.json();
   }
 };

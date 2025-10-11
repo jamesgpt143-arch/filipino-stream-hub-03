@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { VideoModal } from '@/components/VideoModal';
+import { TrailerModal } from '@/components/TrailerModal';
 import { SeasonEpisodeSelector } from '@/components/SeasonEpisodeSelector';
 import { TVShowCard } from '@/components/TVShowCard';
 import { DonateButton } from '@/components/DonateButton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ArrowLeft, Star, Play, ChevronDown } from 'lucide-react';
-import { TVShow, tmdbApi } from '@/lib/tmdb';
+import { ArrowLeft, Star, Play, ChevronDown, Film } from 'lucide-react';
+import { TVShow, tmdbApi, Video } from '@/lib/tmdb';
 
 const TVSeriesDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +24,8 @@ const TVSeriesDetail = () => {
   const [selectedEpisode, setSelectedEpisode] = useState<number | null>(null);
   const [episodeTitle, setEpisodeTitle] = useState<string>('');
   const [showSeasonSelector, setShowSeasonSelector] = useState(false);
+  const [trailerKey, setTrailerKey] = useState<string>('');
+  const [showTrailer, setShowTrailer] = useState(false);
 
   useEffect(() => {
     const loadShowData = async () => {
@@ -32,6 +35,17 @@ const TVSeriesDetail = () => {
       try {
         const showData = await tmdbApi.getTVShowDetails(Number(id));
         setShow(showData);
+        
+        // Load trailer
+        try {
+          const videos = await tmdbApi.getTVShowVideos(Number(id));
+          const trailer = videos.results.find((v: Video) => v.type === 'Trailer' && v.site === 'YouTube');
+          if (trailer) {
+            setTrailerKey(trailer.key);
+          }
+        } catch (error) {
+          console.error('Error loading trailer:', error);
+        }
         
         // Load recommended TV shows based on this show
         try {
@@ -151,27 +165,40 @@ const TVSeriesDetail = () => {
                   {new Date(show.first_air_date).getFullYear()}
                 </Badge>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    <Play className="w-5 h-5 mr-2 fill-current" />
-                    Watch Now
-                    <ChevronDown className="w-4 h-4 ml-2" />
+              <div className="flex gap-4">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Play className="w-5 h-5 mr-2 fill-current" />
+                      Watch Now
+                      <ChevronDown className="w-4 h-4 ml-2" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-background border-border">
+                    {Object.keys(servers).map((server) => (
+                      <DropdownMenuItem
+                        key={server}
+                        onClick={() => handlePlayShow(show, server)}
+                        className="cursor-pointer hover:bg-muted"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        {server}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {trailerKey && (
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    onClick={() => setShowTrailer(true)}
+                    className="bg-background/80 hover:bg-background"
+                  >
+                    <Film className="w-5 h-5 mr-2" />
+                    Trailer
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-background border-border">
-                  {Object.keys(servers).map((server) => (
-                    <DropdownMenuItem
-                      key={server}
-                      onClick={() => handlePlayShow(show, server)}
-                      className="cursor-pointer hover:bg-muted"
-                    >
-                      <Play className="w-4 h-4 mr-2" />
-                      {server}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -231,6 +258,14 @@ const TVSeriesDetail = () => {
           onClose={handleClosePlayer}
         />
       )}
+
+      {/* Trailer Modal */}
+      <TrailerModal
+        isOpen={showTrailer}
+        onClose={() => setShowTrailer(false)}
+        videoKey={trailerKey}
+        title={`${show?.name} - Trailer`}
+      />
     </div>
   );
 };

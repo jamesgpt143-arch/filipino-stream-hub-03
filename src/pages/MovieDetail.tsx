@@ -4,11 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { VideoModal } from '@/components/VideoModal';
+import { TrailerModal } from '@/components/TrailerModal';
 import { MovieCard } from '@/components/MovieCard';
 import { DonateButton } from '@/components/DonateButton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ArrowLeft, Star, Play, ChevronDown } from 'lucide-react';
-import { Movie, tmdbApi } from '@/lib/tmdb';
+import { ArrowLeft, Star, Play, ChevronDown, Film } from 'lucide-react';
+import { Movie, tmdbApi, Video } from '@/lib/tmdb';
 
 const MovieDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,6 +19,8 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [selectedServer, setSelectedServer] = useState<string>('');
+  const [trailerKey, setTrailerKey] = useState<string>('');
+  const [showTrailer, setShowTrailer] = useState(false);
 
   useEffect(() => {
     const loadMovieData = async () => {
@@ -27,6 +30,17 @@ const MovieDetail = () => {
       try {
         const movieData = await tmdbApi.getMovieDetails(Number(id));
         setMovie(movieData);
+        
+        // Load trailer
+        try {
+          const videos = await tmdbApi.getMovieVideos(Number(id));
+          const trailer = videos.results.find((v: Video) => v.type === 'Trailer' && v.site === 'YouTube');
+          if (trailer) {
+            setTrailerKey(trailer.key);
+          }
+        } catch (error) {
+          console.error('Error loading trailer:', error);
+        }
         
         // Load recommended movies based on this movie
         try {
@@ -127,27 +141,40 @@ const MovieDetail = () => {
                   {new Date(movie.release_date).getFullYear()}
                 </Badge>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    <Play className="w-5 h-5 mr-2 fill-current" />
-                    Watch Now
-                    <ChevronDown className="w-4 h-4 ml-2" />
+              <div className="flex gap-4">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Play className="w-5 h-5 mr-2 fill-current" />
+                      Watch Now
+                      <ChevronDown className="w-4 h-4 ml-2" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-background border-border">
+                    {Object.keys(servers).map((server) => (
+                      <DropdownMenuItem
+                        key={server}
+                        onClick={() => handlePlayMovie(movie, server)}
+                        className="cursor-pointer hover:bg-muted"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        {server}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {trailerKey && (
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    onClick={() => setShowTrailer(true)}
+                    className="bg-background/80 hover:bg-background"
+                  >
+                    <Film className="w-5 h-5 mr-2" />
+                    Trailer
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-background border-border">
-                  {Object.keys(servers).map((server) => (
-                    <DropdownMenuItem
-                      key={server}
-                      onClick={() => handlePlayMovie(movie, server)}
-                      className="cursor-pointer hover:bg-muted"
-                    >
-                      <Play className="w-4 h-4 mr-2" />
-                      {server}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -193,6 +220,14 @@ const MovieDetail = () => {
           onClose={handleClosePlayer}
         />
       )}
+
+      {/* Trailer Modal */}
+      <TrailerModal
+        isOpen={showTrailer}
+        onClose={() => setShowTrailer(false)}
+        videoKey={trailerKey}
+        title={`${movie?.title} - Trailer`}
+      />
     </div>
   );
 };
