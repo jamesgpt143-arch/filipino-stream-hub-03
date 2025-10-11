@@ -11,7 +11,7 @@ import {
 
 export const UpdatePopup = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const UPDATE_VERSION = "v2.0"; // Change this when you have new updates
+  const UPDATE_VERSION = "v2.1"; // Change this when you have new updates
 
   useEffect(() => {
     const lastSeenVersion = localStorage.getItem("lastSeenUpdate");
@@ -66,6 +66,26 @@ export const UpdatePopup = () => {
                 <h4 className="font-semibold text-foreground">Easy Management</h4>
                 <p className="text-sm text-muted-foreground">
                   Madaling mag-add, mag-delete, at mag-play ng channels sa loob ng iyong playlist.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
+              <div>
+                <h4 className="font-semibold text-foreground">Movie & TV Trailers</h4>
+                <p className="text-sm text-muted-foreground">
+                  Panoorin ang mga trailer ng movies at TV series bago mo ito i-play!
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
+              <div>
+                <h4 className="font-semibold text-foreground">AI Image Generator</h4>
+                <p className="text-sm text-muted-foreground">
+                  Gumawa ng mga custom AI-generated images gamit ang bagong AI tool!
                 </p>
               </div>
             </div>
