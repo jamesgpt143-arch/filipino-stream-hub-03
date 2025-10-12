@@ -31,7 +31,7 @@ export const UpdatePopup = () => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-2xl">
             <Sparkles className="h-6 w-6 text-primary" />
-            Bagong Update!
+            New Update!
           </DialogTitle>
           <DialogDescription>
             Check out the latest features we've added
@@ -45,7 +45,7 @@ export const UpdatePopup = () => {
               <div>
                 <h4 className="font-semibold text-foreground">Playlist Feature</h4>
                 <p className="text-sm text-muted-foreground">
-                  Gumawa ng iyong sariling playlist! Mag-organize ng mga paborito mong channels mula sa IPTV at Custom Channels.
+                  Create your own playlists! Organize your favorite channels from IPTV and Custom Channels.
                 </p>
               </div>
             </div>
@@ -55,7 +55,7 @@ export const UpdatePopup = () => {
               <div>
                 <h4 className="font-semibold text-foreground">Personal Playlists</h4>
                 <p className="text-sm text-muted-foreground">
-                  Ang mga playlist mo ay private - ikaw lang ang makakakita nito.
+                  Your playlists are private - only you can see them.
                 </p>
               </div>
             </div>
@@ -65,7 +65,7 @@ export const UpdatePopup = () => {
               <div>
                 <h4 className="font-semibold text-foreground">Easy Management</h4>
                 <p className="text-sm text-muted-foreground">
-                  Madaling mag-add, mag-delete, at mag-play ng channels sa loob ng iyong playlist.
+                  Easily add, delete, and play channels within your playlist.
                 </p>
               </div>
             </div>
@@ -75,7 +75,7 @@ export const UpdatePopup = () => {
               <div>
                 <h4 className="font-semibold text-foreground">Movie & TV Trailers</h4>
                 <p className="text-sm text-muted-foreground">
-                  Panoorin ang mga trailer ng movies at TV series bago mo ito i-play!
+                  Watch trailers of movies and TV series before you play them!
                 </p>
               </div>
             </div>
@@ -85,7 +85,7 @@ export const UpdatePopup = () => {
               <div>
                 <h4 className="font-semibold text-foreground">AI Image Generator</h4>
                 <p className="text-sm text-muted-foreground">
-                  Gumawa ng mga custom AI-generated images gamit ang bagong AI tool!
+                  Create custom AI-generated images using the new AI tool!
                 </p>
               </div>
             </div>
@@ -93,15 +93,15 @@ export const UpdatePopup = () => {
 
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 animate-fade-in">
             <p className="text-sm text-foreground text-center">
-              Puntahan ang <span className="font-semibold text-primary">Custom Channels</span> page at i-click ang{" "}
-              <span className="font-semibold text-primary">Playlists</span> tab para magsimula!
+              Go to the <span className="font-semibold text-primary">Custom Channels</span> page and click the{" "}
+              <span className="font-semibold text-primary">Playlists</span> tab to get started!
             </p>
           </div>
         </div>
 
         <div className="flex justify-end gap-2 pt-4">
           <Button onClick={handleClose} className="w-full">
-            Sige, salamat!
+            Got it, thanks!
           </Button>
         </div>
       </DialogContent>
