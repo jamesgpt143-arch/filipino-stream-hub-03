@@ -6,6 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { z } from 'zod';
+
+// Input validation schema
+const playlistSchema = z.object({
+  name: z.string().trim().min(1, "Playlist name is required").max(100, "Name must be 100 characters or less"),
+  description: z.string().trim().max(500, "Description must be 500 characters or less").optional()
+});
 
 interface CreatePlaylistDialogProps {
   open: boolean;
@@ -23,10 +30,17 @@ export const CreatePlaylistDialog = ({ open, onOpenChange, onPlaylistCreated, us
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name.trim()) {
+    // Validate input
+    const validation = playlistSchema.safeParse({
+      name: name,
+      description: description
+    });
+
+    if (!validation.success) {
+      const errorMessage = validation.error.errors[0]?.message || "Invalid input";
       toast({
-        title: "Error",
-        description: "Playlist name is required",
+        title: "Validation Error",
+        description: errorMessage,
         variant: "destructive",
       });
       return;
@@ -35,11 +49,12 @@ export const CreatePlaylistDialog = ({ open, onOpenChange, onPlaylistCreated, us
     setIsSubmitting(true);
 
     try {
+      const validatedData = validation.data;
       const { error } = await supabase
         .from("playlists")
         .insert({
-          name: name.trim(),
-          description: description.trim() || null,
+          name: validatedData.name,
+          description: validatedData.description || null,
           creator_username: username,
         });
 
@@ -85,6 +100,7 @@ export const CreatePlaylistDialog = ({ open, onOpenChange, onPlaylistCreated, us
                 onChange={(e) => setName(e.target.value)}
                 placeholder="My Favorite Channels"
                 disabled={isSubmitting}
+                maxLength={100}
               />
             </div>
             <div className="space-y-2">
@@ -96,6 +112,7 @@ export const CreatePlaylistDialog = ({ open, onOpenChange, onPlaylistCreated, us
                 placeholder="A collection of my favorite channels"
                 disabled={isSubmitting}
                 rows={3}
+                maxLength={500}
               />
             </div>
           </div>
