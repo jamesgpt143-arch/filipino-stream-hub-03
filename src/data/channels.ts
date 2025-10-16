@@ -160,6 +160,14 @@ export const channels: Channel[] = [
   type: 'mpd',
   logo: 'https://cms.cignal.tv/Upload/Images/Celestial-Logo-2022.jpg'
 }, {
+     name: 'Celestial Movies',
+  manifestUri: 'https://linearjitp-playback.astro.com.my/dash-wv/linear/506/default_ott.mpd',
+  clearKey: {
+    'c5c1ba26907291afec11a9a78d513410': '361197805d0149c29801946cf2dde67c'
+  },
+  type: 'mpd',
+  logo: 'https://mir-s3-cdn-cf.behance.net/project_modules/1400/7a0c1582445367.5d1d90a91e63c.jpg'
+}, {
   name: 'CinemaOne',
   manifestUri: 'https://d9rpesrrg1bdi.cloudfront.net/out/v1/93b9db7b231d45f28f64f29b86dc6c65/index.mpd',
   clearKey: {
@@ -231,9 +239,12 @@ export const channels: Channel[] = [
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.MPPdJ1ObiLG4Q6MFEDQ4pAHaEH?rs=1&pid=ImgDetMain'
 }, {
- name: 'Discovery Asia',
-  manifestUri: 'https://pull-hls-live.jr365m.cc/stream/astromalaysia/discoveryasia/master.m3u8',
-  type: 'hls',
+  name: 'Discovery Asia',
+  manifestUri: 'https://linearjitp-playback.astro.com.my/dash-wv/linear/501/default_ott.mpd',
+  clearKey: {
+    '3ff02fcd80c2e3230c52ae70fe903410': 'c3a58ec867cc25829e1fbe8938442553'
+  },
+  type: 'mpd',
   logo: 'https://tse2.mm.bing.net/th/id/OIP.ErOXB9uaqKZMAXn3_yB-ygHaDK?r=0&rs=1&pid=ImgDetMain&o=7&rm=3'
 }, {
   name: 'Discovery Channel',
@@ -389,6 +400,14 @@ name: 'GMA (Youtube Stream)',
   },
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.x2dQgh_yGBdnttScluIGYAHaCp?w=900&h=322&rs=1&pid=ImgDetMain'
+}, {
+   name: 'Hits Movies',
+  manifestUri: 'https://linearjitp-playback.astro.com.my/dash-wv/linear/2305/default_ott.mpd',
+  clearKey: {
+    'ff1febd7018d0dd711601e795e0d6210': '38fbfb3a56e40ff92c9df8acbcba9ef6'
+  },
+  type: 'mpd',
+  logo: 'https://tse2.mm.bing.net/th/id/OIP.IVTdT_KbbSE3puMAYpFGaQAAAA?cb=12&w=434&h=284&rs=1&pid=ImgDetMain&o=7&rm=3'
 }, {
   name: 'Hits Now',
   manifestUri: 'https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/cg_hitsnow/default/index.mpd',
