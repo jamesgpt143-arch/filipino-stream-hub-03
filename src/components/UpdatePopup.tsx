@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -38,7 +38,7 @@ export const UpdatePopup = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto pr-4">
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
@@ -56,6 +56,7 @@ export const UpdatePopup = () => {
                 <h4 className="font-semibold text-foreground">Added Channel</h4>
                 <p className="text-sm text-muted-foreground">
                   Celestial Movies
+                  <br />
                   Hits Movies
                 </p>
               </div>
