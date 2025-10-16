@@ -10,16 +10,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserStats } from '@/components/UserStats';
 import { MessageCircle, Send, User, Clock, Reply, Trash2 } from 'lucide-react';
-import { z } from 'zod';
-
-// Input validation schema
-const commentSchema = z.object({
-  message: z.string().trim().min(1, "Message is required").max(1000, "Message must be 1000 characters or less"),
-  facebook_link: z.string().trim().max(500, "URL is too long").refine(
-    (val) => !val || val === '' || /^https?:\/\/.+/.test(val),
-    "Must be a valid URL starting with http:// or https://"
-  ).optional()
-});
 
 interface Comment {
   id: string;
@@ -97,13 +87,10 @@ const Comments = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate input
-    const validation = commentSchema.safeParse(newComment);
-    if (!validation.success) {
-      const errorMessage = validation.error.errors[0]?.message || "Invalid input";
+    if (!newComment.message.trim()) {
       toast({
-        title: "Validation Error",
-        description: errorMessage,
+        title: "Error",
+        description: "Message is required",
         variant: "destructive"
       });
       return;
@@ -112,13 +99,12 @@ const Comments = () => {
     setIsSubmitting(true);
 
     try {
-      const validatedData = validation.data;
       const { error } = await supabase
         .from('comments')
         .insert({
           name: username || 'Anonymous',
-          message: validatedData.message,
-          facebook_link: validatedData.facebook_link || null,
+          message: newComment.message.trim(),
+          facebook_link: newComment.facebook_link.trim() || null,
           creator_username: username || 'anonymous'
         });
 
@@ -152,14 +138,10 @@ const Comments = () => {
   };
 
   const handleReply = async (parentId: string) => {
-    // Validate reply message
-    const validation = z.string().trim().min(1, "Reply is required").max(1000, "Reply must be 1000 characters or less").safeParse(replyMessage);
-    
-    if (!validation.success) {
-      const errorMessage = validation.error.errors[0]?.message || "Invalid input";
+    if (!replyMessage.trim()) {
       toast({
-        title: "Validation Error",
-        description: errorMessage,
+        title: "Error",
+        description: "Reply message is required",
         variant: "destructive"
       });
       return;
@@ -172,7 +154,7 @@ const Comments = () => {
         .from('comments')
         .insert({
           name: username || 'Anonymous',
-          message: validation.data,
+          message: replyMessage.trim(),
           creator_username: username || 'anonymous',
           reply_to: parentId
         });

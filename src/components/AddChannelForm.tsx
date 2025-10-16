@@ -7,23 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Link, Play } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { z } from 'zod';
-
-// Input validation schema
-const channelSchema = z.object({
-  name: z.string().trim().min(1, "Channel name is required").max(100, "Name must be 100 characters or less"),
-  manifestUri: z.string().trim().min(1, "URL/Manifest URI is required").max(1000, "URL is too long").refine(
-    (val) => /^https?:\/\/.+/.test(val),
-    "Must be a valid URL starting with http:// or https://"
-  ),
-  logo: z.string().trim().min(1, "Logo URL is required").max(1000, "URL is too long").refine(
-    (val) => /^https?:\/\/.+/.test(val),
-    "Must be a valid URL starting with http:// or https://"
-  ),
-  type: z.enum(['hls', 'mpd', 'youtube']),
-  category: z.string().trim().max(50, "Category must be 50 characters or less").optional(),
-  clearKey: z.string().trim().max(500, "Clear key is too long").optional()
-});
 
 interface ChannelFormData {
   name: string;
@@ -78,13 +61,10 @@ const AddChannelForm = ({ onChannelAdded, username }: AddChannelFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate input
-    const validation = channelSchema.safeParse(formData);
-    if (!validation.success) {
-      const errorMessage = validation.error.errors[0]?.message || "Invalid input";
+    if (!formData.name || !formData.manifestUri || !formData.logo) {
       toast({
-        title: "Validation Error",
-        description: errorMessage,
+        title: "Missing Information",
+        description: "Please fill in all required fields",
         variant: "destructive"
       });
       return;
@@ -92,66 +72,58 @@ const AddChannelForm = ({ onChannelAdded, username }: AddChannelFormProps) => {
 
     setIsSubmitting(true);
     
-    const validatedData = validation.data;
-    
     // Process YouTube URL to get embed format
-    let processedUrl = validatedData.manifestUri;
+    let processedUrl = formData.manifestUri;
     let embedUrl = '';
     let youtubeChannelId = '';
     let hasMultipleStreams = false;
     
-    if (validatedData.type === 'youtube') {
+    if (formData.type === 'youtube') {
       // Handle different YouTube URL formats
-      if (validatedData.manifestUri.includes('youtube.com/channel/')) {
-        youtubeChannelId = validatedData.manifestUri.split('/channel/')[1]?.split('?')[0];
+      if (formData.manifestUri.includes('youtube.com/channel/')) {
+        youtubeChannelId = formData.manifestUri.split('/channel/')[1]?.split('?')[0];
         embedUrl = `https://www.youtube.com/embed/live_stream?channel=${youtubeChannelId}`;
         hasMultipleStreams = true; // Enable multi-stream detection for channel URLs
-      } else if (validatedData.manifestUri.includes('embed/live_stream?channel=')) {
-        const urlParams = new URLSearchParams(validatedData.manifestUri.split('?')[1]);
+      } else if (formData.manifestUri.includes('embed/live_stream?channel=')) {
+        const urlParams = new URLSearchParams(formData.manifestUri.split('?')[1]);
         youtubeChannelId = urlParams.get('channel') || '';
-        embedUrl = validatedData.manifestUri;
+        embedUrl = formData.manifestUri;
         hasMultipleStreams = true; // Enable multi-stream detection for embed URLs
-      } else if (validatedData.manifestUri.includes('youtu.be/') || validatedData.manifestUri.includes('youtube.com/watch')) {
+      } else if (formData.manifestUri.includes('youtu.be/') || formData.manifestUri.includes('youtube.com/watch')) {
         // For regular YouTube video URLs, use as-is for embed
-        embedUrl = validatedData.manifestUri.replace('youtu.be/', 'www.youtube.com/embed/').replace('watch?v=', 'embed/');
+        embedUrl = formData.manifestUri.replace('youtu.be/', 'www.youtube.com/embed/').replace('watch?v=', 'embed/');
         hasMultipleStreams = false; // Individual videos don't have multiple streams
       } else {
-        embedUrl = validatedData.manifestUri;
+        embedUrl = formData.manifestUri;
       }
     }
 
     // Process clearKey for MPD streams
     let processedClearKey: Record<string, string> | undefined = undefined;
-    if (validatedData.type === 'mpd' && validatedData.clearKey) {
+    if (formData.type === 'mpd' && formData.clearKey) {
       try {
-        // Try to parse as JSON first
-        processedClearKey = JSON.parse(validatedData.clearKey);
-      } catch {
-        // If not JSON, try to parse as key:value format
-        const parts = validatedData.clearKey.split(':');
-        if (parts.length === 2) {
-          processedClearKey = { [parts[0].trim()]: parts[1].trim() };
+        // Convert "keyId:key" format to object format
+        const [keyId, key] = formData.clearKey.split(':');
+        if (keyId && key && keyId.trim().length > 0 && key.trim().length > 0) {
+          processedClearKey = { [keyId.trim()]: key.trim() };
+          console.log('Processed clearKey:', processedClearKey);
         } else {
-          toast({
-            title: "Invalid Clear Key",
-            description: "Clear Key must be in format 'key:value' or valid JSON",
-            variant: "destructive"
-          });
-          setIsSubmitting(false);
-          return;
+          console.error('Invalid clearKey format. Expected "keyId:key"');
         }
+      } catch (error) {
+        console.error('Error processing clearKey:', error);
       }
     }
 
     // Create new channel object that matches Channel interface
     const newChannel: Channel = {
-      name: validatedData.name,
+      name: formData.name,
       manifestUri: processedUrl,
-      type: validatedData.type,
-      logo: validatedData.logo,
-      category: validatedData.category || 'Custom',
+      type: formData.type,
+      logo: formData.logo,
+      category: formData.category || 'Custom',
       ...(processedClearKey ? { clearKey: processedClearKey } : {}),
-      ...(validatedData.type === 'youtube' ? { 
+      ...(formData.type === 'youtube' ? { 
         embedUrl,
         ...(youtubeChannelId ? { youtubeChannelId } : {}),
         hasMultipleStreams 
@@ -194,7 +166,7 @@ const AddChannelForm = ({ onChannelAdded, username }: AddChannelFormProps) => {
   
       toast({
         title: "Channel Added Successfully!",
-        description: `${validatedData.name} has been added and is now visible to everyone!`,
+        description: `${formData.name} has been added and is now visible to everyone!`,
       });
       
       // Reset form
@@ -209,148 +181,142 @@ const AddChannelForm = ({ onChannelAdded, username }: AddChannelFormProps) => {
     } catch (error) {
       console.error('Error adding channel:', error);
       toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
+        title: "Error Adding Channel",
+        description: "Failed to save channel. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      setIsSubmitting(false);
     }
-  };
-
-  const handleClearForm = () => {
-    setFormData({
-      name: '',
-      manifestUri: '',
-      type: 'hls',
-      logo: '',
-      category: '',
-      clearKey: ''
-    });
+    
+    setIsSubmitting(false);
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Plus className="w-5 h-5" />
-          Add Custom Channel
+    <Card className="bg-gradient-card border-border/30 backdrop-blur-sm">
+      <CardHeader className="text-center">
+        <CardTitle className="flex items-center justify-center gap-2 text-foreground">
+          <Plus className="w-5 h-5 text-accent" />
+          Add Your Own Channel
         </CardTitle>
-        <CardDescription>
-          Add your own streaming channels to the platform
+        <CardDescription className="text-muted-foreground">
+          Add IPTV channels from M3U8, MPD (with ClearKey), or YouTube sources
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="channel-name" className="text-foreground">Channel Name *</Label>
+              <Input
+                id="channel-name"
+                placeholder="e.g., CNN International"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                className="bg-background/50"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="channel-type" className="text-foreground">Stream Type *</Label>
+              <Select value={formData.type} onValueChange={(value: 'mpd' | 'hls' | 'youtube') => handleInputChange('type', value)}>
+                <SelectTrigger className="bg-background/50">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="hls">M3U8 (HLS)</SelectItem>
+                  <SelectItem value="mpd">MPD (DASH)</SelectItem>
+                  <SelectItem value="youtube">YouTube Live</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div className="space-y-2">
-            <Label htmlFor="name">Channel Name *</Label>
+            <Label htmlFor="stream-url" className="text-foreground flex items-center gap-2">
+              <Link className="w-4 h-4" />
+              Stream URL *
+            </Label>
             <Input
-              id="name"
-              placeholder="My Custom Channel"
-              value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-              required
-              maxLength={100}
+              id="stream-url"
+               placeholder={
+                formData.type === 'youtube' 
+                  ? "https://www.youtube.com/channel/UCxxxxxx or https://www.youtube.com/embed/live_stream?channel=UCxxxxxx"
+                  : formData.type === 'mpd'
+                  ? "https://example.com/stream.mpd"
+                  : "https://example.com/stream.m3u8"
+               }
+              value={formData.manifestUri}
+              onChange={(e) => handleInputChange('manifestUri', e.target.value)}
+              className="bg-background/50"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="type">Stream Type *</Label>
-            <Select 
-              value={formData.type} 
-              onValueChange={(value) => handleInputChange('type', value as 'mpd' | 'hls' | 'youtube')}
-            >
-              <SelectTrigger id="type">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="hls">
-                  <div className="flex items-center gap-2">
-                    <Play className="w-4 h-4" />
-                    <span>HLS (.m3u8)</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="mpd">
-                  <div className="flex items-center gap-2">
-                    <Play className="w-4 h-4" />
-                    <span>MPD (DASH)</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="youtube">
-                  <div className="flex items-center gap-2">
-                    <Play className="w-4 h-4" />
-                    <span>YouTube</span>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="manifestUri">
-              {formData.type === 'youtube' ? 'YouTube URL *' : 'Manifest URI / Stream URL *'}
-            </Label>
+            <Label htmlFor="logo-url" className="text-foreground">Logo URL *</Label>
             <Input
-              id="manifestUri"
-              placeholder={
-                formData.type === 'youtube' 
-                  ? "https://youtube.com/channel/... or video URL" 
-                  : formData.type === 'hls' 
-                    ? "https://example.com/stream.m3u8"
-                    : "https://example.com/stream.mpd"
-              }
-              value={formData.manifestUri}
-              onChange={(e) => handleInputChange('manifestUri', e.target.value)}
-              required
-              maxLength={1000}
+              id="logo-url"
+              placeholder="https://example.com/channel-logo.png"
+              value={formData.logo}
+              onChange={(e) => handleInputChange('logo', e.target.value)}
+              className="bg-background/50"
             />
           </div>
 
           {formData.type === 'mpd' && (
-            <div className="space-y-2">
-              <Label htmlFor="clearKey">Clear Key (optional)</Label>
-              <Input
-                id="clearKey"
-                placeholder="keyId:key or JSON format"
-                value={formData.clearKey}
-                onChange={(e) => handleInputChange('clearKey', e.target.value)}
-                maxLength={500}
-              />
-              <p className="text-xs text-muted-foreground">
-                Format: keyId:key or {"{"}"keyId": "key"{"}"}
-              </p>
-            </div>
+             <div className="space-y-2">
+               <Label htmlFor="clear-key" className="text-foreground">Clear Key (for encrypted MPD)</Label>
+               <Input
+                 id="clear-key"
+                 placeholder="keyId:key (e.g., 436b69f987924fcbbc06d40a69c2799a:c63d5b0d7e52335b61aeba4f6537d54d)"
+                 value={formData.clearKey}
+                 onChange={(e) => handleInputChange('clearKey', e.target.value)}
+                 className="bg-background/50"
+               />
+               <p className="text-xs text-muted-foreground">Format: keyId:key (separated by colon)</p>
+             </div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="logo">Logo URL *</Label>
-            <Input
-              id="logo"
-              placeholder="https://example.com/logo.png"
-              value={formData.logo}
-              onChange={(e) => handleInputChange('logo', e.target.value)}
-              required
-              maxLength={1000}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="category">Category (optional)</Label>
+            <Label htmlFor="category" className="text-foreground">Category (Optional)</Label>
             <Input
               id="category"
-              placeholder="Entertainment, News, Sports..."
+              placeholder="e.g., News, Sports, Entertainment"
               value={formData.category}
               onChange={(e) => handleInputChange('category', e.target.value)}
-              maxLength={50}
+              className="bg-background/50"
             />
           </div>
 
-          <div className="flex gap-2 pt-4">
-            <Button type="submit" disabled={isSubmitting} className="flex-1">
-              <Plus className="w-4 h-4 mr-2" />
-              {isSubmitting ? 'Adding Channel...' : 'Add Channel'}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <Button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="bg-accent text-accent-foreground hover:bg-accent/90 flex items-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  Adding Channel...
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4" />
+                  Add Channel
+                </>
+              )}
             </Button>
-            <Button type="button" variant="outline" onClick={handleClearForm}>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setFormData({
+                name: '',
+                manifestUri: '',
+                type: 'hls',
+                logo: '',
+                category: '',
+                clearKey: ''
+              })}
+              className="border-primary/20 hover:bg-primary/10"
+            >
               Clear Form
             </Button>
           </div>
@@ -360,4 +326,4 @@ const AddChannelForm = ({ onChannelAdded, username }: AddChannelFormProps) => {
   );
 };
 
-export default AddChannelForm;
+export { AddChannelForm };

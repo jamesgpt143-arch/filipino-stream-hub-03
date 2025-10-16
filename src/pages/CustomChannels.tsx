@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { ChannelGrid } from '@/components/ChannelGrid';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import AddChannelForm from '@/components/AddChannelForm';
+import { AddChannelForm } from '@/components/AddChannelForm';
 import { Channel } from '@/data/channels';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';

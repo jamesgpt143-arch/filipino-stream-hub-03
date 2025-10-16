@@ -2,6 +2,3 @@ project_id = "fdwinqxxqzybtanpxlbq"
 
 [functions.track-visit]
 verify_jwt = false
-
-[functions.generate-ai-image]
-# JWT verification enabled by default for security
