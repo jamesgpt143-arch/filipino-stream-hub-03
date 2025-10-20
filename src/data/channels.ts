@@ -261,7 +261,7 @@ export const channels: Channel[] = [
     '5458f45efedb4d6f8aa6ac76c85b621b': 'dbf8a0a306a64525ba3012fd225370c0'
   },
   type: 'mpd',
-  logo: 'https://commons.wikimedia.org/wiki/Category:Science_Channel_logos#/media/File:Discovery_Science_-_Logo_2012.svg'
+  logo: 'https://banner2.cleanpng.com/20180824/ava/kisspng-science-channel-logo-discovery-channel-brand-showing-porn-images-for-greek-italian-porn-www-fre-1713949227223.webp'
 }, {
   name: 'Disney Channel',
   manifestUri: 'https://uselector.cdn.intigral-ott.net/DIS/DIS.isml/manifest.mpd',
