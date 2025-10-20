@@ -255,6 +255,14 @@ export const channels: Channel[] = [
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.4ONCH8mk4foZNv6W4xM0nQHaGa?rs=1&pid=ImgDetMain'
 }, {
+   name: 'Discovery Science',
+  manifestUri: 'https://d1g8wgjurz8via.cloudfront.net/bpk-tv/Discoveryscience2/default/manifest.mpd',
+  clearKey: {
+    '5458f45efedb4d6f8aa6ac76c85b621b': 'dbf8a0a306a64525ba3012fd225370c0'
+  },
+  type: 'mpd',
+  logo: 'https://commons.wikimedia.org/wiki/Category:Science_Channel_logos#/media/File:Discovery_Science_-_Logo_2012.svg'
+}, {
   name: 'Disney Channel',
   manifestUri: 'https://uselector.cdn.intigral-ott.net/DIS/DIS.isml/manifest.mpd',
   clearKey: {
