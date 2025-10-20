@@ -58,6 +58,8 @@ export const UpdatePopup = () => {
                   Celestial Movies
                   <br />
                   Hits Movies
+                   <br />
+                  Discovery Science
                 </p>
               </div>
             </div>
