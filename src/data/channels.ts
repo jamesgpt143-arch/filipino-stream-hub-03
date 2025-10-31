@@ -635,6 +635,27 @@ name: 'KPlus',
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.dDzYufwVTWroitJQy9pfXQAAAA?rs=1&pid=ImgDetMain'
 }, {
+    name: 'PBB Collab 2.0',
+  manifestUri: 'https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01006-abs-cbn-pbb-live-dash-abscbnono/index.mpd',
+  type: 'mpd',
+  logo: 'https://pql-static.abs-cbn.com/images/channel/pbbcelebritycollab_livethumb_20251023021847.jpg'
+}, {
+    name: 'PBB Collab 2.0 Dining Area',
+  manifestUri: 'https://abslive.akamaized.net/dash/live/2028025/pbb1/manifest.mpd',
+  clearKey: {
+    'b37bb823fe48452eba8cee62516f5da1': '8b48cec6bce94917e4c39c381d607102'
+  },
+  type: 'mpd',
+  logo: 'https://pql-static.abs-cbn.com/images/channel/pbballaccessstreamdining_livethumb_20251023021947.jpg'
+}, {
+   name: 'PBB Collab 2.0 Pool Area',
+  manifestUri: 'https://abslive.akamaized.net/dash/live/2028025/pbb2/manifest.mpd',
+  clearKey: {
+    '9539027a7c42446a8648555af3bb3095': '1cb94c88f68bef1e728cfa4677e1eeca'
+  },
+  type: 'mpd',
+  logo: 'https://pql-static.abs-cbn.com/images/channel/pbballaccessstreampool_livethumb_20251023022209.jpg'
+}, {
   name: 'PBO',
   manifestUri: 'https://qp-pldt-live-bpk-01-prod.akamaized.net/bpk-tv/pbo_sd/default/index.mpd',
   clearKey: {
