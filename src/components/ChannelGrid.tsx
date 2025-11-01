@@ -6,7 +6,6 @@ interface ChannelGridProps {
   onChannelSelect: (channel: Channel) => void;
   onToggleHide?: (channelName: string) => void;
   onDelete?: (channelName: string) => void;
-  onAddToPlaylist?: (channel: Channel) => void;
   hiddenChannels?: Set<string>;
   customChannels?: Channel[];
   currentUsername?: string;
@@ -18,7 +17,6 @@ export const ChannelGrid = ({
   onChannelSelect, 
   onToggleHide, 
   onDelete,
-  onAddToPlaylist,
   hiddenChannels, 
   customChannels = [],
   currentUsername,
@@ -65,7 +63,6 @@ export const ChannelGrid = ({
             onClick={() => onChannelSelect(channel)}
             onToggleHide={onToggleHide}
             onDelete={onDelete}
-            onAddToPlaylist={onAddToPlaylist}
             isHidden={hiddenChannels?.has(channel.name)}
             isCustom={customChannels.some(customChannel => customChannel.name === channel.name)}
             canDelete={customChannels.some(customChannel => customChannel.name === channel.name) && 

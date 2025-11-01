@@ -7,14 +7,11 @@ import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Eye, EyeOff, Plus, List } from 'lucide-react';
+import { Search, Eye, EyeOff, Plus } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
 import { UserStats } from '@/components/UserStats';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { PlaylistManager } from '@/components/PlaylistManager';
-import { AddToPlaylistDialog } from '@/components/AddToPlaylistDialog';
 
 const CustomChannels = () => {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
@@ -23,8 +20,6 @@ const CustomChannels = () => {
   const [showHidden, setShowHidden] = useState(false);
   const [customChannels, setCustomChannels] = useState<Channel[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [addToPlaylistChannel, setAddToPlaylistChannel] = useState<Channel | null>(null);
-  const [addToPlaylistType, setAddToPlaylistType] = useState<'iptv' | 'custom'>('custom');
   const { toast } = useToast();
   const { username, isAdmin } = useAuth();
 
@@ -216,11 +211,6 @@ const CustomChannels = () => {
     }
   };
 
-  const handleAddToPlaylist = (channel: Channel) => {
-    setAddToPlaylistChannel(channel);
-    setAddToPlaylistType('custom');
-  };
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header Section */}
@@ -284,17 +274,7 @@ const CustomChannels = () => {
       </div>
 
       <main className="container mx-auto px-4 py-6">
-        <Tabs defaultValue="channels" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-            <TabsTrigger value="channels">Channels</TabsTrigger>
-            <TabsTrigger value="playlists">
-              <List className="w-4 h-4 mr-2" />
-              Playlists
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="channels">
-            {customChannels.length === 0 ? (
+        {customChannels.length === 0 ? (
               <div className="text-center py-12">
                 <Card className="max-w-md mx-auto">
                   <CardHeader>
@@ -311,10 +291,10 @@ const CustomChannels = () => {
                       <Plus className="w-4 h-4 mr-2" />
                       Add Your First Channel
                     </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            ) : (
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
               <div className="flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-200px)]">
                 {/* Video Player */}
                 <div className="w-full lg:w-2/3 flex-shrink-0">
@@ -345,26 +325,15 @@ const CustomChannels = () => {
                       onChannelSelect={handleChannelSelect}
                       onToggleHide={handleToggleHide}
                       onDelete={handleDeleteChannel}
-                      onAddToPlaylist={handleAddToPlaylist}
                       hiddenChannels={hiddenChannels}
                       customChannels={customChannels}
                       currentUsername={username}
                       isAdmin={isAdmin}
                     />
-                  </div>
                 </div>
               </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="playlists">
-            <PlaylistManager
-              username={username!}
-              currentUsername={username!}
-              isAdmin={isAdmin}
-            />
-          </TabsContent>
-        </Tabs>
+            </div>
+          )}
       </main>
 
       {/* Footer */}
@@ -379,13 +348,6 @@ const CustomChannels = () => {
         </div>
       </footer>
       <UserStats pagePath="/custom-channels" />
-      
-      <AddToPlaylistDialog
-        open={!!addToPlaylistChannel}
-        onOpenChange={(open) => !open && setAddToPlaylistChannel(null)}
-        channel={addToPlaylistChannel}
-        channelType={addToPlaylistType}
-      />
     </div>
   );
 };

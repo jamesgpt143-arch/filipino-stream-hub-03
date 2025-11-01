@@ -8,14 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Search, Eye, EyeOff } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
 import { UserStats } from '@/components/UserStats';
-import { AddToPlaylistDialog } from '@/components/AddToPlaylistDialog';
 
 const Channels = () => {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [hiddenChannels, setHiddenChannels] = useState<Set<string>>(new Set());
   const [showHidden, setShowHidden] = useState(false);
-  const [addToPlaylistChannel, setAddToPlaylistChannel] = useState<Channel | null>(null);
   const { toast } = useToast();
 
   // Only show static IPTV channels
@@ -69,10 +67,6 @@ const Channels = () => {
   const handleDeleteChannel = (channelName: string) => {
     // This function is not used for IPTV channels as they cannot be deleted
     console.log('Delete not available for IPTV channels:', channelName);
-  };
-
-  const handleAddToPlaylist = (channel: Channel) => {
-    setAddToPlaylistChannel(channel);
   };
 
   return (
@@ -145,7 +139,6 @@ const Channels = () => {
                   onChannelSelect={handleChannelSelect}
                   onToggleHide={handleToggleHide}
                   onDelete={handleDeleteChannel}
-                  onAddToPlaylist={handleAddToPlaylist}
                   hiddenChannels={hiddenChannels}
                   customChannels={[]}
                 />
@@ -166,13 +159,6 @@ const Channels = () => {
         </div>
       </footer>
       <UserStats pagePath="/channels" />
-      
-      <AddToPlaylistDialog
-        open={!!addToPlaylistChannel}
-        onOpenChange={(open) => !open && setAddToPlaylistChannel(null)}
-        channel={addToPlaylistChannel}
-        channelType="iptv"
-      />
     </div>
   );
 };
