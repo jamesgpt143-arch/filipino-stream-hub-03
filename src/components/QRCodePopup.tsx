@@ -34,7 +34,7 @@ export const QRCodePopup = () => {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle className="text-center">Support the Stream</DialogTitle>
+          <DialogTitle className="text-center">Promo Load</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center space-y-4">
           <img 
