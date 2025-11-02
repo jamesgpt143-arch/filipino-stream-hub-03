@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import qrCodeImage from "@/assets/instapay-qr.jpg";
+import promoLoadImage from "@/assets/promo-load.png";
 
 export const DonateButton = () => {
   return (
@@ -22,13 +22,23 @@ export const DonateButton = () => {
         </DialogHeader>
         <div className="flex flex-col items-center space-y-4">
           <img 
-            src={qrCodeImage} 
-            alt="InstaPay QR Code for Donations" 
-            className="w-64 h-64 object-contain rounded-lg border"
+            src={promoLoadImage} 
+            alt="Promo Load Options" 
+            className="w-full max-w-md object-contain rounded-lg border"
           />
-          <p className="text-sm text-muted-foreground text-center">
-            Scan the QR code with your InstaPay app to donate
-          </p>
+          <div className="text-center space-y-2">
+            <p className="text-sm font-medium">
+              Mode of payment: GCash
+            </p>
+            <a 
+              href="https://web.facebook.com/james.benavides.921" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-sm text-primary hover:underline inline-block"
+            >
+              Message us on Facebook
+            </a>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
