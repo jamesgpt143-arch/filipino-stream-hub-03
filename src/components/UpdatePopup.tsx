@@ -60,26 +60,6 @@ export const UpdatePopup = () => {
                 </p>
               </div>
             </div>
-            
-            <div className="flex items-start gap-3">
-              <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-              <div>
-                <h4 className="font-semibold text-foreground">Personal Playlists</h4>
-                <p className="text-sm text-muted-foreground">
-                  Your playlists are private - only you can see them.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-              <div>
-                <h4 className="font-semibold text-foreground">Easy Management</h4>
-                <p className="text-sm text-muted-foreground">
-                  Easily add, delete, and play channels within your playlist.
-                </p>
-              </div>
-            </div>
 
             <div className="flex items-start gap-3">
               <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
