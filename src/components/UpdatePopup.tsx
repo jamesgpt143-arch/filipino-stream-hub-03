@@ -43,16 +43,6 @@ export const UpdatePopup = () => {
             <div className="flex items-start gap-3">
               <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
               <div>
-                <h4 className="font-semibold text-foreground">Playlist Feature</h4>
-                <p className="text-sm text-muted-foreground">
-                  Create your own playlists! Organize your favorite channels from IPTV and Custom Channels.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-              <div>
                 <h4 className="font-semibold text-foreground">Added Channel</h4>
                 <p className="text-sm text-muted-foreground">
                  GMA
@@ -80,13 +70,6 @@ export const UpdatePopup = () => {
                 </p>
               </div>
             </div>
-          </div>
-
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 animate-fade-in">
-            <p className="text-sm text-foreground text-center">
-              Go to the <span className="font-semibold text-primary">Custom Channels</span> page and click the{" "}
-              <span className="font-semibold text-primary">Playlists</span> tab to get started!
-            </p>
           </div>
         </div>
 
