@@ -36,19 +36,7 @@ export const UpdatePopup = () => {
           <DialogDescription>
             Check out the latest features we've added
           </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto pr-4">
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-              <div>
-                <h4 className="font-semibold text-foreground">Playlist Feature</h4>
-                <p className="text-sm text-muted-foreground">
-                  Create your own playlists! Organize your favorite channels from IPTV and Custom Channels.
-                </p>
-              </div>
-            </div>
+        </DialogHeader
 
             <div className="flex items-start gap-3">
               <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
@@ -82,13 +70,6 @@ export const UpdatePopup = () => {
             </div>
           </div>
 
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 animate-fade-in">
-            <p className="text-sm text-foreground text-center">
-              Go to the <span className="font-semibold text-primary">Custom Channels</span> page and click the{" "}
-              <span className="font-semibold text-primary">Playlists</span> tab to get started!
-            </p>
-          </div>
-        </div>
 
         <div className="flex justify-end gap-2 pt-4">
           <Button onClick={handleClose} className="w-full">
