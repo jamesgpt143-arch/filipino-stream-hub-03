@@ -329,6 +329,14 @@ export const channels: Channel[] = [
   type: 'mpd',
   logo: 'https://cdn2.ettoday.net/images/6892/e6892888.jpg'
 }, {
+    name: 'GMA',
+  manifestUri: 'https://mc-nfwz0ez9k2.bunny.run/gma/dopamine/manifest.mpd',
+  clearKey: {
+    '31363231383438333031323033393138': '38694e34324d543478316b7455753437'
+  },
+  type: 'mpd',
+  logo: 'https://logonoid.com/images/gma-logo.png'
+}, {
 name: 'GMA (Youtube Stream)',
   type: 'youtube',
   manifestUri: '', // Add empty manifestUri for youtube channels
