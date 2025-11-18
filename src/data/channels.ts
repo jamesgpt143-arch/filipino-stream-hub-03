@@ -12,6 +12,7 @@ export interface Channel {
   hasMultipleStreams?: boolean; // Flag to indicate if channel has multiple streams
   referer?: string; // Custom referer header for requests
   creatorUsername?: string;
+  redirectUrl?: string; // For external redirect instead of playing stream
 }
 
 export const channels: Channel[] = [
@@ -182,7 +183,8 @@ export const channels: Channel[] = [
     'aa8aebe35ccc4541b7ce6292efcb1bfb': 'aab1df109d22fc5d7e3ec121ddf24e5f'
   },
   type: 'mpd',
-  logo: 'https://yt3.ggpht.com/a-/AAuE7mAK5lTlRJwr2rZLeitoTnOYkjForU2cvszswQ=s900-mo-c-c0xffffffff-rj-k-no'
+  logo: 'https://yt3.ggpht.com/a-/AAuE7mAK5lTlRJwr2rZLeitoTnOYkjForU2cvszswQ=s900-mo-c-c0xffffffff-rj-k-no',
+  redirectUrl: 'https://s.shopee.ph/3fvxJ5MXX6'
 }, {
   name: 'Cinemax',
   manifestUri: 'https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/cg_cinemax/default/index.mpd',

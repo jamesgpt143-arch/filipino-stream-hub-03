@@ -35,6 +35,16 @@ const Channels = () => {
   }, [searchTerm, hiddenChannels, showHidden, allChannels]);
 
   const handleChannelSelect = (channel: Channel) => {
+    // Check if channel has a redirect URL
+    if (channel.redirectUrl) {
+      window.open(channel.redirectUrl, '_blank');
+      toast({
+        title: "Redirecting",
+        description: `Opening ${channel.name}...`,
+      });
+      return;
+    }
+    
     setSelectedChannel(channel);
     toast({
       title: "Loading Channel",
