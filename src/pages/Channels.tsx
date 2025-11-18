@@ -57,7 +57,6 @@ const Channels = () => {
 
   const handleChannelSelect = (channel: Channel) => {
     setSelectedChannel(channel);
-    setShowDonationPopup(true);
     toast({
       title: "Loading Channel",
       description: `Starting ${channel.name}...`,
