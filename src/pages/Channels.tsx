@@ -8,34 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Search, Eye, EyeOff } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
 import { UserStats } from '@/components/UserStats';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import qrCodeImage from "@/assets/instapay-qr.jpg";
 
 const Channels = () => {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [hiddenChannels, setHiddenChannels] = useState<Set<string>>(new Set());
   const [showHidden, setShowHidden] = useState(false);
-  const [showDonationPopup, setShowDonationPopup] = useState(false);
-  const [dontShowToday, setDontShowToday] = useState(false);
   const { toast } = useToast();
-
-  // Show donation popup on initial load
-  useEffect(() => {
-    const lastShown = localStorage.getItem("donation-popup-hidden-date");
-    const today = new Date().toDateString();
-    
-    if (lastShown !== today) {
-      setShowDonationPopup(true);
-    }
-  }, []);
 
   // Only show static IPTV channels
   const allChannels = useMemo(() => {
@@ -61,14 +40,6 @@ const Channels = () => {
       title: "Loading Channel",
       description: `Starting ${channel.name}...`,
     });
-  };
-
-  const handleDonationPopupChange = (isOpen: boolean) => {
-    if (!isOpen && dontShowToday) {
-      const today = new Date().toDateString();
-      localStorage.setItem("donation-popup-hidden-date", today);
-    }
-    setShowDonationPopup(isOpen);
   };
 
   const handleClosePlayer = () => {
@@ -100,37 +71,6 @@ const Channels = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Donation QR Code Popup */}
-      <Dialog open={showDonationPopup} onOpenChange={handleDonationPopupChange}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-center">Support the Stream</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col items-center space-y-4">
-            <img 
-              src={qrCodeImage} 
-              alt="InstaPay QR Code for Donations" 
-              className="w-64 h-64 object-contain rounded-lg border"
-            />
-            <p className="text-sm text-muted-foreground text-center">
-              Scan the QR code with your InstaPay app to donate
-            </p>
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="dont-show-donation-today" 
-                checked={dontShowToday}
-                onCheckedChange={(checked) => setDontShowToday(checked === true)}
-              />
-              <Label 
-                htmlFor="dont-show-donation-today" 
-                className="text-sm cursor-pointer"
-              >
-                Don't show this today
-              </Label>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
       {/* Search and Filter Section */}
       <div className="bg-card border-b border-border p-4">
         <div className="container mx-auto space-y-4">
