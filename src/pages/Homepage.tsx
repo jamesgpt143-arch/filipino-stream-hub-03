@@ -5,7 +5,6 @@ import { Tv, Film, Play, Star, Globe } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
 import { UserStats } from '@/components/UserStats';
 import { PageViews } from '@/components/PageViews';
-import { QRCodePopup } from '@/components/QRCodePopup';
 
 const Homepage = () => {
   return (
@@ -177,7 +176,6 @@ const Homepage = () => {
         </div>
       </footer>
       <UserStats pagePath="/" />
-      <QRCodePopup />
     </div>
   );
 };
