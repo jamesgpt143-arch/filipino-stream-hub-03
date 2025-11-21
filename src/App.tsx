@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { UpdatePopup } from "./components/UpdatePopup";
 import { QRCodePopup } from "./components/QRCodePopup";
+import { ShopeeRedirect } from "./components/ShopeeRedirect";
 import Homepage from "./pages/Homepage";
 import Channels from "./pages/Channels";
 import CustomChannels from "./pages/CustomChannels";
@@ -72,6 +73,7 @@ const App = () => {
         <PWAInstallPrompt />
         <UpdatePopup />
         <QRCodePopup />
+        <ShopeeRedirect />
         <AuthProvider>
           <BrowserRouter>
             <AppContent />
