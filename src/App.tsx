@@ -17,7 +17,6 @@ import MovieDetail from "./pages/MovieDetail";
 import TVSeries from "./pages/TVSeries";
 import TVSeriesDetail from "./pages/TVSeriesDetail";
 import Comments from "./pages/Comments";
-import AIImageGenerator from "./pages/AIImageGenerator";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import { disableDevTools } from "./utils/disableDevTools";
@@ -44,7 +43,6 @@ const AppContent = () => {
         <Route path="/tv-series" element={<TVSeries />} />
         <Route path="/tv-series/:id" element={<TVSeriesDetail />} />
         <Route path="/comments" element={<Comments />} />
-        <Route path="/ai-image-generator" element={<AIImageGenerator />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
