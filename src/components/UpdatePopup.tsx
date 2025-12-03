@@ -45,6 +45,10 @@ export const UpdatePopup = () => {
               <div>
                 <h4 className="font-semibold text-foreground">Added Channel</h4>
                 <p className="text-sm text-muted-foreground">
+                 GTV
+                  <br />
+                 GMA
+                  <br />
                  &Flix
                   <br />
                  I Heart Movies
