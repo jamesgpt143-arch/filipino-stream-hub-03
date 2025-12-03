@@ -45,11 +45,11 @@ export const UpdatePopup = () => {
               <div>
                 <h4 className="font-semibold text-foreground">Added Channel</h4>
                 <p className="text-sm text-muted-foreground">
-                 PBB Collab 2.0
+                 &Flix
                   <br />
-                 PBB Collab 2.0 Dinning Area
+                 I Heart Movies
                   <br />
-                 PBB Collab 2.0 Pool Area
+                 Heart Of Asia
                 </p>
               </div>
             </div>
