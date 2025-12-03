@@ -25,7 +25,7 @@ export const channels: Channel[] = [
   type: 'mpd',
   logo: 'https://i.imgur.com/pRwyOMP.png'
 }, {
-    name: '&Flix HD',
+    name: '&Flix',
   manifestUri: 'https://edge3-moblive.yuppcdn.net/drm/smil:nflixdrm.smil/chunklist_b996000.m3u8',
   type: 'hls',
   logo: 'https://ts1.mm.bing.net/th?id=OIP.FlPpt1NoTPALgSMM8CwFgAHaHa&pid=15.1'
