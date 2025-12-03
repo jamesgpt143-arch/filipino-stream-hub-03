@@ -336,6 +336,12 @@ export const channels: Channel[] = [
   type: 'mpd',
   logo: 'https://cdn2.ettoday.net/images/6892/e6892888.jpg'
 }, {
+   name: 'GMA',
+  manifestUri: 'https://converse.nathcreqtives.com/1093/manifest.mpd',
+  widevineUrl: 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00',
+  type: 'mpd',
+  logo: 'https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126306082.png'
+}, {
 name: 'GMA (Youtube Stream)',
   type: 'youtube',
   manifestUri: '', // Add empty manifestUri for youtube channels
