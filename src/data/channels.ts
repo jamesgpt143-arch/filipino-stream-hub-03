@@ -440,6 +440,11 @@ name: 'GMA (Youtube Stream)',
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.sJNkdFUalhzRyZT4SJ9HBAHaEc?rs=1&pid=ImgDetMain'
 }, {
+   name: 'I Hert Movies',
+  manifestUri: 'https://hls.nathcreqtives.com/playlist.m3u8?id=2',
+  type: 'hls',
+  logo: 'https://logos.fandom.com/wiki/I_Heart_Movies/Other?file=I_Heart_Movies_Network_ID_2021.png'
+}, {
   name: 'INCTV',
   manifestUri: 'https://199211.global.ssl.fastly.net/643cc12aa824db4374021c8c/live_95f6ac80dd6511ed9d08b12be56ae55e/index.m3u8',
   type: 'hls',
