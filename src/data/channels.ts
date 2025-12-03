@@ -350,6 +350,12 @@ name: 'GMA (Youtube Stream)',
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.ntjNVRaXsZJ0vrhWBA35sQHaE7?rs=1&pid=ImgDetMain'
 }, {
+  name: 'GTV',
+  manifestUri: 'https://converse.nathcreqtives.com/1143/manifest.mpd',
+  widevineUrl: 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00',
+  type: 'mpd',
+  logo: 'https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png'
+}, {
   name: 'Global Fashion Channel',
   manifestUri: 'https://gfcomnimedia-globalfashionchannel-1-eu.xiaomi.wurl.tv/playlist.m3u8',
   type: 'hls',
