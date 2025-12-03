@@ -395,7 +395,7 @@ name: 'GMA (Youtube Stream)',
     name: 'Heart Of Asia',
   manifestUri: 'https://hls.nathcreqtives.com/playlist.m3u8?id=1',
   type: 'hls',
-  logo: 'https://logos.fandom.com/wiki/Heart_of_Asia_(Philippines)/Other?file=Heart_of_Asia_3D_Logo.png'
+  logo: 'https://static.wikia.nocookie.net/logopedia/images/7/79/Heart_of_Asia_3D_Logo.png/revision/latest/scale-to-width-down/149?cb=20200713050134'
 }, {
   name: 'HGTV HD',
   manifestUri: 'https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/hgtv_hd1/default/index.mpd',
@@ -445,10 +445,10 @@ name: 'GMA (Youtube Stream)',
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.sJNkdFUalhzRyZT4SJ9HBAHaEc?rs=1&pid=ImgDetMain'
 }, {
-   name: 'I Hert Movies',
+   name: 'I Heart Movies',
   manifestUri: 'https://hls.nathcreqtives.com/playlist.m3u8?id=2',
   type: 'hls',
-  logo: 'https://logos.fandom.com/wiki/I_Heart_Movies/Other?file=I_Heart_Movies_Network_ID_2021.png'
+  logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/26/I_Heart_Movies_2021.png/250px-I_Heart_Movies_2021.png'
 }, {
   name: 'INCTV',
   manifestUri: 'https://199211.global.ssl.fastly.net/643cc12aa824db4374021c8c/live_95f6ac80dd6511ed9d08b12be56ae55e/index.m3u8',
