@@ -392,6 +392,11 @@ name: 'GMA (Youtube Stream)',
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.lY5V2M3D9jtBFJNbOAI8swHaDt?rs=1&pid=ImgDetMain'
 }, {
+    name: 'Heart Of Asia',
+  manifestUri: 'https://hls.nathcreqtives.com/playlist.m3u8?id=1',
+  type: 'hls',
+  logo: 'https://logos.fandom.com/wiki/Heart_of_Asia_(Philippines)/Other?file=Heart_of_Asia_3D_Logo.png'
+}, {
   name: 'HGTV HD',
   manifestUri: 'https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/hgtv_hd1/default/index.mpd',
   clearKey: {
