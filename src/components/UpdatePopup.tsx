@@ -64,15 +64,6 @@ export const UpdatePopup = () => {
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-              <div>
-                <h4 className="font-semibold text-foreground">AI Image Generator</h4>
-                <p className="text-sm text-muted-foreground">
-                  Create custom AI-generated images using the new AI tool!
-                </p>
-              </div>
-            </div>
           </div>
         </div>
 
