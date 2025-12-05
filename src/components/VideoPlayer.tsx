@@ -250,6 +250,7 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
           </>
         ) : (
           <div
+            id="iptv-video-player"
             ref={containerRef}
             className="relative w-full h-full"
             style={{ '--shaka-primary-color': 'hsl(var(--primary))' } as any}
