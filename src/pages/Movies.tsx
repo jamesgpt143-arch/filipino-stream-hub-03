@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Info } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
 import { UserStats } from '@/components/UserStats';
+import { useClickadillaAds } from '@/hooks/useClickadillaAds';
 
 const Movies = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -20,6 +21,9 @@ const Movies = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { toast } = useToast();
+
+  // Clickadilla Popunder Ads
+  useClickadillaAds();
 
   useEffect(() => {
     loadMovies();
