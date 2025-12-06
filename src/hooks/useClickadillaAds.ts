@@ -2,57 +2,57 @@ import { useEffect } from 'react';
 
 export const useClickadillaAds = () => {
   useEffect(() => {
-    const p = "c9b6cb59c84ff56aa7ad154505a16417";
-    const n = [
-      ["siteId", 937 * 711 * 329 * 209 + 979 - 45803801587],
+    const e = "c9b6cb59c84ff56aa7ad154505a16417";
+    const l = [
+      ["siteId", 664 * 771 * 798 - 685 - 403271708],
       ["minBid", 0],
-      ["popundersPerIP", "0:12"],
+      ["popundersPerIP", "0"],
       ["delayBetween", 0],
       ["default", false],
       ["defaultPerDay", 0],
       ["topmostLayer", "auto"]
     ];
-    const i = [
-      "d3d3LnZpc2FyaW9tZWRpYS5jb20vbG5hY2xfZmFjdG9yeS5taW4uY3Nz",
-      "ZDEzazdwcmF4MXlpMDQuY2xvdWRmcm9udC5uZXQvY0ZUL2JncHUubWluLmpz",
-      "d3d3LmRpZndsbXpqdi5jb20vbm5hY2xfZmFjdG9yeS5taW4uY3Nz",
-      "d3d3LmlxY2Vwc2F4YXlqZ3UuY29tL3N5YkUvdWdwdS5taW4uanM="
+    const j = [
+      "d3d3LnZpc2FyaW9tZWRpYS5jb20vcm5hY2xfZmFjdG9yeS5taW4uY3Nz",
+      "ZDEzazdwcmF4MXlpMDQuY2xvdWRmcm9udC5uZXQvRUQvamdwdS5taW4uanM=",
+      "d3d3LmNmdHVib2J2ZS5jb20vd25hY2xfZmFjdG9yeS5taW4uY3Nz",
+      "d3d3LnNtbnB5Zmt3ai5jb20vbXUvc2dwdS5taW4uanM="
     ];
-    let l = -1;
-    let w: HTMLScriptElement | undefined;
-    let f: NodeJS.Timeout | undefined;
+    let k = -1;
+    let o: HTMLScriptElement | undefined;
+    let c: NodeJS.Timeout | undefined;
 
-    const u = () => {
-      clearTimeout(f);
-      l++;
-      if (i[l] && !(1790903244000 < new Date().getTime() && 1 < l)) {
-        w = document.createElement("script");
-        w.type = "text/javascript";
-        w.async = true;
-        const z = document.getElementsByTagName("script")[0];
-        w.src = "https://" + atob(i[l]);
-        w.crossOrigin = "anonymous";
-        w.onerror = u;
-        w.onload = () => {
-          clearTimeout(f);
-          if (!(window as any)[p.slice(0, 16) + p.slice(0, 16)]) {
-            u();
+    const a = () => {
+      clearTimeout(c);
+      k++;
+      if (j[k] && !(1790936803000 < new Date().getTime() && 1 < k)) {
+        o = document.createElement("script");
+        o.type = "text/javascript";
+        o.async = true;
+        const m = document.getElementsByTagName("script")[0];
+        o.src = "https://" + atob(j[k]);
+        o.crossOrigin = "anonymous";
+        o.onerror = a;
+        o.onload = () => {
+          clearTimeout(c);
+          if (!(window as any)[e.slice(0, 16) + e.slice(0, 16)]) {
+            a();
           }
         };
-        f = setTimeout(u, 5000);
-        z.parentNode?.insertBefore(w, z);
+        c = setTimeout(a, 5000);
+        m.parentNode?.insertBefore(o, m);
       }
     };
 
-    if (!(window as any)[p]) {
+    if (!(window as any)[e]) {
       try {
-        Object.freeze((window as any)[p] = n);
-      } catch (e) {}
-      u();
+        Object.freeze((window as any)[e] = l);
+      } catch (err) {}
+      a();
     }
 
     return () => {
-      clearTimeout(f);
+      clearTimeout(c);
     };
   }, []);
 };
