@@ -1,7 +1,6 @@
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { Button } from './ui/button';
-import { Star, Download } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Movie, tmdbApi } from '@/lib/tmdb';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,12 +12,6 @@ interface MovieCardProps {
 export const MovieCard = ({ movie, onPlay }: MovieCardProps) => {
   const servers = tmdbApi.getMovieStreamUrls(movie.id);
   const navigate = useNavigate();
-  
-  const handleDownload = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const searchQuery = encodeURIComponent(`${movie.title} ${new Date(movie.release_date).getFullYear()}`);
-    window.open(`https://1337x.to/search/${searchQuery}/1/`, '_blank');
-  };
   
   return (
     <Card className="group cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg bg-card border-border overflow-hidden">
@@ -38,15 +31,6 @@ export const MovieCard = ({ movie, onPlay }: MovieCardProps) => {
             {movie.vote_average.toFixed(1)}
           </Badge>
         </div>
-        <Button
-          size="icon"
-          variant="secondary"
-          className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 hover:bg-background"
-          onClick={handleDownload}
-          title="Download from 1337x"
-        >
-          <Download className="w-4 h-4" />
-        </Button>
       </div>
       <CardContent className="p-4">
         <h3 className="font-semibold text-foreground line-clamp-2 mb-2">
