@@ -67,6 +67,12 @@ export const tmdbApi = {
     return response.json();
   },
 
+  // Get popular anime (TV shows with animation genre from Japan)
+  getPopularAnime: async (page = 1): Promise<{ results: TVShow[]; total_pages: number }> => {
+    const response = await fetch(`${API_BASE_URL}/discover/tv?api_key=${API_KEY}&with_genres=16&with_origin_country=JP&sort_by=popularity.desc&page=${page}`);
+    return response.json();
+  },
+
   // Search movies
   searchMovies: async (query: string, page = 1): Promise<{ results: Movie[]; total_pages: number }> => {
     const response = await fetch(`${API_BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`);
@@ -77,6 +83,15 @@ export const tmdbApi = {
   searchTVShows: async (query: string, page = 1): Promise<{ results: TVShow[]; total_pages: number }> => {
     const response = await fetch(`${API_BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`);
     return response.json();
+  },
+
+  // Search anime
+  searchAnime: async (query: string, page = 1): Promise<{ results: TVShow[]; total_pages: number }> => {
+    const response = await fetch(`${API_BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`);
+    const data = await response.json();
+    // Filter to only include anime (animation genre 16)
+    const filteredResults = data.results.filter((show: TVShow) => show.genre_ids?.includes(16));
+    return { results: filteredResults, total_pages: data.total_pages };
   },
 
   // Get movie details
@@ -140,6 +155,14 @@ export const tmdbApi = {
     return `https://vidlink.pro/tv/${showId}/${season}/${episode}`;
   },
 
+  // Get anime episode stream URLs with multiple servers
+  getAnimeEpisodeStreamUrls: (showId: number, season: number, episode: number) => {
+    return {
+      'Server 1': `https://vidlink.pro/tv/${showId}/${season}/${episode}`,
+      'Server 2': `https://multiembed.mov/?video_id=${showId}&tmdb=1&s=${season}&e=${episode}`
+    };
+  },
+
   // Get movie recommendations
   getMovieRecommendations: async (movieId: number, page = 1): Promise<{ results: Movie[]; total_pages: number }> => {
     const response = await fetch(`${API_BASE_URL}/movie/${movieId}/recommendations?api_key=${API_KEY}&page=${page}`);
@@ -150,6 +173,15 @@ export const tmdbApi = {
   getTVShowRecommendations: async (showId: number, page = 1): Promise<{ results: TVShow[]; total_pages: number }> => {
     const response = await fetch(`${API_BASE_URL}/tv/${showId}/recommendations?api_key=${API_KEY}&page=${page}`);
     return response.json();
+  },
+
+  // Get anime recommendations
+  getAnimeRecommendations: async (showId: number, page = 1): Promise<{ results: TVShow[]; total_pages: number }> => {
+    const response = await fetch(`${API_BASE_URL}/tv/${showId}/recommendations?api_key=${API_KEY}&page=${page}`);
+    const data = await response.json();
+    // Filter to prioritize anime
+    const filteredResults = data.results.filter((show: TVShow) => show.genre_ids?.includes(16));
+    return { results: filteredResults.length > 0 ? filteredResults : data.results, total_pages: data.total_pages };
   },
 
   // Get movie trailers
