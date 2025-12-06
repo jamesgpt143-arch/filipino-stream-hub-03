@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
 import { UserStats } from '@/components/UserStats';
 import { MessageCircle, Send, User, Clock, Reply, Trash2 } from 'lucide-react';
 
@@ -25,6 +24,7 @@ interface Comment {
 
 const Comments = () => {
   const [comments, setComments] = useState<Comment[]>([]);
+  const [userName, setUserName] = useState('');
   const [newComment, setNewComment] = useState({
     message: '',
     facebook_link: ''
@@ -33,7 +33,6 @@ const Comments = () => {
   const [replyMessage, setReplyMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const { username, isAdmin } = useAuth();
 
   useEffect(() => {
     loadComments();
@@ -87,6 +86,15 @@ const Comments = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!userName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter your name",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!newComment.message.trim()) {
       toast({
         title: "Error",
@@ -102,10 +110,10 @@ const Comments = () => {
       const { error } = await supabase
         .from('comments')
         .insert({
-          name: username || 'Anonymous',
+          name: userName.trim(),
           message: newComment.message.trim(),
           facebook_link: newComment.facebook_link.trim() || null,
-          creator_username: username || 'anonymous'
+          creator_username: userName.trim()
         });
 
       if (error) {
@@ -153,9 +161,9 @@ const Comments = () => {
       const { error } = await supabase
         .from('comments')
         .insert({
-          name: username || 'Anonymous',
+          name: userName.trim() || 'Anonymous',
           message: replyMessage.trim(),
-          creator_username: username || 'anonymous',
+          creator_username: userName.trim() || 'anonymous',
           reply_to: parentId
         });
 
@@ -189,17 +197,7 @@ const Comments = () => {
     }
   };
 
-  const handleDelete = async (commentId: string, commentUsername: string) => {
-    // Check permissions
-    if (commentUsername !== username && !isAdmin) {
-      toast({
-        title: "Permission Denied",
-        description: "You can only delete your own comments",
-        variant: "destructive"
-      });
-      return;
-    }
-
+  const handleDelete = async (commentId: string) => {
     try {
       const { error } = await supabase
         .from('comments')
@@ -292,18 +290,6 @@ const Comments = () => {
                   Reply
                 </Button>
               )}
-              
-              {(comment.creator_username === username || isAdmin) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(comment.id, comment.creator_username)}
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                >
-                  <Trash2 className="w-4 h-4 mr-1" />
-                  Delete
-                </Button>
-              )}
             </div>
 
             {/* Reply Form */}
@@ -371,10 +357,19 @@ const Comments = () => {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-xl">Leave a Comment</CardTitle>
-            <p className="text-sm text-muted-foreground">Posting as: {username}</p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="name">Your Name *</Label>
+                <Input
+                  id="name"
+                  placeholder="Enter your name"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  required
+                />
+              </div>
               <div>
                 <Label htmlFor="facebook">Facebook Profile (optional)</Label>
                 <Input

@@ -4,7 +4,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigation } from "./components/Navigation";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { UpdatePopup } from "./components/UpdatePopup";
 
@@ -18,19 +17,12 @@ import TVSeries from "./pages/TVSeries";
 import TVSeriesDetail from "./pages/TVSeriesDetail";
 import Comments from "./pages/Comments";
 import NotFound from "./pages/NotFound";
-import Login from "./pages/Login";
 import { disableDevTools } from "./utils/disableDevTools";
 import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { isAuthenticated } = useAuth();
-
-  if (!isAuthenticated) {
-    return <Login />;
-  }
-
   return (
     <>
       <Navigation />
@@ -72,11 +64,9 @@ const App = () => {
         <UpdatePopup />
         
         <ShopeeRedirect />
-        <AuthProvider>
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
-        </AuthProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );
