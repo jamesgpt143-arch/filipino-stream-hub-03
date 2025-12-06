@@ -11,7 +11,6 @@ import { Search, Eye, EyeOff, Plus } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
 import { UserStats } from '@/components/UserStats';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
 
 const CustomChannels = () => {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
@@ -21,7 +20,6 @@ const CustomChannels = () => {
   const [customChannels, setCustomChannels] = useState<Channel[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const { toast } = useToast();
-  const { username, isAdmin } = useAuth();
 
   // Load custom channels from Supabase on mount
   useEffect(() => {
@@ -114,28 +112,6 @@ const CustomChannels = () => {
   };
 
   const handleDeleteChannel = async (channelName: string) => {
-    // Get the channel to check if user can delete it
-    const channelToDelete = customChannels.find(ch => ch.name === channelName);
-    
-    if (!channelToDelete) {
-      toast({
-        title: "Error",
-        description: "Channel not found",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Check if user can delete (their own channel or admin)
-    if (channelToDelete.creatorUsername !== username && !isAdmin) {
-      toast({
-        title: "Permission Denied",
-        description: "You can only delete channels you created. Only admin can delete any channel.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     try {
       const { error } = await supabase
         .from('custom_channels')
@@ -233,7 +209,7 @@ const CustomChannels = () => {
 
           {showAddForm && (
             <div className="mt-4">
-              <AddChannelForm onChannelAdded={handleChannelAdded} username={username!} />
+              <AddChannelForm onChannelAdded={handleChannelAdded} username="Anonymous" />
             </div>
           )}
 
@@ -327,8 +303,6 @@ const CustomChannels = () => {
                       onDelete={handleDeleteChannel}
                       hiddenChannels={hiddenChannels}
                       customChannels={customChannels}
-                      currentUsername={username}
-                      isAdmin={isAdmin}
                     />
                 </div>
               </div>

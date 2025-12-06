@@ -1,24 +1,12 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
-import { Tv, Film, Menu, X, Home, Plus, User, Shield, LogOut } from 'lucide-react';
+import { Tv, Film, Menu, X, Home, Plus, User } from 'lucide-react';
 import { Clock } from './Clock';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { username, isAdmin, logout } = useAuth();
-  const { toast } = useToast();
-
-  const handleLogout = () => {
-    logout();
-    toast({
-      title: "Logged out",
-      description: "You have been logged out successfully",
-    });
-  };
 
   const navItems = [
     { path: '/', label: 'Home', icon: Home },
@@ -70,28 +58,6 @@ export const Navigation = () => {
                 </Button>
               );
             })}
-            
-            {/* User Info */}
-            <div className="flex items-center gap-2 ml-4 px-3 py-2 bg-primary-foreground/10 rounded-lg">
-              {isAdmin ? (
-                <Shield className="w-4 h-4 text-accent" />
-              ) : (
-                <User className="w-4 h-4 text-primary-foreground/80" />
-              )}
-              <span className="text-sm font-medium text-primary-foreground">
-                {username} {isAdmin && '(Admin)'}
-              </span>
-            </div>
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleLogout}
-              className="flex items-center gap-2 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
-            >
-              <LogOut className="w-4 h-4" />
-              Logout
-            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -131,33 +97,6 @@ export const Navigation = () => {
                 </Button>
               );
             })}
-            
-            {/* Mobile User Info */}
-            <div className="flex items-center justify-between pt-2 border-t border-primary-foreground/20">
-              <div className="flex items-center gap-2">
-                {isAdmin ? (
-                  <Shield className="w-4 h-4 text-accent" />
-                ) : (
-                  <User className="w-4 h-4 text-primary-foreground/80" />
-                )}
-                <span className="text-sm font-medium text-primary-foreground">
-                  {username} {isAdmin && '(Admin)'}
-                </span>
-              </div>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => {
-                  handleLogout();
-                  setIsOpen(false);
-                }}
-                className="flex items-center gap-2 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
-              >
-                <LogOut className="w-4 h-4" />
-                Logout
-              </Button>
-            </div>
           </div>
         )}
       </div>
