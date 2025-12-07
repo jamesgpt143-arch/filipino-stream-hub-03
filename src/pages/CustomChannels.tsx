@@ -49,6 +49,7 @@ const CustomChannels = () => {
           category: channel.category || 'Custom',
           creatorUsername: channel.creator_username,
           ...(channel.clear_key ? { clearKey: channel.clear_key as Record<string, string> } : {}),
+          ...((channel as any).widevine_url ? { widevineUrl: (channel as any).widevine_url } : {}),
           ...(channel.embed_url ? { embedUrl: channel.embed_url } : {}),
           ...(channel.youtube_channel_id ? { youtubeChannelId: channel.youtube_channel_id } : {}),
           ...(channel.has_multiple_streams !== null ? { hasMultipleStreams: channel.has_multiple_streams } : {})
@@ -175,6 +176,7 @@ const CustomChannels = () => {
         category: channel.category || 'Custom',
         creatorUsername: channel.creator_username,
         ...(channel.clear_key ? { clearKey: channel.clear_key as Record<string, string> } : {}),
+        ...((channel as any).widevine_url ? { widevineUrl: (channel as any).widevine_url } : {}),
         ...(channel.embed_url ? { embedUrl: channel.embed_url } : {}),
         ...(channel.youtube_channel_id ? { youtubeChannelId: channel.youtube_channel_id } : {}),
         ...(channel.has_multiple_streams !== null ? { hasMultipleStreams: channel.has_multiple_streams } : {})

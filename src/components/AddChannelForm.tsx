@@ -145,6 +145,7 @@ const AddChannelForm = ({ onChannelAdded, username }: AddChannelFormProps) => {
           logo: newChannel.logo,
           category: newChannel.category,
           ...(processedClearKey ? { clear_key: processedClearKey } : {}),
+          ...(formData.widevineUrl ? { widevine_url: formData.widevineUrl } : {}),
           ...(embedUrl ? { embed_url: embedUrl } : {}),
           ...(youtubeChannelId ? { youtube_channel_id: youtubeChannelId } : {}),
           ...(hasMultipleStreams !== undefined ? { has_multiple_streams: hasMultipleStreams } : {})

@@ -102,6 +102,7 @@ export type Database = {
           name: string
           type: string
           updated_at: string
+          widevine_url: string | null
           youtube_channel_id: string | null
         }
         Insert: {
@@ -117,6 +118,7 @@ export type Database = {
           name: string
           type: string
           updated_at?: string
+          widevine_url?: string | null
           youtube_channel_id?: string | null
         }
         Update: {
@@ -132,6 +134,7 @@ export type Database = {
           name?: string
           type?: string
           updated_at?: string
+          widevine_url?: string | null
           youtube_channel_id?: string | null
         }
         Relationships: []
