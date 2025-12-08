@@ -16,7 +16,6 @@ interface ChannelFormData {
   embedUrl?: string;
   category?: string;
   clearKey?: string; // Input as string, will be converted to Record<string, string>
-  widevineUrl?: string; // For Widevine DRM license server
 }
 
 // This matches the Channel interface from channels.ts
@@ -46,8 +45,7 @@ const AddChannelForm = ({ onChannelAdded, username }: AddChannelFormProps) => {
     type: 'hls',
     logo: '',
     category: '',
-    clearKey: '',
-    widevineUrl: ''
+    clearKey: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -125,7 +123,6 @@ const AddChannelForm = ({ onChannelAdded, username }: AddChannelFormProps) => {
       logo: formData.logo,
       category: formData.category || 'Custom',
       ...(processedClearKey ? { clearKey: processedClearKey } : {}),
-      ...(formData.widevineUrl ? { widevineUrl: formData.widevineUrl } : {}),
       ...(formData.type === 'youtube' ? { 
         embedUrl,
         ...(youtubeChannelId ? { youtubeChannelId } : {}),
@@ -145,7 +142,6 @@ const AddChannelForm = ({ onChannelAdded, username }: AddChannelFormProps) => {
           logo: newChannel.logo,
           category: newChannel.category,
           ...(processedClearKey ? { clear_key: processedClearKey } : {}),
-          ...(formData.widevineUrl ? { widevine_url: formData.widevineUrl } : {}),
           ...(embedUrl ? { embed_url: embedUrl } : {}),
           ...(youtubeChannelId ? { youtube_channel_id: youtubeChannelId } : {}),
           ...(hasMultipleStreams !== undefined ? { has_multiple_streams: hasMultipleStreams } : {})
@@ -180,8 +176,7 @@ const AddChannelForm = ({ onChannelAdded, username }: AddChannelFormProps) => {
         type: 'hls',
         logo: '',
         category: '',
-        clearKey: '',
-        widevineUrl: ''
+        clearKey: ''
       });
     } catch (error) {
       console.error('Error adding channel:', error);
@@ -267,30 +262,17 @@ const AddChannelForm = ({ onChannelAdded, username }: AddChannelFormProps) => {
           </div>
 
           {formData.type === 'mpd' && (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="clear-key" className="text-foreground">Clear Key (for ClearKey DRM)</Label>
-                <Input
-                  id="clear-key"
-                  placeholder="keyId:key (e.g., 436b69f987924fcbbc06d40a69c2799a:c63d5b0d7e52335b61aeba4f6537d54d)"
-                  value={formData.clearKey}
-                  onChange={(e) => handleInputChange('clearKey', e.target.value)}
-                  className="bg-background/50"
-                />
-                <p className="text-xs text-muted-foreground">Format: keyId:key (separated by colon) - Use this OR Widevine URL</p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="widevine-url" className="text-foreground">Widevine License URL (for Widevine DRM)</Label>
-                <Input
-                  id="widevine-url"
-                  placeholder="https://key.example.com/widevine/?deviceId=02:00:00:00:00:00"
-                  value={formData.widevineUrl}
-                  onChange={(e) => handleInputChange('widevineUrl', e.target.value)}
-                  className="bg-background/50"
-                />
-                <p className="text-xs text-muted-foreground">For streams like GMA/GTV that use Widevine DRM</p>
-              </div>
-            </>
+             <div className="space-y-2">
+               <Label htmlFor="clear-key" className="text-foreground">Clear Key (for encrypted MPD)</Label>
+               <Input
+                 id="clear-key"
+                 placeholder="keyId:key (e.g., 436b69f987924fcbbc06d40a69c2799a:c63d5b0d7e52335b61aeba4f6537d54d)"
+                 value={formData.clearKey}
+                 onChange={(e) => handleInputChange('clearKey', e.target.value)}
+                 className="bg-background/50"
+               />
+               <p className="text-xs text-muted-foreground">Format: keyId:key (separated by colon)</p>
+             </div>
           )}
 
           <div className="space-y-2">
@@ -331,8 +313,7 @@ const AddChannelForm = ({ onChannelAdded, username }: AddChannelFormProps) => {
                 type: 'hls',
                 logo: '',
                 category: '',
-                clearKey: '',
-                widevineUrl: ''
+                clearKey: ''
               })}
               className="border-primary/20 hover:bg-primary/10"
             >

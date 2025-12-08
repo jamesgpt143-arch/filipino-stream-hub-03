@@ -177,44 +177,18 @@ export const VideoPlayer = ({ channel, onClose }: VideoPlayerProps) => {
           ui.configure({ addBigPlayButton: true });
 
           player.addEventListener('error', (event: any) => {
-            const errorCode = event.detail?.code;
-            const errorCategory = event.detail?.category;
-            const errorMessage = event.detail?.message || 'Unknown error';
-            console.error('Shaka Player Error:', { code: errorCode, category: errorCategory, message: errorMessage, detail: event.detail });
-            
-            // Provide more helpful error messages for DRM issues
-            let displayError = errorMessage;
-            if (errorCategory === window.shaka?.util?.Error?.Category?.DRM) {
-              displayError = 'DRM Error: This stream requires Widevine support. Make sure you are using Chrome/Edge/Firefox and have the correct license URL.';
-            }
-            setError(`Player Error: ${displayError}`);
+            console.error('Shaka Player Error:', event.detail);
+            setError(`Player Error: ${event.detail.message || 'Unknown error'}`);
           });
 
           player.getNetworkingEngine().registerRequestFilter((type: any, request: any) => {
             request.headers['Referer'] = channel.referer || 'https://example.com';
-            // Add origin header for CORS
-            request.headers['Origin'] = window.location.origin;
           });
 
-          // Configure DRM
           if (channel.clearKey) {
-            console.log('Configuring ClearKey DRM');
             player.configure({ drm: { clearKeys: channel.clearKey } });
           } else if (channel.widevineUrl) {
-            console.log('Configuring Widevine DRM with license URL:', channel.widevineUrl);
-            player.configure({
-              drm: {
-                servers: {
-                  'com.widevine.alpha': channel.widevineUrl
-                },
-                advanced: {
-                  'com.widevine.alpha': {
-                    videoRobustness: 'SW_SECURE_CRYPTO',
-                    audioRobustness: 'SW_SECURE_CRYPTO'
-                  }
-                }
-              }
-            });
+            player.configure({ drm: { servers: { 'com.widevine.alpha': channel.widevineUrl } } });
           }
 
           await player.load(channel.manifestUri);

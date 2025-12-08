@@ -67,29 +67,10 @@ export const tmdbApi = {
     return response.json();
   },
 
-  // Get ongoing/airing TV shows
-  getOngoingTVShows: async (page = 1): Promise<{ results: TVShow[]; total_pages: number }> => {
-    const response = await fetch(`${API_BASE_URL}/tv/on_the_air?api_key=${API_KEY}&page=${page}`);
-    return response.json();
-  },
-
   // Get popular anime (TV shows with animation genre from Japan)
   getPopularAnime: async (page = 1): Promise<{ results: TVShow[]; total_pages: number }> => {
     const response = await fetch(`${API_BASE_URL}/discover/tv?api_key=${API_KEY}&with_genres=16&with_origin_country=JP&sort_by=popularity.desc&page=${page}`);
     return response.json();
-  },
-
-  // Get ongoing/airing anime
-  getOngoingAnime: async (page = 1): Promise<{ results: TVShow[]; total_pages: number }> => {
-    const response = await fetch(`${API_BASE_URL}/discover/tv?api_key=${API_KEY}&with_genres=16&with_origin_country=JP&with_status=0&sort_by=popularity.desc&page=${page}`);
-    const data = await response.json();
-    // Filter shows that are currently airing (have recent air dates)
-    const now = new Date();
-    const threeMonthsAgo = new Date(now.setMonth(now.getMonth() - 3)).toISOString().split('T')[0];
-    const filteredResults = data.results.filter((show: TVShow) => 
-      show.first_air_date && show.first_air_date >= threeMonthsAgo
-    );
-    return { results: filteredResults.length > 0 ? filteredResults : data.results, total_pages: data.total_pages };
   },
 
   // Search movies

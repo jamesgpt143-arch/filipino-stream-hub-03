@@ -8,13 +8,10 @@ import { AnimeCard } from '@/components/AnimeCard';
 import { VideoModal } from '@/components/VideoModal';
 import { DonateButton } from '@/components/DonateButton';
 import { UserStats } from '@/components/UserStats';
-import { Badge } from '@/components/ui/badge';
-import { Search, ChevronLeft, ChevronRight, Info, TrendingUp, Radio } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import { TVShow, Season, Episode, tmdbApi } from '@/lib/tmdb';
 import { useToast } from '@/hooks/use-toast';
 import { useClickadillaAds } from '@/hooks/useClickadillaAds';
-
-type FilterType = 'popular' | 'ongoing';
 
 const Anime = () => {
   const [animeList, setAnimeList] = useState<TVShow[]>([]);
@@ -31,16 +28,13 @@ const Anime = () => {
   const [showEpisodeDialog, setShowEpisodeDialog] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [filter, setFilter] = useState<FilterType>('popular');
   const { toast } = useToast();
   
   useClickadillaAds();
 
   useEffect(() => {
-    if (!searchTerm) {
-      loadAnime();
-    }
-  }, [currentPage, filter]);
+    loadAnime();
+  }, [currentPage]);
 
   useEffect(() => {
     if (searchTerm) {
@@ -56,9 +50,7 @@ const Anime = () => {
   const loadAnime = async () => {
     setIsLoading(true);
     try {
-      const data = filter === 'ongoing'
-        ? await tmdbApi.getOngoingAnime(currentPage)
-        : await tmdbApi.getPopularAnime(currentPage);
+      const data = await tmdbApi.getPopularAnime(currentPage);
       setAnimeList(data.results);
       setTotalPages(Math.min(data.total_pages, 500));
     } catch (error) {
@@ -70,12 +62,6 @@ const Anime = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleFilterChange = (newFilter: FilterType) => {
-    setFilter(newFilter);
-    setCurrentPage(1);
-    setSearchTerm('');
   };
 
   const searchAnime = async () => {
@@ -155,29 +141,9 @@ const Anime = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Anime</h1>
-              <p className="text-muted-foreground">Watch your favorite anime series</p>
-            </div>
-            <div className="flex gap-2">
-              <Badge
-                variant={filter === 'popular' ? 'default' : 'outline'}
-                className="cursor-pointer hover:bg-primary/80 transition-colors"
-                onClick={() => handleFilterChange('popular')}
-              >
-                <TrendingUp className="w-3 h-3 mr-1" />
-                Popular
-              </Badge>
-              <Badge
-                variant={filter === 'ongoing' ? 'default' : 'outline'}
-                className="cursor-pointer hover:bg-primary/80 transition-colors"
-                onClick={() => handleFilterChange('ongoing')}
-              >
-                <Radio className="w-3 h-3 mr-1" />
-                Ongoing
-              </Badge>
-            </div>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Anime</h1>
+            <p className="text-muted-foreground">Watch your favorite anime series</p>
           </div>
           <div className="relative w-full md:w-80">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />

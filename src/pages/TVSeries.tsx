@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, TrendingUp, Radio } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { TVShowCard } from '@/components/TVShowCard';
 import { VideoModal } from '@/components/VideoModal';
 import { TVShow, Season, Episode, tmdbApi } from '@/lib/tmdb';
@@ -12,9 +12,6 @@ import { Info } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
 import { UserStats } from '@/components/UserStats';
 import { useClickadillaAds } from '@/hooks/useClickadillaAds';
-import { Badge } from '@/components/ui/badge';
-
-type FilterType = 'popular' | 'ongoing';
 
 const TVSeries = () => {
   const [shows, setShows] = useState<TVShow[]>([]);
@@ -30,24 +27,18 @@ const TVSeries = () => {
   const [showEpisodeModal, setShowEpisodeModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [filter, setFilter] = useState<FilterType>('popular');
   const { toast } = useToast();
 
   // Clickadilla Popunder Ads
   useClickadillaAds();
 
   useEffect(() => {
-    if (!searchTerm) {
-      loadTVShows();
-    }
-  }, [currentPage, filter]);
+    loadTVShows();
+  }, [currentPage]);
 
   useEffect(() => {
     if (searchTerm) {
-      const delayDebounce = setTimeout(() => {
-        searchTVShows();
-      }, 500);
-      return () => clearTimeout(delayDebounce);
+      searchTVShows();
     } else {
       loadTVShows();
     }
@@ -56,11 +47,9 @@ const TVSeries = () => {
   const loadTVShows = async () => {
     try {
       setIsLoading(true);
-      const data = filter === 'ongoing' 
-        ? await tmdbApi.getOngoingTVShows(currentPage)
-        : await tmdbApi.getPopularTVShows(currentPage);
+      const data = await tmdbApi.getPopularTVShows(currentPage);
       setShows(data.results);
-      setTotalPages(Math.min(data.total_pages, 500));
+      setTotalPages(data.total_pages);
     } catch (error) {
       toast({
         title: "Error",
@@ -70,12 +59,6 @@ const TVSeries = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleFilterChange = (newFilter: FilterType) => {
-    setFilter(newFilter);
-    setCurrentPage(1);
-    setSearchTerm('');
   };
 
   const searchTVShows = async () => {
@@ -148,26 +131,8 @@ const TVSeries = () => {
       <header className="bg-gradient-hero shadow-elegant border-b border-primary/20 sticky top-0 z-40">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <h1 className="text-3xl font-bold text-primary-foreground">TV Series</h1>
-              <div className="flex gap-2">
-                <Badge
-                  variant={filter === 'popular' ? 'default' : 'outline'}
-                  className="cursor-pointer hover:bg-primary/80 transition-colors"
-                  onClick={() => handleFilterChange('popular')}
-                >
-                  <TrendingUp className="w-3 h-3 mr-1" />
-                  Popular
-                </Badge>
-                <Badge
-                  variant={filter === 'ongoing' ? 'default' : 'outline'}
-                  className="cursor-pointer hover:bg-primary/80 transition-colors"
-                  onClick={() => handleFilterChange('ongoing')}
-                >
-                  <Radio className="w-3 h-3 mr-1" />
-                  Ongoing
-                </Badge>
-              </div>
+            <div>
+              <h1 className="text-3xl font-bold text-primary-foreground mb-2">TV Series</h1>
             </div>
             
             <div className="flex items-center gap-4 w-full lg:w-auto">
@@ -176,10 +141,7 @@ const TVSeries = () => {
                 <Input
                   placeholder="Search TV shows..."
                   value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1);
-                  }}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 bg-background/50 border-border/50 focus:bg-background"
                 />
               </div>
