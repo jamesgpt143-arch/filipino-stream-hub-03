@@ -357,7 +357,7 @@ name: 'GMA (Youtube Stream)',
   logo: 'https://th.bing.com/th/id/OIP.ntjNVRaXsZJ0vrhWBA35sQHaE7?rs=1&pid=ImgDetMain'
 }, {
   name: 'GTV',
-  manifestUri: 'https://converse.nathcreqtives.com/1143/manifest.mpd',
+  manifestUri: 'https://converse.nathcreqtives.com/1143/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0bGFuZyIsImV4cCI6MTc2NTg0NjI1MX0.JnXKVDGw6DR06vXJAeAFyaoSaXH_kc2dVWtBq1ZEWws',
   widevineUrl: 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00',
   type: 'mpd',
   logo: 'https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png'
