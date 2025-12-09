@@ -337,7 +337,7 @@ export const channels: Channel[] = [
   logo: 'https://cdn2.ettoday.net/images/6892/e6892888.jpg'
 }, {
    name: 'GMA',
-  manifestUri: 'https://converse.nathcreqtives.com/1093/manifest.mpd',
+  manifestUri: 'https://converse.nathcreqtives.com/1093/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0bGFuZyIsImV4cCI6MTc2NTg0NjI1MX0.JnXKVDGw6DR06vXJAeAFyaoSaXH_kc2dVWtBq1ZEWws',
   widevineUrl: 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00',
   type: 'mpd',
   logo: 'https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126306082.png'
