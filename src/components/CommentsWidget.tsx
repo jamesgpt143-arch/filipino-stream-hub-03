@@ -50,27 +50,39 @@ export const CommentsWidget = () => {
     if (isAdmin) setUserName(ADMIN_USER);
   }, [isAdmin]);
 
+  // Function to fetch comments
   const fetchComments = async () => {
     const { data, error } = await supabase
       .from('comments')
       .select('*')
       .order('created_at', { ascending: true });
 
-    if (error) console.error("Error fetching comments:", error);
-    else setComments(data || []);
+    if (error) {
+      console.error("Error fetching comments:", error);
+    } else if (data) {
+      // SMART UPDATE: Update lang kung may nagbago para hindi "kumurap" ang screen
+      setComments(prev => {
+        // Kung same ang dami at same ang huling message, wag na mag update
+        if (prev.length === data.length && prev[prev.length - 1]?.id === data[data.length - 1]?.id) {
+          return prev; 
+        }
+        return data;
+      });
+    }
   };
 
-  // REALTIME SUBSCRIPTION (Updated to prevent duplicates)
+  // MAIN EFFECT: Realtime + Polling (Auto-Refresh)
   useEffect(() => {
     if (isOpen) {
-      fetchComments();
+      fetchComments(); // Load agad pagkabukas
+
+      // 1. REALTIME SUBSCRIPTION (Mabilis)
       const channel = supabase
-        .channel('public:comments')
+        .channel('chat_room_updates')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, (payload) => {
           const newComment = payload.new as Comment;
           setComments((prev) => {
-            // Check if comment already exists (para iwas doble pag nag manual update tayo)
-            if (prev.some(c => c.id === newComment.id)) return prev;
+            if (prev.some(c => c.id === newComment.id)) return prev; // Iwas doble
             return [...prev, newComment];
           });
         })
@@ -79,15 +91,26 @@ export const CommentsWidget = () => {
         })
         .subscribe();
 
-      return () => { supabase.removeChannel(channel); };
+      // 2. POLLING / AUTO-REFRESH (Backup - Every 3 seconds)
+      // Ito ang sasalo kung sakaling failed ang Realtime
+      const intervalId = setInterval(() => {
+        fetchComments();
+      }, 3000);
+
+      return () => { 
+        supabase.removeChannel(channel);
+        clearInterval(intervalId); // Stop refresh pag sinara
+      };
     }
   }, [isOpen]);
 
+  // Auto-scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
+      // Mag scroll lang kung nasa baba na o bagong bukas
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [comments, isOpen]);
+  }, [comments.length, isOpen]); // Trigger on length change or open
 
   const handleSend = async () => {
     const finalName = isAdmin ? ADMIN_USER : userName;
@@ -99,7 +122,7 @@ export const CommentsWidget = () => {
     
     setIsLoading(true);
 
-    // ADDED: .select().single() para makuha agad ang data
+    // .select().single() para makuha agad ang data at ma-display
     const { data, error } = await supabase.from('comments').insert({
       name: finalName,
       message: newMessage,
@@ -112,7 +135,7 @@ export const CommentsWidget = () => {
       toast({ title: "Error", description: "Failed to send", variant: "destructive" });
     } else if (data) {
       setNewMessage("");
-      // MANUAL UPDATE: Idagdag agad sa listahan para lumabas agad
+      // MANUAL UPDATE: Idagdag agad sa listahan para instant sa sender
       setComments((prev) => [...prev, data]);
     }
     setIsLoading(false);
@@ -121,7 +144,7 @@ export const CommentsWidget = () => {
   const handleDelete = async (commentId: string) => {
     if (!isAdmin) return;
     
-    // Optimistic update para mabilis sa UI
+    // Optimistic delete para mabilis sa UI
     const previousComments = [...comments];
     setComments(prev => prev.filter(c => c.id !== commentId));
 
@@ -129,7 +152,7 @@ export const CommentsWidget = () => {
 
     if (error) {
       console.error("Delete error:", error);
-      setComments(previousComments); // Revert if failed
+      setComments(previousComments); // Ibalik kung nag fail
       toast({ title: "Error", description: "Failed to delete comment", variant: "destructive" });
     } else {
       toast({ description: "Comment deleted" });
