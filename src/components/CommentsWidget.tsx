@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle, X, Send, Smile, Lock, ShieldCheck, LogOut, Trash2 } from "lucide-react";
+import { MessageCircle, X, Send, Smile, Lock, ShieldCheck, LogOut, Trash2, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -35,16 +35,15 @@ export const CommentsWidget = () => {
   const [inputPass, setInputPass] = useState("");
   
   // Normal User State
+  // Init state from storage, but don't auto-save on change anymore
   const [userName, setUserName] = useState(() => localStorage.getItem("chat_username") || "");
+  const [isNameSet, setIsNameSet] = useState(() => !!localStorage.getItem("chat_username"));
+  
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Save states to local storage
-  useEffect(() => {
-    if (userName && !isAdmin) localStorage.setItem("chat_username", userName);
-  }, [userName, isAdmin]);
-
+  // Handle Admin Persistence
   useEffect(() => {
     localStorage.setItem("chat_is_admin", isAdmin ? "true" : "false");
     if (isAdmin) setUserName(ADMIN_USER);
@@ -60,9 +59,7 @@ export const CommentsWidget = () => {
     if (error) {
       console.error("Error fetching comments:", error);
     } else if (data) {
-      // SMART UPDATE: Update lang kung may nagbago para hindi "kumurap" ang screen
       setComments(prev => {
-        // Kung same ang dami at same ang huling message, wag na mag update
         if (prev.length === data.length && prev[prev.length - 1]?.id === data[data.length - 1]?.id) {
           return prev; 
         }
@@ -71,18 +68,17 @@ export const CommentsWidget = () => {
     }
   };
 
-  // MAIN EFFECT: Realtime + Polling (Auto-Refresh)
+  // MAIN EFFECT: Realtime + Polling
   useEffect(() => {
     if (isOpen) {
-      fetchComments(); // Load agad pagkabukas
+      fetchComments(); 
 
-      // 1. REALTIME SUBSCRIPTION (Mabilis)
       const channel = supabase
         .channel('chat_room_updates')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, (payload) => {
           const newComment = payload.new as Comment;
           setComments((prev) => {
-            if (prev.some(c => c.id === newComment.id)) return prev; // Iwas doble
+            if (prev.some(c => c.id === newComment.id)) return prev; 
             return [...prev, newComment];
           });
         })
@@ -91,26 +87,22 @@ export const CommentsWidget = () => {
         })
         .subscribe();
 
-      // 2. POLLING / AUTO-REFRESH (Backup - Every 3 seconds)
-      // Ito ang sasalo kung sakaling failed ang Realtime
       const intervalId = setInterval(() => {
         fetchComments();
       }, 3000);
 
       return () => { 
         supabase.removeChannel(channel);
-        clearInterval(intervalId); // Stop refresh pag sinara
+        clearInterval(intervalId);
       };
     }
   }, [isOpen]);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
-      // Mag scroll lang kung nasa baba na o bagong bukas
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [comments.length, isOpen]); // Trigger on length change or open
+  }, [comments.length, isOpen]);
 
   const handleSend = async () => {
     const finalName = isAdmin ? ADMIN_USER : userName;
@@ -119,10 +111,15 @@ export const CommentsWidget = () => {
       toast({ description: "Please enter a name and message", variant: "destructive" });
       return;
     }
+
+    // SAVE NAME ON SEND ONLY (Fixes the typing bug)
+    if (!isAdmin) {
+      localStorage.setItem("chat_username", finalName);
+      setIsNameSet(true);
+    }
     
     setIsLoading(true);
 
-    // .select().single() para makuha agad ang data at ma-display
     const { data, error } = await supabase.from('comments').insert({
       name: finalName,
       message: newMessage,
@@ -135,7 +132,6 @@ export const CommentsWidget = () => {
       toast({ title: "Error", description: "Failed to send", variant: "destructive" });
     } else if (data) {
       setNewMessage("");
-      // MANUAL UPDATE: Idagdag agad sa listahan para instant sa sender
       setComments((prev) => [...prev, data]);
     }
     setIsLoading(false);
@@ -144,7 +140,6 @@ export const CommentsWidget = () => {
   const handleDelete = async (commentId: string) => {
     if (!isAdmin) return;
     
-    // Optimistic delete para mabilis sa UI
     const previousComments = [...comments];
     setComments(prev => prev.filter(c => c.id !== commentId));
 
@@ -152,7 +147,7 @@ export const CommentsWidget = () => {
 
     if (error) {
       console.error("Delete error:", error);
-      setComments(previousComments); // Ibalik kung nag fail
+      setComments(previousComments);
       toast({ title: "Error", description: "Failed to delete comment", variant: "destructive" });
     } else {
       toast({ description: "Comment deleted" });
@@ -173,7 +168,8 @@ export const CommentsWidget = () => {
 
   const handleLogout = () => {
     setIsAdmin(false);
-    setUserName(""); 
+    setUserName("");
+    setIsNameSet(false); // Reset name state on logout
     toast({ description: "Logged out" });
   };
 
@@ -190,7 +186,6 @@ export const CommentsWidget = () => {
             </h3>
             
             <div className="flex items-center gap-1">
-              {/* Admin Toggle / Login Trigger */}
               <Popover open={showLogin} onOpenChange={setShowLogin}>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-primary/20 text-primary-foreground">
@@ -244,14 +239,12 @@ export const CommentsWidget = () => {
                     </Avatar>
                     
                     <div className={`flex flex-col max-w-[75%] ${isMe ? 'items-end' : 'items-start'}`}>
-                      {/* Name + Badges + Delete Button */}
                       <span className="text-[10px] text-muted-foreground px-1 mb-0.5 flex items-center gap-1">
                         {comment.name}
                         {isCommentAdmin && (
                           <ShieldCheck size={12} className="text-blue-500 fill-blue-100" />
                         )}
                         
-                        {/* DELETE BUTTON (Only visible to Admin) */}
                         {isAdmin && (
                           <button 
                             onClick={(e) => {
@@ -274,7 +267,6 @@ export const CommentsWidget = () => {
                       >
                         {comment.message}
                         
-                        {/* Reaction Button */}
                         <div className={`absolute ${isMe ? '-left-6' : '-right-6'} bottom-0 opacity-0 group-hover:opacity-100 transition-opacity`}>
                            <Popover>
                             <PopoverTrigger asChild>
@@ -304,13 +296,30 @@ export const CommentsWidget = () => {
 
           {/* Footer / Input */}
           <div className="p-3 bg-background border-t border-border space-y-2">
-            {!isAdmin && !localStorage.getItem("chat_username") && (
-               <Input 
-                 placeholder="Enter your name..." 
-                 value={userName}
-                 onChange={(e) => setUserName(e.target.value)}
-                 className="h-8 text-xs bg-muted/50"
-               />
+            
+            {/* NAME INPUT SECTION */}
+            {!isAdmin && !isNameSet && (
+               <div className="relative">
+                 <Input 
+                   placeholder="Enter your name..." 
+                   value={userName}
+                   onChange={(e) => setUserName(e.target.value)}
+                   className="h-8 text-xs bg-muted/50 pr-8"
+                 />
+               </div>
+            )}
+
+            {/* Change Name Option (Shown when name is set) */}
+            {!isAdmin && isNameSet && (
+              <div className="flex justify-between items-center px-1">
+                <span className="text-[10px] text-muted-foreground">Posting as <span className="font-bold text-foreground">{userName}</span></span>
+                <button 
+                  onClick={() => setIsNameSet(false)} 
+                  className="text-[10px] text-blue-500 hover:text-blue-600 flex items-center gap-1"
+                >
+                  <Edit2 size={8} /> Change
+                </button>
+              </div>
             )}
             
             {isAdmin && (
