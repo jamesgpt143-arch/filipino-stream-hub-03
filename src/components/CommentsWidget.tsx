@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle, X, Send, Smile, Lock, ShieldCheck, LogOut } from "lucide-react";
+import { MessageCircle, X, Send, Smile, Lock, ShieldCheck, LogOut, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -32,7 +32,6 @@ export const CommentsWidget = () => {
   // Login States
   const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem("chat_is_admin") === "true");
   const [showLogin, setShowLogin] = useState(false);
-  // Removed inputUser state since it's auto-set
   const [inputPass, setInputPass] = useState("");
   
   // Normal User State
@@ -68,6 +67,9 @@ export const CommentsWidget = () => {
         .channel('public:comments')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, (payload) => {
           setComments((prev) => [...prev, payload.new as Comment]);
+        })
+        .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'comments' }, (payload) => {
+          setComments((prev) => prev.filter(c => c.id !== payload.old.id));
         })
         .subscribe();
 
@@ -107,13 +109,30 @@ export const CommentsWidget = () => {
     setIsLoading(false);
   };
 
+  const handleDelete = async (commentId: string) => {
+    if (!isAdmin) return;
+    
+    // Optimistic update para mabilis sa UI
+    const previousComments = [...comments];
+    setComments(prev => prev.filter(c => c.id !== commentId));
+
+    const { error } = await supabase.from('comments').delete().eq('id', commentId);
+
+    if (error) {
+      console.error("Delete error:", error);
+      setComments(previousComments); // Revert if failed
+      toast({ title: "Error", description: "Failed to delete comment", variant: "destructive" });
+    } else {
+      toast({ description: "Comment deleted" });
+    }
+  };
+
   const handleAdminLogin = () => {
-    // Check password ONLY since username is fixed
     if (inputPass === ADMIN_PASS) {
       setIsAdmin(true);
       setUserName(ADMIN_USER);
       setShowLogin(false);
-      setInputPass(""); // Clear password field
+      setInputPass("");
       toast({ title: "Welcome back!", description: "Logged in as Admin" });
     } else {
       toast({ title: "Access Denied", description: "Invalid password", variant: "destructive" });
@@ -156,13 +175,7 @@ export const CommentsWidget = () => {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <h4 className="font-medium text-xs text-muted-foreground">Admin Login</h4>
-                      
-                      {/* Fixed Username Display */}
-                      <div className="px-3 py-1.5 bg-muted rounded text-xs text-muted-foreground border cursor-not-allowed">
-                        User: {ADMIN_USER}
-                      </div>
-
+                      <h4 className="font-medium text-xs text-muted-foreground">Admin Access</h4>
                       <Input 
                         type="password" 
                         placeholder="Enter Password" 
@@ -199,10 +212,25 @@ export const CommentsWidget = () => {
                     </Avatar>
                     
                     <div className={`flex flex-col max-w-[75%] ${isMe ? 'items-end' : 'items-start'}`}>
+                      {/* Name + Badges + Delete Button */}
                       <span className="text-[10px] text-muted-foreground px-1 mb-0.5 flex items-center gap-1">
                         {comment.name}
                         {isCommentAdmin && (
                           <ShieldCheck size={12} className="text-blue-500 fill-blue-100" />
+                        )}
+                        
+                        {/* DELETE BUTTON (Only visible to Admin) */}
+                        {isAdmin && (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(comment.id);
+                            }}
+                            className="ml-1 p-0.5 text-muted-foreground hover:text-red-500 transition-colors"
+                            title="Delete comment"
+                          >
+                            <Trash2 size={12} />
+                          </button>
                         )}
                       </span>
                       
