@@ -60,13 +60,19 @@ export const CommentsWidget = () => {
     else setComments(data || []);
   };
 
+  // REALTIME SUBSCRIPTION (Updated to prevent duplicates)
   useEffect(() => {
     if (isOpen) {
       fetchComments();
       const channel = supabase
         .channel('public:comments')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, (payload) => {
-          setComments((prev) => [...prev, payload.new as Comment]);
+          const newComment = payload.new as Comment;
+          setComments((prev) => {
+            // Check if comment already exists (para iwas doble pag nag manual update tayo)
+            if (prev.some(c => c.id === newComment.id)) return prev;
+            return [...prev, newComment];
+          });
         })
         .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'comments' }, (payload) => {
           setComments((prev) => prev.filter(c => c.id !== payload.old.id));
@@ -93,18 +99,21 @@ export const CommentsWidget = () => {
     
     setIsLoading(true);
 
-    const { error } = await supabase.from('comments').insert({
+    // ADDED: .select().single() para makuha agad ang data
+    const { data, error } = await supabase.from('comments').insert({
       name: finalName,
       message: newMessage,
       creator_username: finalName,
       facebook_link: null
-    });
+    }).select().single();
 
     if (error) {
       console.error(error);
       toast({ title: "Error", description: "Failed to send", variant: "destructive" });
-    } else {
+    } else if (data) {
       setNewMessage("");
+      // MANUAL UPDATE: Idagdag agad sa listahan para lumabas agad
+      setComments((prev) => [...prev, data]);
     }
     setIsLoading(false);
   };
