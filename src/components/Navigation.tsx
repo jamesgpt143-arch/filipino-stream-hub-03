@@ -15,7 +15,7 @@ export const Navigation = () => {
     { path: '/movies', label: 'Movies', icon: Film },
     { path: '/tv-series', label: 'TV Series', icon: Tv },
     { path: '/anime', label: 'Anime', icon: Sparkles },
-    { path: '/comments', label: 'Comments', icon: User },
+    // { path: '/comments', label: 'Comments', icon: User }, // <--- REMOVED/COMMENTED OUT
   ];
 
   return (
