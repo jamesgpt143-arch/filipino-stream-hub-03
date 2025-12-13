@@ -21,6 +21,7 @@ import Comments from "./pages/Comments";
 import NotFound from "./pages/NotFound";
 import { disableDevTools } from "./utils/disableDevTools";
 import { useEffect } from "react";
+import { CommentsWidget } from "./components/CommentsWidget"; // <-- ADDED IMPORT HERE
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,9 @@ const AppContent = () => {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      
+      {/* <-- ADDED COMPONENT HERE: Floating Chat Widget accessible on all pages */}
+      <CommentsWidget />
     </>
   );
 };
