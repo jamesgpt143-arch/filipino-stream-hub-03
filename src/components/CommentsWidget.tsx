@@ -35,7 +35,6 @@ export const CommentsWidget = () => {
   const [inputPass, setInputPass] = useState("");
   
   // Normal User State
-  // Init state from storage, but don't auto-save on change anymore
   const [userName, setUserName] = useState(() => localStorage.getItem("chat_username") || "");
   const [isNameSet, setIsNameSet] = useState(() => !!localStorage.getItem("chat_username"));
   
@@ -54,6 +53,8 @@ export const CommentsWidget = () => {
     const { data, error } = await supabase
       .from('comments')
       .select('*')
+      // 👇 FILTER: Wag isama ang mga message na nagsisimula sa #announce:
+      .not('message', 'ilike', '#announce:%') 
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -77,6 +78,12 @@ export const CommentsWidget = () => {
         .channel('chat_room_updates')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, (payload) => {
           const newComment = payload.new as Comment;
+          
+          // 👇 REALTIME FILTER: Kung announcement ito, IGNORE natin sa chat
+          if (newComment.message.toLowerCase().startsWith('#announce:')) {
+            return;
+          }
+
           setComments((prev) => {
             if (prev.some(c => c.id === newComment.id)) return prev; 
             return [...prev, newComment];
@@ -112,7 +119,6 @@ export const CommentsWidget = () => {
       return;
     }
 
-    // SAVE NAME ON SEND ONLY (Fixes the typing bug)
     if (!isAdmin) {
       localStorage.setItem("chat_username", finalName);
       setIsNameSet(true);
@@ -132,7 +138,14 @@ export const CommentsWidget = () => {
       toast({ title: "Error", description: "Failed to send", variant: "destructive" });
     } else if (data) {
       setNewMessage("");
-      setComments((prev) => [...prev, data]);
+      
+      // 👇 UI UPDATE: Idagdag lang sa chat kung HINDI announcement
+      // (Para sa sender, makikita niya agad except kung nag-command siya)
+      if (!data.message.toLowerCase().startsWith('#announce:')) {
+          setComments((prev) => [...prev, data]);
+      } else {
+          toast({ description: "Announcement posted! Check the top bar." });
+      }
     }
     setIsLoading(false);
   };
@@ -169,7 +182,7 @@ export const CommentsWidget = () => {
   const handleLogout = () => {
     setIsAdmin(false);
     setUserName("");
-    setIsNameSet(false); // Reset name state on logout
+    setIsNameSet(false); 
     toast({ description: "Logged out" });
   };
 
@@ -309,7 +322,7 @@ export const CommentsWidget = () => {
                </div>
             )}
 
-            {/* Change Name Option (Shown when name is set) */}
+            {/* Change Name Option */}
             {!isAdmin && isNameSet && (
               <div className="flex justify-between items-center px-1">
                 <span className="text-[10px] text-muted-foreground">Posting as <span className="font-bold text-foreground">{userName}</span></span>
