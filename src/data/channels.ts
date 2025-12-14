@@ -469,9 +469,11 @@ name: 'GMA (Youtube Stream)',
 }, {
     name: 'iQIYI',
   manifestUri: 'https://converse.nathcreqtives.com/astro/1006/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nIiwiZXhwIjoxNzY2MTM5MjczfQ.XByFBFnLmTlL4ZgjewVUmP08StGv7jQjK5vG_4K_QW0',
-  widevineUrl: 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00',
+  clearKey: {
+    '7ef7e913ce85a1131b27036069169a10': '77d98ed71db7524c27875a09a975f9e6'
+  },
   type: 'mpd',
-  logo: 'https://logodix.com/logo/74403.png'
+  logo: 'https://th.bing.com/th/id/OIP.tGUjHFJqDIFUuKfn-31TxAHaEN?rs=1&pid=ImgDetMain'
 }, {
    name: 'Jeepney TV',
   manifestUri: 'https://abslive.akamaized.net/dash/live/2028025/jeepneytv/manifest.mpd',
@@ -524,9 +526,11 @@ name: 'GMA (Youtube Stream)',
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.ix5ReWijxZg8uPcKrk2GHwHaGd?rs=1&pid=ImgDetMain'
 }, {
-name: 'iQIYI',
+ name: 'Kplus',
   manifestUri: 'https://converse.nathcreqtives.com/astro/9983/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nIiwiZXhwIjoxNzY2MTM5MjczfQ.XByFBFnLmTlL4ZgjewVUmP08StGv7jQjK5vG_4K_QW0',
-  widevineUrl: 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00',
+  clearKey: {
+    'aa48b28bd723f91214887df6ed9fad10': 'b5a3a800848120c843ae0fa68c09c261'
+  },
   type: 'mpd',
   logo: 'https://www.pngkey.com/png/detail/306-3060351_k-plus-k-plus-channel-logo.png'
 }, {
