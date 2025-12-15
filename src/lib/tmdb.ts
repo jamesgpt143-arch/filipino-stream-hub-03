@@ -55,9 +55,16 @@ export interface Video {
 }
 
 export const tmdbApi = {
-  // Get popular movies
-  getPopularMovies: async (page = 1): Promise<{ results: Movie[]; total_pages: number }> => {
-    const response = await fetch(`${API_BASE_URL}/movie/popular?api_key=${API_KEY}&page=${page}`);
+  // UPDATED: Now accepts 'genreId' parameter for proper filtering
+  getPopularMovies: async (page = 1, genreId?: number | null): Promise<{ results: Movie[]; total_pages: number }> => {
+    // Kung walang genre, kunin ang normal na popular movies
+    if (!genreId) {
+        const response = await fetch(`${API_BASE_URL}/movie/popular?api_key=${API_KEY}&page=${page}`);
+        return response.json();
+    }
+    
+    // Kung MERONG genre, gamitin ang discover endpoint para puno ang page ng genre na yun
+    const response = await fetch(`${API_BASE_URL}/discover/movie?api_key=${API_KEY}&page=${page}&sort_by=popularity.desc&with_genres=${genreId}`);
     return response.json();
   },
 
