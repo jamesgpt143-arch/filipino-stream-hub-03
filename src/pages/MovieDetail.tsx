@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Movie, tmdbApi, Video } from '@/lib/tmdb';
 import { Button } from '@/components/ui/button';
-import { Play, Calendar, Star, Clock, ArrowLeft, ExternalLink, Server } from 'lucide-react';
+import { Play, Calendar, Star, Clock, ArrowLeft, ExternalLink, Server, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { VideoModal } from '@/components/VideoModal';
 import { Badge } from '@/components/ui/badge';
@@ -21,19 +21,20 @@ const MovieDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [movie, setMovie] = useState<MovieDetails | null>(null);
-  const [videos, setVideos] = useState<Video[]>([]);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
-  const [currentServer, setCurrentServer] = useState('Server 1'); // Default Server
+  const [currentServer, setCurrentServer] = useState('Server 1');
+  const [isGeneratingLink, setIsGeneratingLink] = useState(false); // Loading state para sa button
   const { toast } = useToast();
 
   useClickadillaAds();
 
-  // AUTO-PLAY DETECTION
+  // 1. AUTO-PLAY DETECTION
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     if (params.get('autoplay') === 'true') {
       setIsVideoOpen(true);
       window.history.replaceState({}, '', location.pathname);
+      
       toast({
         title: "Thanks for supporting!",
         description: "Enjoy watching the movie.",
@@ -47,12 +48,11 @@ const MovieDetail = () => {
     const fetchMovieData = async () => {
       if (!id) return;
       try {
-        const [movieData, videoData] = await Promise.all([
+        const [movieData] = await Promise.all([
           tmdbApi.getMovieDetails(parseInt(id)),
           tmdbApi.getMovieVideos(parseInt(id))
         ]);
         setMovie(movieData as unknown as MovieDetails);
-        setVideos(videoData.results);
       } catch (error) {
         console.error("Error loading movie:", error);
         toast({ title: "Error", description: "Could not load movie details", variant: "destructive" });
@@ -74,11 +74,39 @@ const MovieDetail = () => {
 
   const streamUrls = tmdbApi.getMovieStreamUrls(movie.id);
 
-  const handleMonetizedClick = () => {
-    const currentPageUrl = window.location.href.split('?')[0];
-    const returnUrl = `${currentPageUrl}?autoplay=true`;
-    const monetizedUrl = `https://cuty.io/st?api=${CUTTLINKS_API_KEY}&url=${encodeURIComponent(returnUrl)}`;
-    window.location.href = monetizedUrl;
+  // 2. MONETIZATION HANDLER (USING DEVELOPER API JSON)
+  const handleMonetizedClick = async () => {
+    setIsGeneratingLink(true); // Pakita ang loading spinner
+    
+    try {
+        // Kunin ang current link ng site mo at dagdagan ng autoplay code
+        const currentPageUrl = window.location.href.split('?')[0];
+        const returnUrl = `${currentPageUrl}?autoplay=true`;
+        
+        // Tawagin ang Cuty.io API gamit ang format na binigay mo
+        // Note: Gumamit ako ng 'alias' para hindi mag error kung existing na, pero optional ito.
+        const apiUrl = `https://cuty.io/api?api=${CUTTLINKS_API_KEY}&url=${encodeURIComponent(returnUrl)}`;
+
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        if (data.status === 'success' || data.shortenedUrl) {
+            // Kung successful, redirect sa short link
+            window.location.href = data.shortenedUrl;
+        } else {
+            console.error("Cuty Error:", data.message);
+            // Fallback: Kung mag-error ang API, mag-play nalang diretso para hindi ma-stuck user
+            toast({ title: "Connection Error", description: "Directing to player...", variant: "destructive" });
+            setIsVideoOpen(true);
+        }
+
+    } catch (error) {
+        console.error("Network Error:", error);
+        // Fallback sa Direct Play pag may error
+        setIsVideoOpen(true); 
+    } finally {
+        setIsGeneratingLink(false);
+    }
   };
 
   return (
@@ -135,7 +163,7 @@ const MovieDetail = () => {
                 ))}
               </div>
 
-              {/* SERVER SELECTOR (Binabalik natin dito) */}
+              {/* SERVER SELECTOR */}
               <div className="flex flex-col gap-2 pt-2">
                 <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Select Server:</span>
                 <div className="flex flex-wrap gap-2">
@@ -160,14 +188,23 @@ const MovieDetail = () => {
                   <Play className="w-5 h-5" /> Direct Play ({currentServer})
                 </Button>
 
-                {/* MONETIZED BUTTON */}
+                {/* MONETIZED BUTTON (UPDATED) */}
                 <Button 
                     size="lg" 
                     variant="secondary" 
-                    className="gap-2 bg-yellow-600 hover:bg-yellow-700 text-white border-none shadow-lg shadow-yellow-900/20 animate-pulse"
+                    disabled={isGeneratingLink}
+                    className="gap-2 bg-yellow-600 hover:bg-yellow-700 text-white border-none shadow-lg shadow-yellow-900/20"
                     onClick={handleMonetizedClick}
                 >
-                  <ExternalLink className="w-5 h-5" /> Support & Watch
+                  {isGeneratingLink ? (
+                    <>
+                        <Loader2 className="w-5 h-5 animate-spin" /> Generating Link...
+                    </>
+                  ) : (
+                    <>
+                        <ExternalLink className="w-5 h-5" /> Support & Watch
+                    </>
+                  )}
                 </Button>
               </div>
 
