@@ -2,17 +2,15 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Movie, tmdbApi, Video } from '@/lib/tmdb';
 import { Button } from '@/components/ui/button';
-import { Play, Calendar, Star, Clock, ArrowLeft, ExternalLink } from 'lucide-react';
+import { Play, Calendar, Star, Clock, ArrowLeft, ExternalLink, Server } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { VideoModal } from '@/components/VideoModal';
 import { Badge } from '@/components/ui/badge';
 import { UserStats } from '@/components/UserStats';
 import { useClickadillaAds } from '@/hooks/useClickadillaAds';
 
-// 👇 YOUR CUTTLINKS API KEY
 const CUTTLINKS_API_KEY = '67e33ac96fe3e5f792747feb8c184f871726dc01'; 
 
-// Extended Interface para sa Details (dahil iba ang format ng TMDB sa details)
 interface MovieDetails extends Omit<Movie, 'genre_ids'> {
   genres: { id: number; name: string }[];
   runtime?: number;
@@ -25,18 +23,17 @@ const MovieDetail = () => {
   const [movie, setMovie] = useState<MovieDetails | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
-  const [currentServer, setCurrentServer] = useState('Server 1');
+  const [currentServer, setCurrentServer] = useState('Server 1'); // Default Server
   const { toast } = useToast();
 
   useClickadillaAds();
 
-  // 1. AUTO-PLAY DETECTION
+  // AUTO-PLAY DETECTION
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     if (params.get('autoplay') === 'true') {
       setIsVideoOpen(true);
       window.history.replaceState({}, '', location.pathname);
-      
       toast({
         title: "Thanks for supporting!",
         description: "Enjoy watching the movie.",
@@ -54,7 +51,6 @@ const MovieDetail = () => {
           tmdbApi.getMovieDetails(parseInt(id)),
           tmdbApi.getMovieVideos(parseInt(id))
         ]);
-        // Type assertion dahil alam nating may genres ang details
         setMovie(movieData as unknown as MovieDetails);
         setVideos(videoData.results);
       } catch (error) {
@@ -78,11 +74,10 @@ const MovieDetail = () => {
 
   const streamUrls = tmdbApi.getMovieStreamUrls(movie.id);
 
-  // 2. MONETIZATION HANDLER
   const handleMonetizedClick = () => {
     const currentPageUrl = window.location.href.split('?')[0];
     const returnUrl = `${currentPageUrl}?autoplay=true`;
-    const monetizedUrl = `https://cuttlinks.com/st?api=${CUTTLINKS_API_KEY}&url=${encodeURIComponent(returnUrl)}`;
+    const monetizedUrl = `https://cuty.io/st?api=${CUTTLINKS_API_KEY}&url=${encodeURIComponent(returnUrl)}`;
     window.location.href = monetizedUrl;
   };
 
@@ -132,7 +127,6 @@ const MovieDetail = () => {
                 )}
               </div>
 
-              {/* FIX: Ito yung dating nagpapa-crash. Ngayon ay 'movie.genres' na ang gamit */}
               <div className="flex flex-wrap gap-2">
                 {movie.genres?.map(genre => (
                    <Badge key={genre.id} variant="outline" className="text-white border-white/20">
@@ -141,17 +135,36 @@ const MovieDetail = () => {
                 ))}
               </div>
 
-              <div className="flex flex-wrap gap-3 pt-4">
+              {/* SERVER SELECTOR (Binabalik natin dito) */}
+              <div className="flex flex-col gap-2 pt-2">
+                <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Select Server:</span>
+                <div className="flex flex-wrap gap-2">
+                  {Object.keys(streamUrls).map((serverName) => (
+                    <Button
+                      key={serverName}
+                      variant={currentServer === serverName ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentServer(serverName)}
+                      className={`h-8 border-white/20 ${currentServer === serverName ? 'bg-primary text-primary-foreground' : 'text-white hover:bg-white/10'}`}
+                    >
+                      <Server className="w-3 h-3 mr-2" />
+                      {serverName}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-3 pt-2">
                 {/* DIRECT PLAY BUTTON */}
                 <Button size="lg" className="gap-2 bg-primary/90 hover:bg-primary" onClick={() => setIsVideoOpen(true)}>
-                  <Play className="w-5 h-5" /> Direct Play
+                  <Play className="w-5 h-5" /> Direct Play ({currentServer})
                 </Button>
 
                 {/* MONETIZED BUTTON */}
                 <Button 
                     size="lg" 
                     variant="secondary" 
-                    className="gap-2 bg-yellow-600 hover:bg-yellow-700 text-white border-none shadow-lg shadow-yellow-900/20"
+                    className="gap-2 bg-yellow-600 hover:bg-yellow-700 text-white border-none shadow-lg shadow-yellow-900/20 animate-pulse"
                     onClick={handleMonetizedClick}
                 >
                   <ExternalLink className="w-5 h-5" /> Support & Watch
@@ -175,7 +188,7 @@ const MovieDetail = () => {
       <VideoModal
         isOpen={isVideoOpen}
         onClose={() => setIsVideoOpen(false)}
-        title={movie.title}
+        title={`${movie.title} - ${currentServer}`}
         videoUrl={streamUrls ? streamUrls[currentServer as keyof typeof streamUrls] : ''}
       />
       <UserStats pagePath={`/movie/${id}`} />
