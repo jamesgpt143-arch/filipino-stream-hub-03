@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { UserStats } from '@/components/UserStats';
 import { useClickadillaAds } from '@/hooks/useClickadillaAds';
 
-// 👇 YOUR API KEY
+// API KEY MO
 const CUTY_API_KEY = '67e33ac96fe3e5f792747feb8c184f871726dc01'; 
 
 interface MovieDetails extends Omit<Movie, 'genre_ids'> {
@@ -75,7 +75,7 @@ const MovieDetail = () => {
 
   const streamUrls = tmdbApi.getMovieStreamUrls(movie.id);
 
-  // 2. MONETIZATION HANDLER (UPDATED SA BAGO MONG DOCS)
+  // 2. MONETIZATION HANDLER (WITH CORS PROXY)
   const handleMonetizedClick = async () => {
     setIsGeneratingLink(true);
     
@@ -83,27 +83,24 @@ const MovieDetail = () => {
         const currentPageUrl = window.location.href.split('?')[0];
         const returnUrl = `${currentPageUrl}?autoplay=true`;
         
-        // Prepare Data for POST Request
-        const formData = new URLSearchParams();
-        formData.append('token', CUTY_API_KEY);
-        formData.append('url', returnUrl);
-        formData.append('title', `Watch ${movie.title}`); // Optional: Add title for analytics
+        // 1. Buuin ang Target URL (Legacy API Format)
+        const targetApiUrl = `https://cuty.io/api?api=${CUTY_API_KEY}&url=${encodeURIComponent(returnUrl)}`;
+        
+        // 2. Balutin sa CORS Proxy (api.allorigins.win) para hindi ma-block ng browser
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetApiUrl)}`;
 
-        // Call the API (POST method)
-        const response = await fetch('https://api.cuty.io/full', {
-            method: 'POST',
-            body: formData, // Sends as application/x-www-form-urlencoded
-        });
-
+        const response = await fetch(proxyUrl);
         const data = await response.json();
 
-        // Check if successful (based on your docs: "data": { "short_url": ... })
-        if (response.ok && data.data && data.data.short_url) {
-            // Redirect to the generated short link
-            window.location.href = data.data.short_url;
+        // Check response based on Legacy API format
+        if (data.status === 'success' && data.shortenedUrl) {
+            // Redirect sa short link
+            window.location.href = data.shortenedUrl;
+        } else if (data.shortenedUrl) {
+             // Minsan direct binibigay ang URL kahit walang status
+             window.location.href = data.shortenedUrl;
         } else {
             console.error("API Error:", data);
-            // Show explicit error message instead of failing silently
             toast({ 
                 title: "Link Generation Failed", 
                 description: "Playing directly instead.", 
@@ -114,6 +111,7 @@ const MovieDetail = () => {
 
     } catch (error) {
         console.error("Network Error:", error);
+        // Fallback: Play directly kapag nag-fail ang proxy o API
         toast({ 
             title: "Network Error", 
             description: "Playing directly.", 
@@ -204,7 +202,7 @@ const MovieDetail = () => {
                   <Play className="w-5 h-5" /> Direct Play ({currentServer})
                 </Button>
 
-                {/* MONETIZED BUTTON (POST Method) */}
+                {/* MONETIZED BUTTON (Proxy Method) */}
                 <Button 
                     size="lg" 
                     variant="secondary" 
