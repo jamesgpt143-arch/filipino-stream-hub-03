@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Info, Play, X } from 'lucide-react'; // Added icons
+import { Search, Info, Play } from 'lucide-react';
 import { MovieCard } from '@/components/MovieCard';
 import { VideoModal } from '@/components/VideoModal';
 import { Movie, tmdbApi } from '@/lib/tmdb';
@@ -32,7 +32,7 @@ const GENRES = [
 const Movies = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState<number | null>(null); // New Genre State
+  const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [selectedServer, setSelectedServer] = useState<string>('');
@@ -42,8 +42,8 @@ const Movies = () => {
 
   useClickadillaAds();
 
+  // Reset page pag nagbago ang search o genre
   useEffect(() => {
-    // Reset page when genre/search changes
     setCurrentPage(1);
   }, [searchTerm, selectedGenre]);
 
@@ -56,24 +56,16 @@ const Movies = () => {
         }
     };
     fetchData();
-  }, [currentPage, searchTerm, selectedGenre]); // Re-fetch on genre change
+  }, [currentPage, searchTerm, selectedGenre]);
 
   const loadMovies = async () => {
     try {
       setIsLoading(true);
-      // NOTE: You might need to update your tmdbApi to accept 'with_genres' parameter
-      // Example: const data = await tmdbApi.getPopularMovies(currentPage, selectedGenre);
-      // For now, I'll stick to your existing function:
-      const data = await tmdbApi.getPopularMovies(currentPage);
       
-      let results = data.results;
+      // FIX: Pass selectedGenre to API para Server-Side filtering
+      const data = await tmdbApi.getPopularMovies(currentPage, selectedGenre);
       
-      // CLIENT-SIDE FILTERING (Temporary solution if API doesn't support filter yet)
-      if (selectedGenre) {
-        results = results.filter((m: Movie) => m.genre_ids?.includes(selectedGenre));
-      }
-
-      setMovies(results);
+      setMovies(data.results);
       setTotalPages(data.total_pages);
     } catch (error) {
       toast({
@@ -169,7 +161,7 @@ const Movies = () => {
         <Alert className="mb-6 bg-blue-500/10 border-blue-500/20 text-blue-200">
           <Info className="h-4 w-4 text-blue-400" />
           <AlertDescription>
-            Tip: Hover over a movie card to quick play! Use Brave Browser for ad-free experience.
+            Tip: Use Brave Browser for ad-free experience.
           </AlertDescription>
         </Alert>
 
@@ -190,7 +182,6 @@ const Movies = () => {
                 <h2 className="text-lg font-semibold text-muted-foreground">
                     {searchTerm ? `Search results for "${searchTerm}"` : selectedGenre ? `${GENRES.find(g => g.id === selectedGenre)?.name} Movies` : "Popular Movies"}
                 </h2>
-                <span className="text-xs bg-secondary px-2 py-1 rounded-md text-muted-foreground">{movies.length} titles</span>
              </div>
 
             <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 lg:gap-6">
