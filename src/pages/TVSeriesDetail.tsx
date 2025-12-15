@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { TVShow, tmdbApi, Season, Episode } from '@/lib/tmdb';
 import { Button } from '@/components/ui/button';
-import { Play, Calendar, Star, ArrowLeft, Layers, ExternalLink, Loader2, Server } from 'lucide-react';
+import { Play, Calendar, Star, ArrowLeft, Layers, Loader2, Server } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { VideoModal } from '@/components/VideoModal';
 import { Badge } from '@/components/ui/badge';
@@ -26,28 +26,46 @@ const TVSeriesDetail = () => {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
   const [currentServer, setCurrentServer] = useState('Server 1');
-  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
+  
+  // Track kung aling episode ID ang naglo-loading (para sa spinner)
+  const [loadingEpisodeId, setLoadingEpisodeId] = useState<number | null>(null);
   
   const { toast } = useToast();
   useClickadillaAds();
 
-  // 1. AUTO-PLAY DETECTION (Pagbalik galing Cuty)
+  // 1. SMART AUTO-PLAY DETECTION (Pagbalik galing Cuty)
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    if (params.get('autoplay') === 'true') {
-      // Note: Sa TV Series, medyo tricky ang autoplay kasi kailangan alam natin kung anong episode.
-      // For now, bubuksan nito ang player kung may selected episode na, or mag-aabang.
-      // Dahil nag-reload ang page, pwedeng reset sa S1E1 ito. 
-      // Pero okay lang 'yun, at least nag-play.
-      
-      // Auto-select first episode if none selected logic can be added here
+    const isAutoplay = params.get('autoplay') === 'true';
+    const returnSeason = params.get('s');
+    const returnEpisode = params.get('e');
+
+    if (isAutoplay && returnSeason && returnEpisode) {
+      // Set UI to correct season
+      setSelectedSeason(returnSeason);
+
+      // Create a temporary episode object para makapag-play agad
+      // (Kahit hindi pa tapos mag-load ang episode list)
+      const epNum = parseInt(returnEpisode);
+      const tempEpisode = {
+          id: 0, // Dummy ID
+          episode_number: epNum,
+          name: `Episode ${epNum}`,
+          overview: '',
+          still_path: null,
+          air_date: '',
+          vote_average: 0,
+          vote_count: 0
+      } as unknown as Episode;
+
+      setCurrentEpisode(tempEpisode);
       setIsVideoOpen(true);
       
+      // Clean URL
       window.history.replaceState({}, '', location.pathname);
       toast({
-        title: "Thanks for supporting!",
-        description: "Enjoy watching the series.",
-        duration: 3000,
+        title: "Welcome Back!",
+        description: `Playing Season ${returnSeason}, Episode ${returnEpisode}`,
         className: "bg-green-600 text-white border-none"
       });
     }
@@ -81,27 +99,14 @@ const TVSeriesDetail = () => {
     fetchEpisodes();
   }, [id, selectedSeason]);
 
-  const handlePlayEpisode = (episode: Episode) => {
-    setCurrentEpisode(episode);
-    setIsVideoOpen(true);
-  };
-
-  // 2. MONETIZATION HANDLER (THE WORKING FIX)
-  const handleMonetizedClick = async () => {
-    // Check muna kung may piniling episode
-    if (!currentEpisode && episodes.length > 0) {
-        // Default to first episode if none clicked yet
-        setCurrentEpisode(episodes[0]);
-    } else if (!currentEpisode && episodes.length === 0) {
-        toast({ description: "Please wait for episodes to load.", variant: "destructive" });
-        return;
-    }
-
-    setIsGeneratingLink(true);
+  // 2. MONETIZED EPISODE CLICK HANDLER
+  const handleEpisodeClick = async (episode: Episode) => {
+    setLoadingEpisodeId(episode.id); // Start loading spinner for THIS card
     
     try {
         const currentPageUrl = window.location.href.split('?')[0];
-        const returnUrl = `${currentPageUrl}?autoplay=true`;
+        // Isama ang Season (s) at Episode (e) sa return URL
+        const returnUrl = `${currentPageUrl}?autoplay=true&s=${selectedSeason}&e=${episode.episode_number}`;
         
         // Target URL (Cuty API)
         const targetApiUrl = `https://cuty.io/api?api=${CUTY_API_KEY}&url=${encodeURIComponent(returnUrl)}`;
@@ -116,6 +121,7 @@ const TVSeriesDetail = () => {
             const cutyData = JSON.parse(proxyData.contents);
 
             if (cutyData.shortenedUrl) {
+                // Redirect user to ads
                 window.location.href = cutyData.shortenedUrl;
                 return;
             }
@@ -124,14 +130,16 @@ const TVSeriesDetail = () => {
 
     } catch (error) {
         console.error("Monetization Error:", error);
+        // Fallback: Play directly kapag may error
         toast({ 
-            title: "Support Link Error", 
-            description: "Opening player directly...", 
+            title: "Link Error", 
+            description: "Playing directly...", 
             variant: "destructive" 
         });
+        setCurrentEpisode(episode);
         setIsVideoOpen(true);
     } finally {
-        setIsGeneratingLink(false);
+        setLoadingEpisodeId(null); // Stop loading
     }
   };
 
@@ -146,17 +154,16 @@ const TVSeriesDetail = () => {
     );
   }
 
-  // Get stream URLs logic
+  // Get available servers based on CURRENT state (updated for correct logic)
+  const availableServers = currentEpisode 
+    ? tmdbApi.getTVEpisodeStreamUrls(show.id, parseInt(selectedSeason), currentEpisode.episode_number) 
+    : tmdbApi.getTVEpisodeStreamUrls(show.id, 1, 1); // Default for initial render
+
   const getStreamUrl = () => {
     if (!currentEpisode) return "";
     const urls = tmdbApi.getTVEpisodeStreamUrls(show.id, parseInt(selectedSeason), currentEpisode.episode_number);
     return urls[currentServer as keyof typeof urls];
   };
-
-  // Get available servers for display
-  const availableServers = currentEpisode 
-    ? tmdbApi.getTVEpisodeStreamUrls(show.id, parseInt(selectedSeason), currentEpisode.episode_number) 
-    : { 'Server 1': '', 'Server 2': '' };
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -230,37 +237,18 @@ const TVSeriesDetail = () => {
                 </div>
               </div>
 
-              {/* ACTION BUTTONS */}
+              {/* START WATCHING BUTTON */}
               <div className="flex flex-wrap gap-3 pt-2">
-                {/* Note: Direct Play is usually triggered by clicking an episode list item below, 
-                    but we can add a "Play First Episode" button here */}
                 <Button 
                     size="lg" 
                     className="gap-2 bg-primary/90 hover:bg-primary"
+                    disabled={episodes.length === 0}
                     onClick={() => {
-                        if(episodes.length > 0) handlePlayEpisode(episodes[0]);
+                        if(episodes.length > 0) handleEpisodeClick(episodes[0]);
                     }}
                 >
-                  <Play className="w-5 h-5" /> Start Watching
-                </Button>
-
-                {/* MONETIZED BUTTON */}
-                <Button 
-                    size="lg" 
-                    variant="secondary" 
-                    disabled={isGeneratingLink}
-                    className="gap-2 bg-yellow-600 hover:bg-yellow-700 text-white border-none shadow-lg shadow-yellow-900/20"
-                    onClick={handleMonetizedClick}
-                >
-                  {isGeneratingLink ? (
-                    <>
-                        <Loader2 className="w-5 h-5 animate-spin" /> Generating Link...
-                    </>
-                  ) : (
-                    <>
-                        <ExternalLink className="w-5 h-5" /> Support & Watch
-                    </>
-                  )}
+                  <Play className="w-5 h-5" /> 
+                  {loadingEpisodeId === episodes[0]?.id ? "Generating Link..." : "Start Watching S1:E1"}
                 </Button>
               </div>
 
@@ -302,10 +290,18 @@ const TVSeriesDetail = () => {
                 {episodes.map((episode) => (
                   <Card 
                     key={episode.id} 
-                    className="cursor-pointer hover:bg-accent transition-colors group"
-                    onClick={() => handlePlayEpisode(episode)}
+                    className={`cursor-pointer transition-all group border-transparent hover:border-primary/50 ${loadingEpisodeId === episode.id ? 'opacity-70 bg-secondary' : 'hover:bg-accent'}`}
+                    onClick={() => !loadingEpisodeId && handleEpisodeClick(episode)}
                   >
-                    <CardContent className="p-4 flex gap-4">
+                    <CardContent className="p-4 flex gap-4 relative">
+                      
+                      {/* LOADING OVERLAY FOR EPISODE */}
+                      {loadingEpisodeId === episode.id && (
+                        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/20 backdrop-blur-[1px] rounded-lg">
+                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                        </div>
+                      )}
+
                       <div className="relative w-32 aspect-video flex-shrink-0 bg-muted rounded overflow-hidden">
                         {episode.still_path ? (
                           <img 
