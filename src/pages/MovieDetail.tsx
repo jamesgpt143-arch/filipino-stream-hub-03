@@ -75,7 +75,7 @@ const MovieDetail = () => {
 
   const streamUrls = tmdbApi.getMovieStreamUrls(movie.id);
 
-  // 2. MONETIZATION HANDLER (WITH CORS PROXY)
+  // 2. THE ULTIMATE FIX FOR LINK GENERATION
   const handleMonetizedClick = async () => {
     setIsGeneratingLink(true);
     
@@ -83,38 +83,42 @@ const MovieDetail = () => {
         const currentPageUrl = window.location.href.split('?')[0];
         const returnUrl = `${currentPageUrl}?autoplay=true`;
         
-        // 1. Buuin ang Target URL (Legacy API Format)
+        // Step A: Target URL (Cuty API)
         const targetApiUrl = `https://cuty.io/api?api=${CUTY_API_KEY}&url=${encodeURIComponent(returnUrl)}`;
         
-        // 2. Balutin sa CORS Proxy (api.allorigins.win) para hindi ma-block ng browser
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetApiUrl)}`;
+        // Step B: Proxy URL (allorigins) - Ito ang magbubukas ng pinto
+        // Gumagamit tayo ng '/get' endpoint para makuha ang full content
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetApiUrl)}`;
 
         const response = await fetch(proxyUrl);
-        const data = await response.json();
+        const proxyData = await response.json();
 
-        // Check response based on Legacy API format
-        if (data.status === 'success' && data.shortenedUrl) {
-            // Redirect sa short link
-            window.location.href = data.shortenedUrl;
-        } else if (data.shortenedUrl) {
-             // Minsan direct binibigay ang URL kahit walang status
-             window.location.href = data.shortenedUrl;
-        } else {
-            console.error("API Error:", data);
-            toast({ 
-                title: "Link Generation Failed", 
-                description: "Playing directly instead.", 
-                variant: "destructive" 
-            });
-            setIsVideoOpen(true);
+        // Step C: PARSING (Ito ang kulang dati)
+        // Ang data galing sa allorigins ay nasa loob ng "contents" property at string ito.
+        if (proxyData.contents) {
+            const cutyData = JSON.parse(proxyData.contents); // Convert String to JSON object
+
+            if (cutyData.status === 'success' && cutyData.shortenedUrl) {
+                // SUCCESS! Redirect na.
+                window.location.href = cutyData.shortenedUrl;
+                return;
+            } else if (cutyData.shortenedUrl) {
+                // Minsan walang status pero may URL
+                window.location.href = cutyData.shortenedUrl;
+                return;
+            }
         }
 
+        // Kung umabot dito, ibig sabihin may mali sa data
+        throw new Error("Invalid response from Cuty");
+
     } catch (error) {
-        console.error("Network Error:", error);
-        // Fallback: Play directly kapag nag-fail ang proxy o API
+        console.error("Monetization Error:", error);
+        
+        // FALLBACK: Pag ayaw talaga, Direct Play na lang (para di ma-badtrip user)
         toast({ 
-            title: "Network Error", 
-            description: "Playing directly.", 
+            title: "Support Link Error", 
+            description: "Opening video directly...", 
             variant: "destructive" 
         });
         setIsVideoOpen(true);
@@ -202,7 +206,7 @@ const MovieDetail = () => {
                   <Play className="w-5 h-5" /> Direct Play ({currentServer})
                 </Button>
 
-                {/* MONETIZED BUTTON (Proxy Method) */}
+                {/* MONETIZED BUTTON */}
                 <Button 
                     size="lg" 
                     variant="secondary" 
