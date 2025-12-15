@@ -1,9 +1,8 @@
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { Star, PlayCircle } from 'lucide-react'; // Added PlayCircle
+import { Star } from 'lucide-react';
 import { Movie, tmdbApi } from '@/lib/tmdb';
 import { useNavigate } from 'react-router-dom';
-import { Button } from './ui/button'; // Added Button
 
 interface MovieCardProps {
   movie: Movie;
@@ -11,14 +10,7 @@ interface MovieCardProps {
 }
 
 export const MovieCard = ({ movie, onPlay }: MovieCardProps) => {
-  const servers = tmdbApi.getMovieStreamUrls(movie.id);
   const navigate = useNavigate();
-
-  const handlePlayClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Pigilan ang pag-navigate sa details page
-    // Default server selection (e.g., VidSrc)
-    onPlay(movie, 'VidSrc'); 
-  };
   
   return (
     <Card 
@@ -39,18 +31,6 @@ export const MovieCard = ({ movie, onPlay }: MovieCardProps) => {
             <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
             {movie.vote_average.toFixed(1)}
           </Badge>
-        </div>
-
-        {/* HOVER OVERLAY - Darken image & Show Play Button */}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-            <Button 
-                variant="default" 
-                size="icon" 
-                className="rounded-full w-12 h-12 bg-primary text-primary-foreground hover:scale-110 transition-transform"
-                onClick={handlePlayClick}
-            >
-                <PlayCircle className="w-8 h-8" />
-            </Button>
         </div>
       </div>
 
