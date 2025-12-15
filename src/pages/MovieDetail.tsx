@@ -12,11 +12,17 @@ import { useClickadillaAds } from '@/hooks/useClickadillaAds';
 // 👇 YOUR CUTTLINKS API KEY
 const CUTTLINKS_API_KEY = '67e33ac96fe3e5f792747feb8c184f871726dc01'; 
 
+// Extended Interface para sa Details (dahil iba ang format ng TMDB sa details)
+interface MovieDetails extends Omit<Movie, 'genre_ids'> {
+  genres: { id: number; name: string }[];
+  runtime?: number;
+}
+
 const MovieDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [movie, setMovie] = useState<Movie | null>(null);
+  const [movie, setMovie] = useState<MovieDetails | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [currentServer, setCurrentServer] = useState('Server 1');
@@ -24,15 +30,11 @@ const MovieDetail = () => {
 
   useClickadillaAds();
 
-  // 1. AUTO-PLAY DETECTION:
-  // Kapag bumalik sila galing Cuttlinks, may "?autoplay=true" sa link.
-  // De-detect natin yun para mag-play agad ang movie.
+  // 1. AUTO-PLAY DETECTION
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     if (params.get('autoplay') === 'true') {
-      setIsVideoOpen(true); // Buksan ang player
-      
-      // Linisin ang URL (tanggalin ang ?autoplay=true)
+      setIsVideoOpen(true);
       window.history.replaceState({}, '', location.pathname);
       
       toast({
@@ -52,32 +54,35 @@ const MovieDetail = () => {
           tmdbApi.getMovieDetails(parseInt(id)),
           tmdbApi.getMovieVideos(parseInt(id))
         ]);
-        setMovie(movieData);
+        // Type assertion dahil alam nating may genres ang details
+        setMovie(movieData as unknown as MovieDetails);
         setVideos(videoData.results);
       } catch (error) {
-        console.error(error);
+        console.error("Error loading movie:", error);
+        toast({ title: "Error", description: "Could not load movie details", variant: "destructive" });
       }
     };
     fetchMovieData();
   }, [id]);
 
-  if (!movie) return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
+  if (!movie) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center text-white">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p>Loading Movie Details...</p>
+        </div>
+      </div>
+    );
+  }
 
   const streamUrls = tmdbApi.getMovieStreamUrls(movie.id);
 
-  // 2. MONETIZATION HANDLER:
-  // Papupuntahin sila sa Cuttlinks, tapos ibabalik sa site mo.
+  // 2. MONETIZATION HANDLER
   const handleMonetizedClick = () => {
-    // Kunin ang current link ng site mo
     const currentPageUrl = window.location.href.split('?')[0];
-    
-    // Dagdagan ng secret code "?autoplay=true"
     const returnUrl = `${currentPageUrl}?autoplay=true`;
-    
-    // Generate Cuttlinks URL (Using your API Key)
     const monetizedUrl = `https://cuttlinks.com/st?api=${CUTTLINKS_API_KEY}&url=${encodeURIComponent(returnUrl)}`;
-    
-    // Redirect user
     window.location.href = monetizedUrl;
   };
 
@@ -113,18 +118,25 @@ const MovieDetail = () => {
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300">
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                  {movie.vote_average.toFixed(1)}
+                  {movie.vote_average?.toFixed(1) || 'N/A'}
                 </div>
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
-                  {new Date(movie.release_date).getFullYear()}
+                  {movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}
                 </div>
+                {movie.runtime && (
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
+                    </div>
+                )}
               </div>
 
+              {/* FIX: Ito yung dating nagpapa-crash. Ngayon ay 'movie.genres' na ang gamit */}
               <div className="flex flex-wrap gap-2">
-                {movie.genre_ids.map(id => (
-                   <Badge key={id} variant="outline" className="text-white border-white/20">
-                     Genre {id}
+                {movie.genres?.map(genre => (
+                   <Badge key={genre.id} variant="outline" className="text-white border-white/20">
+                     {genre.name}
                    </Badge>
                 ))}
               </div>
@@ -135,7 +147,7 @@ const MovieDetail = () => {
                   <Play className="w-5 h-5" /> Direct Play
                 </Button>
 
-                {/* 👇 MONETIZED BUTTON (Yellow) */}
+                {/* MONETIZED BUTTON */}
                 <Button 
                     size="lg" 
                     variant="secondary" 
@@ -164,7 +176,7 @@ const MovieDetail = () => {
         isOpen={isVideoOpen}
         onClose={() => setIsVideoOpen(false)}
         title={movie.title}
-        videoUrl={streamUrls[currentServer as keyof typeof streamUrls]}
+        videoUrl={streamUrls ? streamUrls[currentServer as keyof typeof streamUrls] : ''}
       />
       <UserStats pagePath={`/movie/${id}`} />
     </div>
