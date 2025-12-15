@@ -9,7 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { UserStats } from '@/components/UserStats';
 import { useClickadillaAds } from '@/hooks/useClickadillaAds';
 
-const CUTTLINKS_API_KEY = '67e33ac96fe3e5f792747feb8c184f871726dc01'; 
+// 👇 YOUR API KEY
+const CUTY_API_KEY = '67e33ac96fe3e5f792747feb8c184f871726dc01'; 
 
 interface MovieDetails extends Omit<Movie, 'genre_ids'> {
   genres: { id: number; name: string }[];
@@ -23,7 +24,7 @@ const MovieDetail = () => {
   const [movie, setMovie] = useState<MovieDetails | null>(null);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [currentServer, setCurrentServer] = useState('Server 1');
-  const [isGeneratingLink, setIsGeneratingLink] = useState(false); // Loading state para sa button
+  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const { toast } = useToast();
 
   useClickadillaAds();
@@ -74,36 +75,51 @@ const MovieDetail = () => {
 
   const streamUrls = tmdbApi.getMovieStreamUrls(movie.id);
 
-  // 2. MONETIZATION HANDLER (USING DEVELOPER API JSON)
+  // 2. MONETIZATION HANDLER (UPDATED SA BAGO MONG DOCS)
   const handleMonetizedClick = async () => {
-    setIsGeneratingLink(true); // Pakita ang loading spinner
+    setIsGeneratingLink(true);
     
     try {
-        // Kunin ang current link ng site mo at dagdagan ng autoplay code
         const currentPageUrl = window.location.href.split('?')[0];
         const returnUrl = `${currentPageUrl}?autoplay=true`;
         
-        // Tawagin ang Cuty.io API gamit ang format na binigay mo
-        // Note: Gumamit ako ng 'alias' para hindi mag error kung existing na, pero optional ito.
-        const apiUrl = `https://cuty.io/api?api=${CUTTLINKS_API_KEY}&url=${encodeURIComponent(returnUrl)}`;
+        // Prepare Data for POST Request
+        const formData = new URLSearchParams();
+        formData.append('token', CUTY_API_KEY);
+        formData.append('url', returnUrl);
+        formData.append('title', `Watch ${movie.title}`); // Optional: Add title for analytics
 
-        const response = await fetch(apiUrl);
+        // Call the API (POST method)
+        const response = await fetch('https://api.cuty.io/full', {
+            method: 'POST',
+            body: formData, // Sends as application/x-www-form-urlencoded
+        });
+
         const data = await response.json();
 
-        if (data.status === 'success' || data.shortenedUrl) {
-            // Kung successful, redirect sa short link
-            window.location.href = data.shortenedUrl;
+        // Check if successful (based on your docs: "data": { "short_url": ... })
+        if (response.ok && data.data && data.data.short_url) {
+            // Redirect to the generated short link
+            window.location.href = data.data.short_url;
         } else {
-            console.error("Cuty Error:", data.message);
-            // Fallback: Kung mag-error ang API, mag-play nalang diretso para hindi ma-stuck user
-            toast({ title: "Connection Error", description: "Directing to player...", variant: "destructive" });
+            console.error("API Error:", data);
+            // Show explicit error message instead of failing silently
+            toast({ 
+                title: "Link Generation Failed", 
+                description: "Playing directly instead.", 
+                variant: "destructive" 
+            });
             setIsVideoOpen(true);
         }
 
     } catch (error) {
         console.error("Network Error:", error);
-        // Fallback sa Direct Play pag may error
-        setIsVideoOpen(true); 
+        toast({ 
+            title: "Network Error", 
+            description: "Playing directly.", 
+            variant: "destructive" 
+        });
+        setIsVideoOpen(true);
     } finally {
         setIsGeneratingLink(false);
     }
@@ -188,7 +204,7 @@ const MovieDetail = () => {
                   <Play className="w-5 h-5" /> Direct Play ({currentServer})
                 </Button>
 
-                {/* MONETIZED BUTTON (UPDATED) */}
+                {/* MONETIZED BUTTON (POST Method) */}
                 <Button 
                     size="lg" 
                     variant="secondary" 
