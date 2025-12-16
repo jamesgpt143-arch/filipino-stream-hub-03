@@ -395,11 +395,6 @@ name: 'GMA (Youtube Stream)',
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.lY5V2M3D9jtBFJNbOAI8swHaDt?rs=1&pid=ImgDetMain'
 }, {
-    name: 'Heart Of Asia',
-  manifestUri: 'http://hls.nathcreqtives.com/playlist.m3u8?id=1&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nIiwiZXhwIjoxNzY2MTM5MjczfQ.XByFBFnLmTlL4ZgjewVUmP08StGv7jQjK5vG_4K_QW0',
-  type: 'hls',
-  logo: 'https://static.wikia.nocookie.net/logopedia/images/7/79/Heart_of_Asia_3D_Logo.png/revision/latest/scale-to-width-down/149?cb=20200713050134'
-}, {
   name: 'HGTV HD',
   manifestUri: 'https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/hgtv_hd1/default/index.mpd',
   clearKey: {
@@ -447,11 +442,6 @@ name: 'GMA (Youtube Stream)',
   },
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.sJNkdFUalhzRyZT4SJ9HBAHaEc?rs=1&pid=ImgDetMain'
-}, {
-   name: 'I Heart Movies',
-  manifestUri: 'http://hls.nathcreqtives.com/playlist.m3u8?id=2&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nIiwiZXhwIjoxNzY2MTM5MjczfQ.XByFBFnLmTlL4ZgjewVUmP08StGv7jQjK5vG_4K_QW0',
-  type: 'hls',
-  logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/26/I_Heart_Movies_2021.png/250px-I_Heart_Movies_2021.png'
 }, {
   name: 'INCTV',
   manifestUri: 'https://199211.global.ssl.fastly.net/643cc12aa824db4374021c8c/live_95f6ac80dd6511ed9d08b12be56ae55e/index.m3u8',
