@@ -21,23 +21,20 @@ import Comments from "./pages/Comments";
 import NotFound from "./pages/NotFound";
 import { disableDevTools } from "./utils/disableDevTools";
 import { useEffect } from "react";
-
-// NEW IMPORTS
 import { CommentsWidget } from "./components/CommentsWidget";
 import { AnnouncementBar } from "./components/AnnouncementBar";
 
+// IMPORT AUTH GUARD
+import { AuthGuard } from "./components/AuthGuard";
+
 const queryClient = new QueryClient();
 
-const AppContent = () => {
+// Nilipat ko sa loob ng AuthGuard ang navigation at routes
+const ProtectedApp = () => {
   return (
     <>
-      {/* 1. Announcement Bar (Running Text) - Nasa pinakataas */}
       <AnnouncementBar />
-
-      {/* 2. Navigation Bar */}
       <Navigation />
-
-      {/* 3. Main Pages */}
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/channels" element={<Channels />} />
@@ -48,15 +45,9 @@ const AppContent = () => {
         <Route path="/tv-series/:id" element={<TVSeriesDetail />} />
         <Route path="/anime" element={<Anime />} />
         <Route path="/anime/:id" element={<AnimeDetail />} />
-        
-        {/* Note: Nandoon pa rin ang route na ito, pero hidden na sa nav button */}
         <Route path="/comments" element={<Comments />} />
-        
-        {/* 404 Page */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-      
-      {/* 4. Floating Chat Widget - Nasa ibaba (nakalutang) */}
       <CommentsWidget />
     </>
   );
@@ -64,10 +55,7 @@ const AppContent = () => {
 
 const App = () => {
   useEffect(() => {
-    // Initialize developer tools protection
     disableDevTools();
-    
-    // Register service worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').catch(() => {});
@@ -82,11 +70,15 @@ const App = () => {
         <Sonner />
         <PWAInstallPrompt />
         <UpdatePopup />
-        
         <ShopeeRedirect />
+        
         <BrowserRouter>
-          <AppContent />
+          {/* 👇 DITO NATIN IBABALOT ANG LAHAT SA AUTH GUARD */}
+          <AuthGuard>
+             <ProtectedApp />
+          </AuthGuard>
         </BrowserRouter>
+
       </TooltipProvider>
     </QueryClientProvider>
   );
