@@ -182,15 +182,6 @@ export const channels: Channel[] = [
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.3wplDtTyzPCr4Yoyg8t_GgHaDC?rs=1&pid=ImgDetMain'
 }, {
-  name: 'CINEMO',
-  manifestUri: 'https://d1bail49udbz1k.cloudfront.net/out/v1/3a895f368f4a467c9bca0962559efc19/index.mpd',
-  clearKey: {
-    'aa8aebe35ccc4541b7ce6292efcb1bfb': 'aab1df109d22fc5d7e3ec121ddf24e5f'
-  },
-  type: 'mpd',
-  logo: 'https://yt3.ggpht.com/a-/AAuE7mAK5lTlRJwr2rZLeitoTnOYkjForU2cvszswQ=s900-mo-c-c0xffffffff-rj-k-no',
-  redirectUrl: 'https://s.shopee.ph/3fvxJ5MXX6'
-}, {
   name: 'Cinemax',
   manifestUri: 'https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/cg_cinemax/default/index.mpd',
   clearKey: {
@@ -458,7 +449,7 @@ name: 'GMA (Youtube Stream)',
   logo: 'https://th.bing.com/th/id/OIP.sJNkdFUalhzRyZT4SJ9HBAHaEc?rs=1&pid=ImgDetMain'
 }, {
    name: 'I Heart Movies',
-  manifestUri: 'http://hls.nathcreqtives.com/playlist.m3u8?id=2&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nYWEiLCJleHAiOjE3NjYxNDMxMTd9.Im2wmUGkxC7EOOdY3t943snIITriN5ZLV3ONpHBwtis',
+  manifestUri: 'http://hls.nathcreqtives.com/playlist.m3u8?id=2&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nIiwiZXhwIjoxNzY2MTM5MjczfQ.XByFBFnLmTlL4ZgjewVUmP08StGv7jQjK5vG_4K_QW0',
   type: 'hls',
   logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/26/I_Heart_Movies_2021.png/250px-I_Heart_Movies_2021.png'
 }, {
