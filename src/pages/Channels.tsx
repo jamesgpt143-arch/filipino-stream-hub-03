@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Search, Eye, EyeOff } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
 import { UserStats } from '@/components/UserStats';
-import { useClickadillaAds } from '@/hooks/useClickadillaAds';
 
 const Channels = () => {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
@@ -17,8 +16,6 @@ const Channels = () => {
   const [showHidden, setShowHidden] = useState(false);
   const { toast } = useToast();
 
-  // Clickadilla Popunder Ads
-  useClickadillaAds();
 
   // Only show static IPTV channels
   const allChannels = useMemo(() => {
