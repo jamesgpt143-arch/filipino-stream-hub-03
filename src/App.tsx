@@ -69,7 +69,6 @@ const App = () => {
         <Sonner />
         <PWAInstallPrompt />
         <UpdatePopup />
-        <ShopeeRedirect />
         
         <BrowserRouter>
           {/* 👇 DITO NATIN IBABALOT ANG LAHAT SA AUTH GUARD */}
