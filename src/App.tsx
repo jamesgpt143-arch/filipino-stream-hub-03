@@ -7,7 +7,6 @@ import { Navigation } from "./components/Navigation";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { UpdatePopup } from "./components/UpdatePopup";
 
-import { ShopeeRedirect } from "./components/ShopeeRedirect";
 import Homepage from "./pages/Homepage";
 import Channels from "./pages/Channels";
 import CustomChannels from "./pages/CustomChannels";
