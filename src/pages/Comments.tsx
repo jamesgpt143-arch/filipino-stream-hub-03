@@ -39,7 +39,7 @@ const Comments = () => {
 
   useEffect(() => {
     loadComments();
-    // Load liked comments from local storage
+    // Load liked comments from local storage para maalala ng browser kung nag-like na
     const storedLikes = localStorage.getItem('flame_liked_comments');
     if (storedLikes) {
         setLikedComments(new Set(JSON.parse(storedLikes)));
@@ -69,7 +69,7 @@ const Comments = () => {
             ...comment, 
             likes: comment.likes || 0,
             replies: [] 
-        } as unknown as Comment; // Type assertion needed for strict TS
+        } as unknown as Comment;
         commentsMap.set(comment.id, commentWithLikes);
       });
 
@@ -126,8 +126,7 @@ const Comments = () => {
         if (error) throw error;
     } catch (err) {
         console.error("Error updating like:", err);
-        // Revert if error (Optional: usually not needed for simple likes)
-        loadComments(); 
+        loadComments(); // Revert on error
     }
   };
 
@@ -201,7 +200,6 @@ const Comments = () => {
   };
 
   const handleDelete = async (commentId: string) => {
-    // Basic password check for deletion (Quick fix since there's no auth role in this component yet)
     const pass = prompt("Enter Admin Password to Delete:");
     if (pass !== "darman18") {
         toast({ title: "Error", description: "Wrong password", variant: "destructive" });
@@ -253,7 +251,7 @@ const Comments = () => {
             </p>
 
             <div className="flex items-center gap-4 pt-2 border-t border-border/50">
-              {/* LIKE BUTTON */}
+              {/* BUTTON NG REACT/LIKE */}
               <button
                 onClick={() => handleLike(comment.id, comment.likes)}
                 className={`flex items-center gap-1.5 text-sm transition-colors group ${
@@ -274,7 +272,6 @@ const Comments = () => {
                 </button>
               )}
 
-              {/* Delete Button (Optional Admin Feature) */}
               <button 
                 onClick={() => handleDelete(comment.id)}
                 className="ml-auto text-muted-foreground hover:text-red-500 transition-colors"
