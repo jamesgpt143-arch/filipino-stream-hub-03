@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { UserStats } from '@/components/UserStats';
 import { useClickadillaAds } from '@/hooks/useClickadillaAds';
 
-// API KEY MO
 const CUTY_API_KEY = '67e33ac96fe3e5f792747feb8c184f871726dc01';
 
 interface MovieDetails extends Omit<Movie, 'genre_ids'> {
@@ -32,27 +31,30 @@ const MovieDetail = () => {
   const { toast } = useToast();
   useClickadillaAds();
 
-  // 1. CHECK ACCESS ON LOAD & HANDLE RETURN FROM ADS
+  // 1. CHECK ACCESS ON LOAD
   useEffect(() => {
     const checkAccess = () => {
       const now = Date.now();
       const expiry = localStorage.getItem('flame_session_expiry');
       
-      // A. Check URL for successful return from Ads
+      // Handle Return from Ads
       const params = new URLSearchParams(location.search);
       if (params.get('auth') === 'success') {
          const newExpiry = now + (12 * 60 * 60 * 1000); // 12 Hours
          localStorage.setItem('flame_session_expiry', newExpiry.toString());
          setIsUnlocked(true);
-         setIsVideoOpen(true); // Auto-play!
          
-         // Clean URL
+         // Auto-add to history & play
+         if (params.get('autoplay') === 'true') {
+            setIsVideoOpen(true);
+            // We'll add to history in the next render cycle effectively
+         }
+         
          window.history.replaceState({}, '', location.pathname);
          toast({ title: "Access Unlocked! 🔓", description: "Enjoy 12 hours of free viewing.", className: "bg-green-600 text-white" });
          return;
       }
 
-      // B. Check existing session
       if (expiry && parseInt(expiry) > now) {
         setIsUnlocked(true);
       } else {
@@ -62,6 +64,7 @@ const MovieDetail = () => {
     checkAccess();
   }, [location, toast]);
 
+  // Load Movie Data
   useEffect(() => {
     const fetchMovieData = async () => {
       if (!id) return;
@@ -78,21 +81,50 @@ const MovieDetail = () => {
     fetchMovieData();
   }, [id]);
 
-  // 2. HANDLE PLAY CLICK (THE GATE)
+  // SAVE HISTORY HELPER
+  const addToHistory = () => {
+    if (!movie) return;
+    
+    const historyItem = {
+        id: `movie-${movie.id}`,
+        tmdbId: movie.id,
+        type: 'movie',
+        title: movie.title,
+        posterPath: movie.backdrop_path || movie.poster_path,
+        lastWatchedAt: Date.now(),
+        link: `/movie/${movie.id}?autoplay=true&auth=success` // Direct link trick
+    };
+
+    const stored = localStorage.getItem('flame_watch_history');
+    let history = stored ? JSON.parse(stored) : [];
+    
+    // Remove duplicates
+    history = history.filter((h: any) => h.id !== historyItem.id);
+    // Add to top
+    history.unshift(historyItem);
+    // Limit 20
+    if (history.length > 20) history.pop();
+
+    localStorage.setItem('flame_watch_history', JSON.stringify(history));
+  };
+
+  // HANDLE PLAY CLICK
   const handlePlayClick = async () => {
-    // Kung unlocked na, play agad
+    // Kung unlocked na, play agad at save history
     if (isUnlocked) {
+        addToHistory();
         setIsVideoOpen(true);
         return;
     }
 
-    // Kung locked pa, generate link
+    // Kung locked, hingi ads
     if (!window.confirm("Watch a short ad to unlock full access for 12 hours?")) return;
 
     setIsProcessing(true);
     try {
         const currentPageUrl = window.location.href.split('?')[0];
-        const returnUrl = `${currentPageUrl}?auth=success`;
+        // Note: We add autoplay=true so it plays immediately upon return
+        const returnUrl = `${currentPageUrl}?auth=success&autoplay=true`;
         
         const targetApiUrl = `https://cuty.io/api?api=${CUTY_API_KEY}&url=${encodeURIComponent(returnUrl)}`;
         const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetApiUrl)}`;
@@ -115,10 +147,7 @@ const MovieDetail = () => {
   if (!movie) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center text-white">
-        <div className="animate-pulse flex flex-col items-center gap-4">
-          <Loader2 className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p>Loading Movie Details...</p>
-        </div>
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
       </div>
     );
   }
@@ -156,13 +185,19 @@ const MovieDetail = () => {
               
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300">
                 <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                  {movie.vote_average?.toFixed(1) || 'N/A'}
-                </div>
-                <div className="flex items-center gap-1">
                    {isUnlocked ? <Unlock className="w-4 h-4 text-green-500" /> : <Lock className="w-4 h-4 text-red-500" />}
                    {isUnlocked ? "Premium Access" : "Ad-Supported"}
                 </div>
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                  {movie.vote_average?.toFixed(1) || 'N/A'}
+                </div>
+                {movie.runtime && (
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
+                    </div>
+                )}
               </div>
 
               <div className="flex flex-wrap gap-2">
@@ -173,7 +208,6 @@ const MovieDetail = () => {
                 ))}
               </div>
 
-              {/* SERVER SELECTOR */}
               <div className="flex flex-col gap-2 pt-2">
                 <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Select Server:</span>
                 <div className="flex flex-wrap gap-2">
@@ -193,20 +227,14 @@ const MovieDetail = () => {
               </div>
 
               <div className="flex flex-wrap gap-3 pt-2">
-                {/* PLAY BUTTON WITH LOCK LOGIC */}
                 <Button 
                     size="lg" 
                     className={`gap-2 ${isUnlocked ? 'bg-primary hover:bg-primary/90' : 'bg-yellow-600 hover:bg-yellow-700'}`}
                     onClick={handlePlayClick}
                     disabled={isProcessing}
                 >
-                  {isProcessing ? (
-                    <><Loader2 className="w-5 h-5 animate-spin" /> Unlocking...</>
-                  ) : isUnlocked ? (
-                    <><Play className="w-5 h-5" /> Play Movie</>
-                  ) : (
-                    <><Lock className="w-5 h-5" /> Unlock & Play</>
-                  )}
+                  {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : isUnlocked ? <Play className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
+                  {isProcessing ? "Unlocking..." : isUnlocked ? "Play Movie" : "Unlock & Play"}
                 </Button>
               </div>
 
