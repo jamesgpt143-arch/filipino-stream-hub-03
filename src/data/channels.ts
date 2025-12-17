@@ -336,7 +336,7 @@ export const channels: Channel[] = [
   logo: 'https://cdn2.ettoday.net/images/6892/e6892888.jpg'
 }, {
    name: 'GMA',
-  manifestUri: 'https://converse.nathcreqtives.com/1093/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nYWEiLCJleHAiOjE3NjYxNDMxMTd9.Im2wmUGkxC7EOOdY3t943snIITriN5ZLV3ONpHBwtis',
+  manifestUri: 'https://converse.nathcreqtives.com/1093/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nIiwiZXhwIjoxNzY2MjI0MjAyfQ.z7zLY0g7Pim-rbsW5I0ZYx9hvUswbssoQVwMLG-vUEs',
   widevineUrl: 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00',
   type: 'mpd',
   logo: 'https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126306082.png'
@@ -356,7 +356,7 @@ name: 'GMA (Youtube Stream)',
   logo: 'https://th.bing.com/th/id/OIP.ntjNVRaXsZJ0vrhWBA35sQHaE7?rs=1&pid=ImgDetMain'
 }, {
   name: 'GTV',
-  manifestUri: 'https://converse.nathcreqtives.com/1143/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nYWEiLCJleHAiOjE3NjYxNDMxMTd9.Im2wmUGkxC7EOOdY3t943snIITriN5ZLV3ONpHBwtis',
+  manifestUri: 'https://converse.nathcreqtives.com/1143/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nIiwiZXhwIjoxNzY2MjI0MjAyfQ.z7zLY0g7Pim-rbsW5I0ZYx9hvUswbssoQVwMLG-vUEs',
   widevineUrl: 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00',
   type: 'mpd',
   logo: 'https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png'
@@ -457,7 +457,7 @@ name: 'GMA (Youtube Stream)',
   logo: 'https://th.bing.com/th/id/OIP.MHyjJgpgcnoGypCLEIh9qAHaDH?rs=1&pid=ImgDetMain'
 }, {
     name: 'iQIYI',
-  manifestUri: 'https://converse.nathcreqtives.com/astro/1006/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nYWEiLCJleHAiOjE3NjYxNDMxMTd9.Im2wmUGkxC7EOOdY3t943snIITriN5ZLV3ONpHBwtis',
+  manifestUri: 'https://converse.nathcreqtives.com/astro/1006/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nIiwiZXhwIjoxNzY2MjI0MjAyfQ.z7zLY0g7Pim-rbsW5I0ZYx9hvUswbssoQVwMLG-vUEs',
   clearKey: {
     '7ef7e913ce85a1131b27036069169a10': '77d98ed71db7524c27875a09a975f9e6'
   },
@@ -516,7 +516,7 @@ name: 'GMA (Youtube Stream)',
   logo: 'https://th.bing.com/th/id/OIP.ix5ReWijxZg8uPcKrk2GHwHaGd?rs=1&pid=ImgDetMain'
 }, {
  name: 'Kplus',
-  manifestUri: 'https://converse.nathcreqtives.com/astro/9983/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nYWEiLCJleHAiOjE3NjYxNDMxMTd9.Im2wmUGkxC7EOOdY3t943snIITriN5ZLV3ONpHBwtis',
+  manifestUri: 'https://converse.nathcreqtives.com/astro/9983/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nIiwiZXhwIjoxNzY2MjI0MjAyfQ.z7zLY0g7Pim-rbsW5I0ZYx9hvUswbssoQVwMLG-vUEs',
   clearKey: {
     'aa48b28bd723f91214887df6ed9fad10': 'b5a3a800848120c843ae0fa68c09c261'
   },
