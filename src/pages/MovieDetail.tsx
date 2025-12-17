@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Movie, tmdbApi, Video } from '@/lib/tmdb';
 import { Button } from '@/components/ui/button';
-import { Play, Calendar, Star, Clock, ArrowLeft, ExternalLink, Server, Loader2 } from 'lucide-react';
+import { Play, Calendar, Star, Clock, ArrowLeft, Server, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { VideoModal } from '@/components/VideoModal';
 import { Badge } from '@/components/ui/badge';
 import { UserStats } from '@/components/UserStats';
 import { useClickadillaAds } from '@/hooks/useClickadillaAds';
-
-// API KEY MO
-const CUTY_API_KEY = '67e33ac96fe3e5f792747feb8c184f871726dc01'; 
 
 interface MovieDetails extends Omit<Movie, 'genre_ids'> {
   genres: { id: number; name: string }[];
@@ -20,30 +17,12 @@ interface MovieDetails extends Omit<Movie, 'genre_ids'> {
 const MovieDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const [movie, setMovie] = useState<MovieDetails | null>(null);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [currentServer, setCurrentServer] = useState('Server 1');
-  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const { toast } = useToast();
 
   useClickadillaAds();
-
-  // 1. AUTO-PLAY DETECTION
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    if (params.get('autoplay') === 'true') {
-      setIsVideoOpen(true);
-      window.history.replaceState({}, '', location.pathname);
-      
-      toast({
-        title: "Thanks for supporting!",
-        description: "Enjoy watching the movie.",
-        duration: 3000,
-        className: "bg-green-600 text-white border-none"
-      });
-    }
-  }, [location]);
 
   useEffect(() => {
     const fetchMovieData = async () => {
@@ -66,7 +45,8 @@ const MovieDetail = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center text-white">
         <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <Loader2 className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin">
+          </Loader2>
           <p>Loading Movie Details...</p>
         </div>
       </div>
@@ -74,58 +54,6 @@ const MovieDetail = () => {
   }
 
   const streamUrls = tmdbApi.getMovieStreamUrls(movie.id);
-
-  // 2. THE ULTIMATE FIX FOR LINK GENERATION
-  const handleMonetizedClick = async () => {
-    setIsGeneratingLink(true);
-    
-    try {
-        const currentPageUrl = window.location.href.split('?')[0];
-        const returnUrl = `${currentPageUrl}?autoplay=true`;
-        
-        // Step A: Target URL (Cuty API)
-        const targetApiUrl = `https://cuty.io/api?api=${CUTY_API_KEY}&url=${encodeURIComponent(returnUrl)}`;
-        
-        // Step B: Proxy URL (allorigins) - Ito ang magbubukas ng pinto
-        // Gumagamit tayo ng '/get' endpoint para makuha ang full content
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetApiUrl)}`;
-
-        const response = await fetch(proxyUrl);
-        const proxyData = await response.json();
-
-        // Step C: PARSING (Ito ang kulang dati)
-        // Ang data galing sa allorigins ay nasa loob ng "contents" property at string ito.
-        if (proxyData.contents) {
-            const cutyData = JSON.parse(proxyData.contents); // Convert String to JSON object
-
-            if (cutyData.status === 'success' && cutyData.shortenedUrl) {
-                // SUCCESS! Redirect na.
-                window.location.href = cutyData.shortenedUrl;
-                return;
-            } else if (cutyData.shortenedUrl) {
-                // Minsan walang status pero may URL
-                window.location.href = cutyData.shortenedUrl;
-                return;
-            }
-        }
-
-        // Kung umabot dito, ibig sabihin may mali sa data
-        throw new Error("Invalid response from Cuty");
-
-    } catch (error) {
-        console.error("Monetization Error:", error);
-        
-        // FALLBACK: Pag ayaw talaga, Direct Play na lang (para di ma-badtrip user)
-        toast({ 
-            title: "Support Link Error", 
-            description: "Opening video directly...", 
-            variant: "destructive" 
-        });
-        setIsVideoOpen(true);
-    } finally {
-        setIsGeneratingLink(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -204,25 +132,6 @@ const MovieDetail = () => {
                 {/* DIRECT PLAY BUTTON */}
                 <Button size="lg" className="gap-2 bg-primary/90 hover:bg-primary" onClick={() => setIsVideoOpen(true)}>
                   <Play className="w-5 h-5" /> Direct Play ({currentServer})
-                </Button>
-
-                {/* MONETIZED BUTTON */}
-                <Button 
-                    size="lg" 
-                    variant="secondary" 
-                    disabled={isGeneratingLink}
-                    className="gap-2 bg-yellow-600 hover:bg-yellow-700 text-white border-none shadow-lg shadow-yellow-900/20"
-                    onClick={handleMonetizedClick}
-                >
-                  {isGeneratingLink ? (
-                    <>
-                        <Loader2 className="w-5 h-5 animate-spin" /> Generating Link...
-                    </>
-                  ) : (
-                    <>
-                        <ExternalLink className="w-5 h-5" /> Support & Watch
-                    </>
-                  )}
                 </Button>
               </div>
 
