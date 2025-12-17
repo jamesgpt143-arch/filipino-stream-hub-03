@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Movie, tmdbApi, Video } from '@/lib/tmdb';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Movie, tmdbApi } from '@/lib/tmdb';
 import { Button } from '@/components/ui/button';
-import { Play, Calendar, Star, Clock, ArrowLeft, Server, Loader2 } from 'lucide-react';
+import { Play, Calendar, Star, Clock, ArrowLeft, Server, Loader2, Lock, Unlock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { VideoModal } from '@/components/VideoModal';
 import { Badge } from '@/components/ui/badge';
 import { UserStats } from '@/components/UserStats';
 import { useClickadillaAds } from '@/hooks/useClickadillaAds';
+
+// API KEY MO
+const CUTY_API_KEY = '67e33ac96fe3e5f792747feb8c184f871726dc01';
 
 interface MovieDetails extends Omit<Movie, 'genre_ids'> {
   genres: { id: number; name: string }[];
@@ -17,12 +20,47 @@ interface MovieDetails extends Omit<Movie, 'genre_ids'> {
 const MovieDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [movie, setMovie] = useState<MovieDetails | null>(null);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [currentServer, setCurrentServer] = useState('Server 1');
+  
+  // AD LOCK STATES
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  
   const { toast } = useToast();
-
   useClickadillaAds();
+
+  // 1. CHECK ACCESS ON LOAD & HANDLE RETURN FROM ADS
+  useEffect(() => {
+    const checkAccess = () => {
+      const now = Date.now();
+      const expiry = localStorage.getItem('flame_session_expiry');
+      
+      // A. Check URL for successful return from Ads
+      const params = new URLSearchParams(location.search);
+      if (params.get('auth') === 'success') {
+         const newExpiry = now + (12 * 60 * 60 * 1000); // 12 Hours
+         localStorage.setItem('flame_session_expiry', newExpiry.toString());
+         setIsUnlocked(true);
+         setIsVideoOpen(true); // Auto-play!
+         
+         // Clean URL
+         window.history.replaceState({}, '', location.pathname);
+         toast({ title: "Access Unlocked! 🔓", description: "Enjoy 12 hours of free viewing.", className: "bg-green-600 text-white" });
+         return;
+      }
+
+      // B. Check existing session
+      if (expiry && parseInt(expiry) > now) {
+        setIsUnlocked(true);
+      } else {
+        setIsUnlocked(false);
+      }
+    };
+    checkAccess();
+  }, [location, toast]);
 
   useEffect(() => {
     const fetchMovieData = async () => {
@@ -35,18 +73,50 @@ const MovieDetail = () => {
         setMovie(movieData as unknown as MovieDetails);
       } catch (error) {
         console.error("Error loading movie:", error);
-        toast({ title: "Error", description: "Could not load movie details", variant: "destructive" });
       }
     };
     fetchMovieData();
   }, [id]);
 
+  // 2. HANDLE PLAY CLICK (THE GATE)
+  const handlePlayClick = async () => {
+    // Kung unlocked na, play agad
+    if (isUnlocked) {
+        setIsVideoOpen(true);
+        return;
+    }
+
+    // Kung locked pa, generate link
+    if (!window.confirm("Watch a short ad to unlock full access for 12 hours?")) return;
+
+    setIsProcessing(true);
+    try {
+        const currentPageUrl = window.location.href.split('?')[0];
+        const returnUrl = `${currentPageUrl}?auth=success`;
+        
+        const targetApiUrl = `https://cuty.io/api?api=${CUTY_API_KEY}&url=${encodeURIComponent(returnUrl)}`;
+        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetApiUrl)}`;
+
+        const response = await fetch(proxyUrl);
+        const data = await response.json();
+
+        if (data.shortenedUrl) {
+            window.location.href = data.shortenedUrl;
+        } else {
+            throw new Error("No link generated");
+        }
+    } catch (error) {
+        console.error("Ad Link Error:", error);
+        toast({ title: "Connection Error", description: "Please disable AdBlock and try again.", variant: "destructive" });
+        setIsProcessing(false);
+    }
+  };
+
   if (!movie) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center text-white">
         <div className="animate-pulse flex flex-col items-center gap-4">
-          <Loader2 className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin">
-          </Loader2>
+          <Loader2 className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           <p>Loading Movie Details...</p>
         </div>
       </div>
@@ -90,15 +160,9 @@ const MovieDetail = () => {
                   {movie.vote_average?.toFixed(1) || 'N/A'}
                 </div>
                 <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  {movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}
+                   {isUnlocked ? <Unlock className="w-4 h-4 text-green-500" /> : <Lock className="w-4 h-4 text-red-500" />}
+                   {isUnlocked ? "Premium Access" : "Ad-Supported"}
                 </div>
-                {movie.runtime && (
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      {Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
-                    </div>
-                )}
               </div>
 
               <div className="flex flex-wrap gap-2">
@@ -129,9 +193,20 @@ const MovieDetail = () => {
               </div>
 
               <div className="flex flex-wrap gap-3 pt-2">
-                {/* DIRECT PLAY BUTTON */}
-                <Button size="lg" className="gap-2 bg-primary/90 hover:bg-primary" onClick={() => setIsVideoOpen(true)}>
-                  <Play className="w-5 h-5" /> Direct Play ({currentServer})
+                {/* PLAY BUTTON WITH LOCK LOGIC */}
+                <Button 
+                    size="lg" 
+                    className={`gap-2 ${isUnlocked ? 'bg-primary hover:bg-primary/90' : 'bg-yellow-600 hover:bg-yellow-700'}`}
+                    onClick={handlePlayClick}
+                    disabled={isProcessing}
+                >
+                  {isProcessing ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Unlocking...</>
+                  ) : isUnlocked ? (
+                    <><Play className="w-5 h-5" /> Play Movie</>
+                  ) : (
+                    <><Lock className="w-5 h-5" /> Unlock & Play</>
+                  )}
                 </Button>
               </div>
 
