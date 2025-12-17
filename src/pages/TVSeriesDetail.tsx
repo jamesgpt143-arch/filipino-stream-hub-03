@@ -26,7 +26,6 @@ const TVSeriesDetail = () => {
   const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
   const [currentServer, setCurrentServer] = useState('Server 1');
   
-  // AD LOCK STATES
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -39,25 +38,21 @@ const TVSeriesDetail = () => {
       const now = Date.now();
       const expiry = localStorage.getItem('flame_session_expiry');
       
-      // Handle return from ads with episode info
       const params = new URLSearchParams(location.search);
       if (params.get('auth') === 'success') {
          const newExpiry = now + (12 * 60 * 60 * 1000);
          localStorage.setItem('flame_session_expiry', newExpiry.toString());
          setIsUnlocked(true);
          
-         // Auto-play the correct episode
          const retS = params.get('s');
          const retE = params.get('e');
          if (retS && retE) {
              setSelectedSeason(retS);
-             // Note: episode object might not be loaded yet, but player will handle simple IDs
-             // For better UX, we just open modal and let user select or wait for load
-             // Or construct a temp episode object
-             setIsVideoOpen(true); 
-             toast({ title: "Unlocked! 🔓", description: `Playing S${retS}:E${retE}` });
+             // Note: Episode might not be loaded yet, user might need to click manually if not instant
+             // But we unlocked it!
+             toast({ title: "Unlocked! 🔓", description: `You can now watch S${retS}:E${retE}` });
          } else {
-             toast({ title: "Access Unlocked! 🔓", description: "You can now watch any episode." });
+             toast({ title: "Unlocked! 🔓", description: "Enjoy watching!" });
          }
 
          window.history.replaceState({}, '', location.pathname);
@@ -100,12 +95,40 @@ const TVSeriesDetail = () => {
     fetchEpisodes();
   }, [id, selectedSeason]);
 
-  // 2. EPISODE CLICK HANDLER
+  // SAVE HISTORY HELPER
+  const addToHistory = (episode: Episode) => {
+    if (!show) return;
+    
+    const historyItem = {
+        id: `tv-${show.id}`,
+        tmdbId: show.id,
+        type: 'tv',
+        title: show.name,
+        posterPath: show.backdrop_path || show.poster_path,
+        lastWatchedAt: Date.now(),
+        season: selectedSeason,
+        episode: episode.episode_number,
+        episodeName: episode.name,
+        link: `/tv-series/${show.id}?auth=success&s=${selectedSeason}&e=${episode.episode_number}`
+    };
+
+    const stored = localStorage.getItem('flame_watch_history');
+    let history = stored ? JSON.parse(stored) : [];
+    
+    history = history.filter((h: any) => h.id !== historyItem.id);
+    history.unshift(historyItem);
+    if (history.length > 20) history.pop();
+
+    localStorage.setItem('flame_watch_history', JSON.stringify(history));
+  };
+
+  // EPISODE CLICK
   const handleEpisodeClick = async (episode: Episode) => {
     setCurrentEpisode(episode);
 
-    // If Unlocked, play directly
+    // If Unlocked, play directly & save
     if (isUnlocked) {
+        addToHistory(episode);
         setIsVideoOpen(true);
         return;
     }
@@ -116,7 +139,6 @@ const TVSeriesDetail = () => {
     setIsProcessing(true);
     try {
         const currentPageUrl = window.location.href.split('?')[0];
-        // Pass episode info so we remember what to play upon return
         const returnUrl = `${currentPageUrl}?auth=success&s=${selectedSeason}&e=${episode.episode_number}`;
         
         const targetApiUrl = `https://cuty.io/api?api=${CUTY_API_KEY}&url=${encodeURIComponent(returnUrl)}`;
@@ -186,6 +208,10 @@ const TVSeriesDetail = () => {
               <h1 className="text-3xl md:text-5xl font-bold text-white">{show.name}</h1>
               
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300">
+                 <div className="flex items-center gap-1">
+                   {isUnlocked ? <Unlock className="w-4 h-4 text-green-500" /> : <Lock className="w-4 h-4 text-red-500" />}
+                   {isUnlocked ? "Premium Access" : "Ad-Supported"}
+                 </div>
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                   {show.vote_average.toFixed(1)}
@@ -193,10 +219,6 @@ const TVSeriesDetail = () => {
                 <div className="flex items-center gap-1">
                   <Layers className="w-4 h-4" />
                   {show.seasons?.length} Seasons
-                </div>
-                <div className="flex items-center gap-1">
-                   {isUnlocked ? <Unlock className="w-4 h-4 text-green-500" /> : <Lock className="w-4 h-4 text-red-500" />}
-                   {isUnlocked ? "Premium Access" : "Ad-Supported"}
                 </div>
               </div>
 
@@ -208,7 +230,6 @@ const TVSeriesDetail = () => {
                 ))}
               </div>
 
-               {/* SERVER SELECTOR */}
                <div className="flex flex-col gap-2 pt-2">
                 <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Select Server:</span>
                 <div className="flex flex-wrap gap-2">
@@ -227,7 +248,6 @@ const TVSeriesDetail = () => {
                 </div>
               </div>
 
-              {/* START WATCHING BUTTON */}
               <div className="flex flex-wrap gap-3 pt-2">
                 <Button 
                     size="lg" 
@@ -237,8 +257,8 @@ const TVSeriesDetail = () => {
                         if(episodes.length > 0) handleEpisodeClick(episodes[0]);
                     }}
                 >
-                  {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : isUnlocked ? <Play className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
-                  {isProcessing ? "Unlocking..." : isUnlocked ? "Start Watching S1:E1" : "Unlock to Watch"}
+                   {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : isUnlocked ? <Play className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
+                   {isProcessing ? "Unlocking..." : isUnlocked ? "Start Watching S1:E1" : "Unlock to Watch"}
                 </Button>
               </div>
 
@@ -247,7 +267,6 @@ const TVSeriesDetail = () => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           
@@ -287,15 +306,14 @@ const TVSeriesDetail = () => {
                           <img 
                             src={tmdbApi.getImageUrl(episode.still_path, 'w300')} 
                             alt={episode.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                             <Play className="w-8 h-8 opacity-50" />
                           </div>
                         )}
-                        {/* Lock Overlay if not unlocked */}
-                        {!isUnlocked && (
+                         {!isUnlocked && (
                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
                               <Lock className="w-6 h-6 text-white/80" />
                            </div>
