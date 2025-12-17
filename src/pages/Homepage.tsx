@@ -1,14 +1,21 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tv, Film, Play, Star, Globe } from 'lucide-react';
+import { Tv, Film, Play, Star } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
 import { UserStats } from '@/components/UserStats';
 import { PageViews } from '@/components/PageViews';
+import { ContinueWatching } from '@/components/ContinueWatching'; // Import
 
 const Homepage = () => {
   return (
     <div className="min-h-screen bg-gradient-hero">
+      
+      {/* ADDED: Continue Watching Section */}
+      <div className="pt-4">
+        <ContinueWatching />
+      </div>
+
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center space-y-8">
@@ -35,56 +42,6 @@ const Homepage = () => {
               </Link>
             </Button>
           </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
-            Why Choose FlameIPTV?
-          </h2>
-          <p className="text-primary-foreground/70 text-lg max-w-2xl mx-auto">
-            Experience the best in streaming entertainment with our premium features
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          <Card className="bg-gradient-card border-border/30 backdrop-blur-sm">
-            <CardContent className="p-8 text-center space-y-4">
-              <div className="bg-accent/10 p-4 rounded-full w-fit mx-auto">
-                <Tv className="w-8 h-8 text-accent" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground">Live Channels</h3>
-              <p className="text-muted-foreground">
-                Access hundreds of premium live TV channels from around the world
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-card border-border/30 backdrop-blur-sm">
-            <CardContent className="p-8 text-center space-y-4">
-              <div className="bg-accent/10 p-4 rounded-full w-fit mx-auto">
-                <Film className="w-8 h-8 text-accent" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground">Movies & Series</h3>
-              <p className="text-muted-foreground">
-                Enjoy the latest movies and binge-worthy TV series on demand
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-card border-border/30 backdrop-blur-sm">
-            <CardContent className="p-8 text-center space-y-4">
-              <div className="bg-accent/10 p-4 rounded-full w-fit mx-auto">
-                <Star className="w-8 h-8 text-accent" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground">HD Quality</h3>
-              <p className="text-muted-foreground">
-                Crystal clear HD streaming with minimal buffering and delays
-              </p>
-            </CardContent>
-          </Card>
         </div>
       </section>
 
@@ -115,50 +72,6 @@ const Homepage = () => {
             <Link to="/tv-series" className="flex flex-col items-center gap-2 text-primary-foreground">
               <Tv className="w-8 h-8" />
               <span className="font-medium">TV Series</span>
-            </Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-3 gap-8 text-center">
-          <div className="space-y-2">
-            <div className="text-4xl font-bold text-accent">500+</div>
-            <div className="text-primary-foreground/70">Live Channels</div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-4xl font-bold text-accent">1000+</div>
-            <div className="text-primary-foreground/70">Movies & Shows</div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-4xl font-bold text-accent">24/7</div>
-            <div className="text-primary-foreground/70">Streaming</div>
-          </div>
-        </div>
-        
-        {/* Homepage Page Views */}
-        <div className="flex justify-center mt-8">
-          <PageViews pagePath="/" />
-        </div>
-      </section>
-
-      {/* Add Channel Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
-            Add Your Own Channels
-          </h2>
-          <p className="text-primary-foreground/70 text-lg max-w-2xl mx-auto">
-            Expand your viewing experience by adding custom IPTV channels. Login to start adding channels.
-          </p>
-        </div>
-        
-        <div className="max-w-4xl mx-auto text-center">
-          <Button asChild size="lg" className="bg-accent text-accent-foreground shadow-glow hover:shadow-glow-intense">
-            <Link to="/custom-channels" className="flex items-center gap-2">
-              <Tv className="w-5 h-5" />
-              Manage Custom Channels
             </Link>
           </Button>
         </div>
