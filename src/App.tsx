@@ -18,39 +18,13 @@ import Anime from "./pages/Anime";
 import AnimeDetail from "./pages/AnimeDetail";
 import Comments from "./pages/Comments";
 import NotFound from "./pages/NotFound";
+import { Login } from "./pages/Login"; // Keep Login for Admin access
 import { disableDevTools } from "./utils/disableDevTools";
 import { useEffect } from "react";
 import { CommentsWidget } from "./components/CommentsWidget";
 import { AnnouncementBar } from "./components/AnnouncementBar";
 
-// IMPORT AUTH GUARD
-import { AuthGuard } from "./components/AuthGuard";
-
 const queryClient = new QueryClient();
-
-// Nilipat ko sa loob ng AuthGuard ang navigation at routes
-const ProtectedApp = () => {
-  return (
-    <>
-      <AnnouncementBar />
-      <Navigation />
-      <Routes>
-        <Route path="/" element={<Homepage />} />
-        <Route path="/channels" element={<Channels />} />
-        <Route path="/custom-channels" element={<CustomChannels />} />
-        <Route path="/movies" element={<Movies />} />
-        <Route path="/movie/:id" element={<MovieDetail />} />
-        <Route path="/tv-series" element={<TVSeries />} />
-        <Route path="/tv-series/:id" element={<TVSeriesDetail />} />
-        <Route path="/anime" element={<Anime />} />
-        <Route path="/anime/:id" element={<AnimeDetail />} />
-        <Route path="/comments" element={<Comments />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <CommentsWidget />
-    </>
-  );
-};
 
 const App = () => {
   useEffect(() => {
@@ -71,10 +45,24 @@ const App = () => {
         <UpdatePopup />
         
         <BrowserRouter>
-          {/* 👇 DITO NATIN IBABALOT ANG LAHAT SA AUTH GUARD */}
-          <AuthGuard>
-             <ProtectedApp />
-          </AuthGuard>
+          {/* TINANGGAL NA NATIN ANG AUTH GUARD WRAPPER */}
+          <AnnouncementBar />
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<Homepage />} />
+            <Route path="/channels" element={<Channels />} />
+            <Route path="/custom-channels" element={<CustomChannels />} />
+            <Route path="/movies" element={<Movies />} />
+            <Route path="/movie/:id" element={<MovieDetail />} />
+            <Route path="/tv-series" element={<TVSeries />} />
+            <Route path="/tv-series/:id" element={<TVSeriesDetail />} />
+            <Route path="/anime" element={<Anime />} />
+            <Route path="/anime/:id" element={<AnimeDetail />} />
+            <Route path="/comments" element={<Comments />} />
+            <Route path="/login" element={<Login />} /> {/* Admin Entrance */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <CommentsWidget />
         </BrowserRouter>
 
       </TooltipProvider>
