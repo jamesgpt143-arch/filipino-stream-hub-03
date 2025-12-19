@@ -457,7 +457,7 @@ name: 'GMA (Youtube Stream)',
   logo: 'https://th.bing.com/th/id/OIP.MHyjJgpgcnoGypCLEIh9qAHaDH?rs=1&pid=ImgDetMain'
 }, {
     name: 'iQIYI',
-  manifestUri: 'https://converse.nathcreqtives.com/astro/1006/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nIiwiZXhwIjoxNzY2MjI0MjAyfQ.z7zLY0g7Pim-rbsW5I0ZYx9hvUswbssoQVwMLG-vUEs',
+  manifestUri: 'https://mt12.aa.astro.com.my/default_ott.mpd?PID=&PAID=1006&deviceIdType=%5BdevIdType%5D&deviceId=1&appId=astrogo.astro.com.my&appName=%5BappName%5D&devModel=%5BdevModel%5D&playerWidth=%5BplayerWidth%5D&playerHeight=%5BplayerHeight%5D&sessionId=abr-linear-1&optin=true&hhid=1&kvp=lang%7Echi&kvp=genre%7ECHINESE%2CHD%2CALL&daiEnabled=true',
   clearKey: {
     '7ef7e913ce85a1131b27036069169a10': '77d98ed71db7524c27875a09a975f9e6'
   },
@@ -516,9 +516,9 @@ name: 'GMA (Youtube Stream)',
   logo: 'https://th.bing.com/th/id/OIP.ix5ReWijxZg8uPcKrk2GHwHaGd?rs=1&pid=ImgDetMain'
 }, {
  name: 'Kplus',
-  manifestUri: 'https://converse.nathcreqtives.com/astro/9983/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nIiwiZXhwIjoxNzY2MjI0MjAyfQ.z7zLY0g7Pim-rbsW5I0ZYx9hvUswbssoQVwMLG-vUEs',
+  manifestUri: 'https://unifi-live2.secureswiftcontent.com/Content/DASH/Live/channel(Kplus)/master.mpd',
   clearKey: {
-    'aa48b28bd723f91214887df6ed9fad10': 'b5a3a800848120c843ae0fa68c09c261'
+    '826e7fd2d6a14060bfea9347d96f8824': '176897afb079e0cc76bc912df4cb0b6e'
   },
   type: 'mpd',
   logo: 'https://www.pngkey.com/png/detail/306-3060351_k-plus-k-plus-channel-logo.png'
