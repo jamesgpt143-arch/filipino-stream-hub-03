@@ -1,94 +1,78 @@
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tv, Film, Play, Star } from 'lucide-react';
-import { DonateButton } from '@/components/DonateButton';
-import { UserStats } from '@/components/UserStats';
-import { PageViews } from '@/components/PageViews';
-import { ContinueWatching } from '@/components/ContinueWatching'; // Import
+import { useEffect, useState } from "react";
+import HeroSection from "@/components/HeroSection";
+import ContentSection from "@/components/ContentSection";
+import MovieCard from "@/components/MovieCard"; // Ensure tama ang import path
+import ChannelCard from "@/components/ChannelCard"; // Ensure tama ang import path
+import { Skeleton } from "@/components/ui/skeleton";
+import { channels } from "@/data/channels"; // Assuming may ganito ka based sa file list
 
+// Mock data muna kung wala pang API call sa hook
+// Pwede mong palitan ng actual data fetching logic mo
 const Homepage = () => {
+  const [loading, setLoading] = useState(true);
+
+  // Simulate loading
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Filter channels para sa "Live TV" section
+  const featuredChannels = channels.slice(0, 10);
+
   return (
-    <div className="min-h-screen bg-gradient-hero">
-      
-      {/* ADDED: Continue Watching Section */}
-      <div className="pt-4">
-        <ContinueWatching />
+    <div className="min-h-screen bg-background text-foreground pb-20">
+      {/* 1. Hero Section */}
+      <HeroSection />
+
+      <div className="-mt-20 relative z-10 space-y-2">
+        {/* 2. Live TV Channels Section */}
+        <ContentSection title="Live TV Channels">
+          {loading
+            ? Array(5).fill(0).map((_, i) => (
+                <div key={i} className="min-w-[200px] md:min-w-[280px]">
+                  <Skeleton className="h-[160px] w-full rounded-xl bg-secondary" />
+                </div>
+              ))
+            : featuredChannels.map((channel) => (
+                <div key={channel.id} className="min-w-[200px] md:min-w-[280px] snap-start">
+                   {/* I-wrap natin sa div para ma-control ang width sa loob ng scroll */}
+                   <ChannelCard channel={channel} />
+                </div>
+              ))}
+        </ContentSection>
+
+        {/* 3. Trending Movies Section */}
+        <ContentSection title="Trending Movies">
+          {loading
+            ? Array(5).fill(0).map((_, i) => (
+                <div key={i} className="min-w-[150px] md:min-w-[200px]">
+                  <Skeleton className="h-[300px] w-full rounded-xl bg-secondary" />
+                </div>
+              ))
+            : /* Placeholder lang 'to, palitan ng .map sa movies data mo */
+              [1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="min-w-[150px] md:min-w-[200px] snap-start">
+                  <MovieCard
+                    id={i}
+                    title={`Movie Title ${i}`}
+                    poster_path="/placeholder.svg" // Replace with real path
+                    vote_average={8.5}
+                    release_date="2024"
+                    overview="Magandang movie ito."
+                  />
+                </div>
+              ))}
+        </ContentSection>
+
+        {/* 4. Popular TV Series Section */}
+        <ContentSection title="Popular Series">
+           {/* Reuse logic ng movies pero para sa TV Shows */}
+           <div className="flex items-center justify-center h-40 w-full text-muted-foreground border border-dashed border-white/10 rounded-xl">
+              Add your TV Series mapping here
+           </div>
+        </ContentSection>
       </div>
-
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="text-center space-y-8">
-          <div className="space-y-4">
-            <h1 className="text-5xl md:text-7xl font-bold text-primary-foreground leading-tight">
-              flame<span className="text-accent">iptv</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-primary-foreground/80 max-w-3xl mx-auto">
-              Your ultimate destination for premium IPTV channels, movies, and TV series
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button asChild size="lg" className="bg-accent text-accent-foreground shadow-glow hover:shadow-glow-intense">
-              <Link to="/channels" className="flex items-center gap-2">
-                <Play className="w-5 h-5" />
-                Watch Live TV
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10">
-              <Link to="/movies" className="flex items-center gap-2">
-                <Film className="w-5 h-5" />
-                Browse Movies
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Quick Access Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
-            Quick Access
-          </h2>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Button asChild className="h-24 bg-gradient-primary hover:shadow-glow">
-            <Link to="/channels" className="flex flex-col items-center gap-2">
-              <Tv className="w-8 h-8" />
-              <span className="font-medium">IPTV Channels</span>
-            </Link>
-          </Button>
-
-          <Button asChild variant="outline" className="h-24 border-primary/20 hover:bg-primary/10">
-            <Link to="/movies" className="flex flex-col items-center gap-2 text-primary-foreground">
-              <Film className="w-8 h-8" />
-              <span className="font-medium">Movies</span>
-            </Link>
-          </Button>
-
-          <Button asChild variant="outline" className="h-24 border-primary/20 hover:bg-primary/10">
-            <Link to="/tv-series" className="flex flex-col items-center gap-2 text-primary-foreground">
-              <Tv className="w-8 h-8" />
-              <span className="font-medium">TV Series</span>
-            </Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-primary/20 mt-12 py-8">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-sm text-primary-foreground/60">
-            flameiptv - Premium Streaming Experience
-          </p>
-          <div className="mt-3">
-            <DonateButton />
-          </div>
-        </div>
-      </footer>
-      <UserStats pagePath="/" />
     </div>
   );
 };
