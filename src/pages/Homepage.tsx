@@ -6,21 +6,20 @@ import ChannelCard from "@/components/ChannelCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { channels } from "@/data/channels";
 
-// Dummy Data para may laman habang wala pang API
-const DUMMY_MOVIES = Array(10).fill(null).map((_, i) => ({
-  id: i + 1,
-  title: `Sample Movie ${i + 1}`,
-  poster_path: null, 
-  vote_average: 8.5,
-  release_date: "2024-01-01",
-  overview: "This is a sample movie description."
-}));
+// Placeholder data for movies (Replace this with your actual API fetch later)
+const DUMMY_MOVIES = [
+  { id: 1, title: "Movie 1", poster_path: "/placeholder.svg", vote_average: 8.5 },
+  { id: 2, title: "Movie 2", poster_path: "/placeholder.svg", vote_average: 7.2 },
+  { id: 3, title: "Movie 3", poster_path: "/placeholder.svg", vote_average: 9.0 },
+  { id: 4, title: "Movie 4", poster_path: "/placeholder.svg", vote_average: 6.5 },
+  { id: 5, title: "Movie 5", poster_path: "/placeholder.svg", vote_average: 8.1 },
+];
 
 const Homepage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading effect
+    // Simulate loading time
     const timer = setTimeout(() => setLoading(false), 1000);
     return () => clearTimeout(timer);
   }, []);
@@ -29,12 +28,13 @@ const Homepage = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      {/* 1. Hero Section */}
+      {/* 1. New Hero Section */}
       <HeroSection />
 
-      <div className="-mt-16 relative z-10 space-y-6">
+      {/* 2. Content Sections (Horizontal Scrolling) */}
+      <div className="-mt-16 relative z-10 space-y-8">
         
-        {/* 2. Live TV Channels */}
+        {/* Live TV Channels */}
         <ContentSection title="Watch Live TV">
           {loading
             ? Array(5).fill(0).map((_, i) => (
@@ -49,7 +49,7 @@ const Homepage = () => {
               ))}
         </ContentSection>
 
-        {/* 3. Trending Movies */}
+        {/* Trending Movies */}
         <ContentSection title="Trending Now">
           {loading
             ? Array(5).fill(0).map((_, i) => (
@@ -62,12 +62,13 @@ const Homepage = () => {
                   <MovieCard
                     id={movie.id}
                     title={movie.title}
-                    poster_path={movie.poster_path || ""}
+                    poster_path={movie.poster_path}
                     vote_average={movie.vote_average}
                   />
                 </div>
               ))}
         </ContentSection>
+
       </div>
     </div>
   );
