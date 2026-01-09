@@ -1,4 +1,4 @@
-import { ChannelCard } from './ChannelCard';
+import ChannelCard from './ChannelCard';
 import { Channel } from '@/data/channels';
 
 interface ChannelGridProps {
