@@ -4,11 +4,17 @@ import { Channel } from "@/data/channels";
 
 interface ChannelCardProps {
   channel: Channel;
+  onClick?: () => void;
+  onToggleHide?: (channelName: string) => void;
+  onDelete?: (channelName: string) => void;
+  isHidden?: boolean;
+  isCustom?: boolean;
+  canDelete?: boolean;
 }
 
-const ChannelCard = ({ channel }: ChannelCardProps) => {
+const ChannelCard = ({ channel, onClick }: ChannelCardProps) => {
   return (
-    <Link to={`/channels?id=${channel.id}`} className="block h-full">
+    <div onClick={onClick} className="block h-full cursor-pointer">
       <div className="group relative h-[160px] md:h-[180px] w-full bg-secondary/20 backdrop-blur-sm rounded-xl border border-white/5 overflow-hidden transition-all duration-300 hover:bg-secondary/40 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1">
         
         {/* Background Image/Logo with Blur */}
@@ -42,7 +48,7 @@ const ChannelCard = ({ channel }: ChannelCardProps) => {
           Live
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

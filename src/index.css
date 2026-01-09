@@ -50,3 +50,13 @@
 .glass {
   @apply bg-black/40 backdrop-blur-md border border-white/10;
 }
+
+/* Safe Area for Mobile Bottom Nav */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Glow effect for active nav item */
+.drop-shadow-glow {
+  filter: drop-shadow(0 0 6px hsl(var(--primary)));
+}

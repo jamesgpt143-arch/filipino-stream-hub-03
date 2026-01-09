@@ -3,7 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Navigation } from "./components/Navigation";
+import Navigation from "./components/Navigation";
+import BottomNav from "./components/BottomNav";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { UpdatePopup } from "./components/UpdatePopup";
 
@@ -18,7 +19,7 @@ import Anime from "./pages/Anime";
 import AnimeDetail from "./pages/AnimeDetail";
 import Comments from "./pages/Comments";
 import NotFound from "./pages/NotFound";
-import { Login } from "./pages/Login"; // Keep Login for Admin access
+import { Login } from "./pages/Login";
 import { disableDevTools } from "./utils/disableDevTools";
 import { useEffect } from "react";
 import { CommentsWidget } from "./components/CommentsWidget";
@@ -45,7 +46,6 @@ const App = () => {
         <UpdatePopup />
         
         <BrowserRouter>
-          {/* TINANGGAL NA NATIN ANG AUTH GUARD WRAPPER */}
           <AnnouncementBar />
           <Navigation />
           <Routes>
@@ -59,10 +59,11 @@ const App = () => {
             <Route path="/anime" element={<Anime />} />
             <Route path="/anime/:id" element={<AnimeDetail />} />
             <Route path="/comments" element={<Comments />} />
-            <Route path="/login" element={<Login />} /> {/* Admin Entrance */}
+            <Route path="/login" element={<Login />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <CommentsWidget />
+          <BottomNav />
         </BrowserRouter>
 
       </TooltipProvider>

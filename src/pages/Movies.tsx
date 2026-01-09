@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Info, Play } from 'lucide-react';
-import { MovieCard } from '@/components/MovieCard';
+import MovieCard from '@/components/MovieCard';
 import { VideoModal } from '@/components/VideoModal';
 import { Movie, tmdbApi } from '@/lib/tmdb';
 import { useToast } from '@/hooks/use-toast';
@@ -188,8 +188,12 @@ const Movies = () => {
               {movies.map((movie) => (
                 <MovieCard
                   key={movie.id}
-                  movie={movie}
-                  onPlay={handlePlayMovie}
+                  id={movie.id}
+                  title={movie.title}
+                  poster_path={movie.poster_path}
+                  vote_average={movie.vote_average}
+                  release_date={movie.release_date}
+                  overview={movie.overview}
                 />
               ))}
             </div>

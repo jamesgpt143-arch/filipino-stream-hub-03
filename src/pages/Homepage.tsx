@@ -42,8 +42,8 @@ const Homepage = () => {
                   <Skeleton className="h-[160px] w-full rounded-xl bg-secondary/50" />
                 </div>
               ))
-            : featuredChannels.map((channel) => (
-                <div key={channel.id} className="min-w-[200px] md:min-w-[260px] snap-start">
+            : featuredChannels.map((channel, index) => (
+                <div key={`${channel.name}-${index}`} className="min-w-[200px] md:min-w-[260px] snap-start">
                    <ChannelCard channel={channel} />
                 </div>
               ))}
