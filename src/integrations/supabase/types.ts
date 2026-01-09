@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          duration_hours: number
+          id: number
+          is_used: boolean | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          duration_hours: number
+          id?: number
+          is_used?: boolean | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          duration_hours?: number
+          id?: number
+          is_used?: boolean | null
+        }
+        Relationships: []
+      }
       api_usage_log: {
         Row: {
           created_at: string
@@ -53,6 +77,7 @@ export type Database = {
           creator_username: string
           facebook_link: string | null
           id: string
+          likes: number | null
           message: string
           name: string
           reply_to: string | null
@@ -63,6 +88,7 @@ export type Database = {
           creator_username?: string
           facebook_link?: string | null
           id?: string
+          likes?: number | null
           message: string
           name: string
           reply_to?: string | null
@@ -73,6 +99,7 @@ export type Database = {
           creator_username?: string
           facebook_link?: string | null
           id?: string
+          likes?: number | null
           message?: string
           name?: string
           reply_to?: string | null
