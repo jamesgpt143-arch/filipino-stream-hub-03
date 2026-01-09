@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 interface TVShowCardProps {
   show: TVShow;
-  onPlay?: (show: TVShow, server: string) => void;
+  onPlay: (show: TVShow, server: string) => void;
 }
 
 export const TVShowCard = ({ show, onPlay }: TVShowCardProps) => {

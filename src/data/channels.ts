@@ -182,13 +182,14 @@ export const channels: Channel[] = [
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.3wplDtTyzPCr4Yoyg8t_GgHaDC?rs=1&pid=ImgDetMain'
 }, {
-    name: 'Cinemo',
+  name: 'Cinemo',
   manifestUri: 'https://d1bail49udbz1k.cloudfront.net/out/v1/3a895f368f4a467c9bca0962559efc19/index.mpd',
   clearKey: {
     'aa8aebe35ccc4541b7ce6292efcb1bfb': 'aab1df109d22fc5d7e3ec121ddf24e5f'
   },
   type: 'mpd',
-  logo: 'https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723219276891.png'
+  logo: 'https://yt3.ggpht.com/a-/AAuE7mAK5lTlRJwr2rZLeitoTnOYkjForU2cvszswQ=s900-mo-c-c0xffffffff-rj-k-no',
+  redirectUrl: 'https://s.shopee.ph/3fvxJ5MXX6'
 }, {
   name: 'Cinemax',
   manifestUri: 'https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/cg_cinemax/default/index.mpd',
@@ -336,7 +337,7 @@ export const channels: Channel[] = [
   logo: 'https://cdn2.ettoday.net/images/6892/e6892888.jpg'
 }, {
    name: 'GMA',
-  manifestUri: 'https://converse.nathcreqtives.com/1093/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nIiwiZXhwIjoxNzY2MjI0MjAyfQ.z7zLY0g7Pim-rbsW5I0ZYx9hvUswbssoQVwMLG-vUEs',
+  manifestUri: 'https://converse.nathcreqtives.com/1093/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0bGFuZyIsImV4cCI6MTc2NTg0NjI1MX0.JnXKVDGw6DR06vXJAeAFyaoSaXH_kc2dVWtBq1ZEWws',
   widevineUrl: 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00',
   type: 'mpd',
   logo: 'https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126306082.png'
@@ -356,7 +357,7 @@ name: 'GMA (Youtube Stream)',
   logo: 'https://th.bing.com/th/id/OIP.ntjNVRaXsZJ0vrhWBA35sQHaE7?rs=1&pid=ImgDetMain'
 }, {
   name: 'GTV',
-  manifestUri: 'https://converse.nathcreqtives.com/1143/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0cnlsYW5nIiwiZXhwIjoxNzY2MjI0MjAyfQ.z7zLY0g7Pim-rbsW5I0ZYx9hvUswbssoQVwMLG-vUEs',
+  manifestUri: 'https://converse.nathcreqtives.com/1143/manifest.mpd?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0bGFuZyIsImV4cCI6MTc2NTg0NjI1MX0.JnXKVDGw6DR06vXJAeAFyaoSaXH_kc2dVWtBq1ZEWws',
   widevineUrl: 'https://key.nathcreqtives.com/widevine/?deviceId=02:00:00:00:00:00',
   type: 'mpd',
   logo: 'https://ottepg8.comclark.com:8443/iptvepg/images/markurl/mark_1723126332757.png'
@@ -402,6 +403,11 @@ name: 'GMA (Youtube Stream)',
   },
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.lY5V2M3D9jtBFJNbOAI8swHaDt?rs=1&pid=ImgDetMain'
+}, {
+    name: 'Heart Of Asia',
+  manifestUri: 'https://hls.nathcreqtives.com/playlist.m3u8?id=1',
+  type: 'hls',
+  logo: 'https://static.wikia.nocookie.net/logopedia/images/7/79/Heart_of_Asia_3D_Logo.png/revision/latest/scale-to-width-down/149?cb=20200713050134'
 }, {
   name: 'HGTV HD',
   manifestUri: 'https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/hgtv_hd1/default/index.mpd',
@@ -451,18 +457,23 @@ name: 'GMA (Youtube Stream)',
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.sJNkdFUalhzRyZT4SJ9HBAHaEc?rs=1&pid=ImgDetMain'
 }, {
+   name: 'I Heart Movies',
+  manifestUri: 'https://hls.nathcreqtives.com/playlist.m3u8?id=2',
+  type: 'hls',
+  logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/26/I_Heart_Movies_2021.png/250px-I_Heart_Movies_2021.png'
+}, {
   name: 'INCTV',
   manifestUri: 'https://199211.global.ssl.fastly.net/643cc12aa824db4374021c8c/live_95f6ac80dd6511ed9d08b12be56ae55e/index.m3u8',
   type: 'hls',
   logo: 'https://th.bing.com/th/id/OIP.MHyjJgpgcnoGypCLEIh9qAHaDH?rs=1&pid=ImgDetMain'
 }, {
-    name: 'iQIYI',
-  manifestUri: 'https://mt12.aa.astro.com.my/default_ott.mpd?PID=&PAID=1006&deviceIdType=%5BdevIdType%5D&deviceId=1&appId=astrogo.astro.com.my&appName=%5BappName%5D&devModel=%5BdevModel%5D&playerWidth=%5BplayerWidth%5D&playerHeight=%5BplayerHeight%5D&sessionId=abr-linear-1&optin=true&hhid=1&kvp=lang%7Echi&kvp=genre%7ECHINESE%2CHD%2CALL&daiEnabled=true',
+    name: 'IQIYI',
+  manifestUri: 'https://linearjitp-playback.astro.com.my/dash-wv/linear/1006/default_ott.mpd',
   clearKey: {
     '7ef7e913ce85a1131b27036069169a10': '77d98ed71db7524c27875a09a975f9e6'
   },
   type: 'mpd',
-  logo: 'https://th.bing.com/th/id/OIP.tGUjHFJqDIFUuKfn-31TxAHaEN?rs=1&pid=ImgDetMain'
+  logo: 'https://i.pinimg.com/originals/28/43/e5/2843e5c36e847576f1e86e80f43e5384.jpg'
 }, {
    name: 'Jeepney TV',
   manifestUri: 'https://abslive.akamaized.net/dash/live/2028025/jeepneytv/manifest.mpd',
@@ -515,13 +526,13 @@ name: 'GMA (Youtube Stream)',
   type: 'mpd',
   logo: 'https://th.bing.com/th/id/OIP.ix5ReWijxZg8uPcKrk2GHwHaGd?rs=1&pid=ImgDetMain'
 }, {
- name: 'Kplus',
-  manifestUri: 'https://unifi-live2.secureswiftcontent.com/Content/DASH/Live/channel(Kplus)/master.mpd',
+name: 'KPlus',
+  manifestUri: 'https://linearjitp-playback.astro.com.my/dash-wv/linear/9983/default_ott.mpd',
   clearKey: {
-    '826e7fd2d6a14060bfea9347d96f8824': '176897afb079e0cc76bc912df4cb0b6e'
+    'aa48b28bd723f91214887df6ed9fad10': 'b5a3a800848120c843ae0fa68c09c261'
   },
   type: 'mpd',
-  logo: 'https://www.pngkey.com/png/detail/306-3060351_k-plus-k-plus-channel-logo.png'
+  logo: 'https://tse4.mm.bing.net/th/id/OIP.esJMNcht-1gASl36YXkaZwHaEK?rs=1&pid=ImgDetMain&o=7&rm=3'
 }, {
   name: 'Lifetime',
   manifestUri: 'https://qp-pldt-live-bpk-01-prod.akamaized.net/bpk-tv/dr_lifetime/default/index.mpd',

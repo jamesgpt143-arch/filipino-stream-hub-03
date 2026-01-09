@@ -1,71 +1,59 @@
 import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Tv, Info } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Search } from 'lucide-react';
 import { TVShowCard } from '@/components/TVShowCard';
-import { TVShow, tmdbApi } from '@/lib/tmdb';
+import { VideoModal } from '@/components/VideoModal';
+import { TVShow, Season, Episode, tmdbApi } from '@/lib/tmdb';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Info } from 'lucide-react';
 import { DonateButton } from '@/components/DonateButton';
 import { UserStats } from '@/components/UserStats';
 import { useClickadillaAds } from '@/hooks/useClickadillaAds';
 
-// TV SPECIFIC GENRES (Iba ito sa Movies)
-const TV_GENRES = [
-  { id: 10759, name: "Action & Adventure" },
-  { id: 16, name: "Animation" },
-  { id: 35, name: "Comedy" },
-  { id: 80, name: "Crime" },
-  { id: 18, name: "Drama" },
-  { id: 9648, name: "Mystery" },
-  { id: 10765, name: "Sci-Fi & Fantasy" },
-  { id: 10762, name: "Kids" },
-  { id: 10768, name: "War & Politics" },
-  { id: 37, name: "Western" },
-  { id: 10764, name: "Reality" },
-  { id: 10766, name: "Soap" },
-  { id: 10767, name: "Talk" },
-  { id: 99, name: "Documentary" },
-];
-
 const TVSeries = () => {
   const [shows, setShows] = useState<TVShow[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedShow, setSelectedShow] = useState<TVShow | null>(null);
+  const [selectedSeason, setSelectedSeason] = useState<Season | null>(null);
+  const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
+  const [seasons, setSeasons] = useState<Season[]>([]);
+  const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [selectedServer, setSelectedServer] = useState<string>('');
+  const [showSeasonModal, setShowSeasonModal] = useState(false);
+  const [showEpisodeModal, setShowEpisodeModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { toast } = useToast();
 
+  // Clickadilla Popunder Ads
   useClickadillaAds();
 
-  // Reset page pag nagbago filter
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, selectedGenre]);
+    loadTVShows();
+  }, [currentPage]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (searchTerm) {
-        await searchTVShows();
-      } else {
-        await loadTVShows();
-      }
-    };
-    fetchData();
-  }, [currentPage, searchTerm, selectedGenre]);
+    if (searchTerm) {
+      searchTVShows();
+    } else {
+      loadTVShows();
+    }
+  }, [searchTerm]);
 
   const loadTVShows = async () => {
     try {
       setIsLoading(true);
-      // Pass selectedGenre for Server-Side Filtering
-      const data = await tmdbApi.getPopularTVShows(currentPage, selectedGenre);
+      const data = await tmdbApi.getPopularTVShows(currentPage);
       setShows(data.results);
       setTotalPages(data.total_pages);
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to load TV series.",
+        description: "Failed to load TV shows. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -80,110 +68,121 @@ const TVSeries = () => {
       setShows(data.results);
       setTotalPages(data.total_pages);
     } catch (error) {
-      console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to search TV shows. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handlePlayShow = async (show: TVShow, server: string) => {
+    try {
+      setSelectedShow(show);
+      setSelectedServer(server);
+      const data = await tmdbApi.getTVShowSeasons(show.id);
+      setSeasons(data.seasons.filter(season => season.season_number > 0));
+      setShowSeasonModal(true);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load seasons. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSelectSeason = async (season: Season) => {
+    try {
+      setSelectedSeason(season);
+      setShowSeasonModal(false);
+      const data = await tmdbApi.getSeasonEpisodes(selectedShow!.id, season.season_number);
+      setEpisodes(data.episodes);
+      setShowEpisodeModal(true);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load episodes. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSelectEpisode = (episode: Episode) => {
+    setSelectedEpisode(episode);
+    setShowEpisodeModal(false);
+    toast({
+      title: "Loading Episode",
+      description: `Starting ${selectedShow?.name} S${selectedSeason?.season_number}E${episode.episode_number}...`,
+    });
+  };
+
+  const handleClosePlayer = () => {
+    setSelectedEpisode(null);
+    setSelectedSeason(null);
+    setSelectedShow(null);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-gradient-hero shadow-elegant border-b border-primary/20 sticky top-0 z-40 backdrop-blur-md bg-background/80">
-        <div className="container mx-auto px-4 py-4 space-y-4">
+      <header className="bg-gradient-hero shadow-elegant border-b border-primary/20 sticky top-0 z-40">
+        <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-primary-foreground flex items-center gap-2">
-                <Tv className="fill-primary text-primary" /> TV Series
-              </h1>
+              <h1 className="text-3xl font-bold text-primary-foreground mb-2">TV Series</h1>
             </div>
             
             <div className="flex items-center gap-4 w-full lg:w-auto">
               <div className="relative flex-1 lg:w-80">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search TV series..."
+                  placeholder="Search TV shows..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-secondary/50 border-transparent focus:bg-background focus:border-primary transition-all"
+                  className="pl-10 bg-background/50 border-border/50 focus:bg-background"
                 />
               </div>
             </div>
           </div>
-
-          {/* TV GENRE FILTER BAR */}
-          {!searchTerm && (
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide mask-fade-sides">
-                <Button
-                    variant={selectedGenre === null ? "default" : "outline"}
-                    size="sm"
-                    className="rounded-full whitespace-nowrap"
-                    onClick={() => setSelectedGenre(null)}
-                >
-                    All
-                </Button>
-                {TV_GENRES.map((genre) => (
-                    <Button
-                        key={genre.id}
-                        variant={selectedGenre === genre.id ? "default" : "outline"}
-                        size="sm"
-                        className={`rounded-full whitespace-nowrap ${selectedGenre === genre.id ? "bg-primary text-white" : "hover:text-primary hover:border-primary"}`}
-                        onClick={() => setSelectedGenre(genre.id)}
-                    >
-                        {genre.name}
-                    </Button>
-                ))}
-            </div>
-          )}
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <Alert className="mb-6 bg-blue-500/10 border-blue-500/20 text-blue-200">
-          <Info className="h-4 w-4 text-blue-400" />
+        {/* Browser Notice */}
+        <Alert className="mb-6 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
+          <Info className="h-4 w-4" />
           <AlertDescription>
-             Discover the latest and most popular TV Series. Use Brave Browser for the best experience.
+            <strong>Note:</strong> For the best streaming experience with minimal ads, we recommend using Brave Browser or enabling an ad blocker.
           </AlertDescription>
         </Alert>
-
         {isLoading ? (
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {Array.from({ length: 12 }).map((_, index) => (
-              <div key={index} className="animate-pulse space-y-2">
-                <div className="bg-muted aspect-[2/3] rounded-xl"></div>
-                <div className="bg-muted h-3 rounded w-3/4"></div>
-                <div className="bg-muted h-2 rounded w-1/2"></div>
+              <div key={index} className="animate-pulse">
+                <div className="bg-muted aspect-[2/3] rounded-lg mb-4"></div>
+                <div className="bg-muted h-4 rounded mb-2"></div>
+                <div className="bg-muted h-3 rounded w-2/3"></div>
               </div>
             ))}
           </div>
         ) : (
           <>
-             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-muted-foreground">
-                    {searchTerm ? `Search results for "${searchTerm}"` : selectedGenre ? `${TV_GENRES.find(g => g.id === selectedGenre)?.name} Series` : "Popular TV Series"}
-                </h2>
-             </div>
-
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 lg:gap-6">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
               {shows.map((show) => (
                 <TVShowCard
                   key={show.id}
                   show={show}
+                  onPlay={handlePlayShow}
                 />
               ))}
             </div>
 
-            {/* Empty State */}
-            {shows.length === 0 && (
-                <div className="text-center py-20 text-muted-foreground">
-                    <p className="text-lg">No TV shows found.</p>
-                    <Button variant="link" onClick={() => {setSearchTerm(''); setSelectedGenre(null);}}>Clear Filters</Button>
-                </div>
-            )}
-
             {/* Pagination */}
-            {totalPages > 1 && shows.length > 0 && (
-              <div className="flex justify-center gap-2 mt-10">
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-8">
                 <Button
                   variant="outline"
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
@@ -191,7 +190,7 @@ const TVSeries = () => {
                 >
                   Previous
                 </Button>
-                <span className="flex items-center px-4 text-sm font-medium bg-secondary rounded-md">
+                <span className="flex items-center px-4 text-sm text-muted-foreground">
                   Page {currentPage} of {totalPages}
                 </span>
                 <Button
@@ -207,12 +206,98 @@ const TVSeries = () => {
         )}
       </main>
 
-      <footer className="border-t border-border mt-12 py-8 bg-card/50">
+      {/* Season Selection Modal */}
+      <Dialog open={showSeasonModal} onOpenChange={setShowSeasonModal}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Select Season - {selectedShow?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
+            {seasons.map((season) => (
+              <Button
+                key={season.id}
+                variant="outline"
+                onClick={() => handleSelectSeason(season)}
+                className="h-auto p-4 flex flex-col items-center gap-2"
+              >
+                <img
+                  src={tmdbApi.getImageUrl(season.poster_path, 'w300')}
+                  alt={season.name}
+                  className="w-full aspect-[2/3] object-cover rounded"
+                />
+                <div className="text-center">
+                  <div className="font-semibold">{season.name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {season.episode_count} episodes
+                  </div>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Episode Selection Modal */}
+      <Dialog open={showEpisodeModal} onOpenChange={setShowEpisodeModal}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>
+              Select Episode - {selectedShow?.name} {selectedSeason?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 max-h-96 overflow-y-auto">
+            {episodes.map((episode) => (
+              <Button
+                key={episode.id}
+                variant="outline"
+                onClick={() => handleSelectEpisode(episode)}
+                className="h-auto p-4 flex items-start gap-4 text-left"
+              >
+                <img
+                  src={tmdbApi.getImageUrl(episode.still_path, 'w300')}
+                  alt={episode.name}
+                  className="w-32 aspect-video object-cover rounded flex-shrink-0"
+                />
+                <div className="flex-1">
+                  <div className="font-semibold mb-1">
+                    {episode.episode_number}. {episode.name}
+                  </div>
+                  <div className="text-sm text-muted-foreground line-clamp-3">
+                    {episode.overview}
+                  </div>
+                  {episode.air_date && (
+                    <div className="text-xs text-muted-foreground mt-2">
+                      {new Date(episode.air_date).toLocaleDateString()}
+                    </div>
+                  )}
+                </div>
+              </Button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Video Modal */}
+      {selectedEpisode && selectedShow && selectedSeason && (
+        <VideoModal
+          isOpen={!!selectedEpisode}
+          onClose={handleClosePlayer}
+          title={`${selectedShow.name} S${selectedSeason.season_number}E${selectedEpisode.episode_number} - ${selectedEpisode.name}`}
+          videoUrl={tmdbApi.getTVEpisodeStreamUrls(
+            selectedShow.id,
+            selectedSeason.season_number,
+            selectedEpisode.episode_number
+          )[selectedServer]}
+        />
+      )}
+
+      {/* Footer */}
+      <footer className="border-t border-border mt-12 py-8">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-sm text-muted-foreground font-medium">
-            flameiptv • 2024
+          <p className="text-sm text-muted-foreground">
+            flameiptv
           </p>
-          <div className="mt-4 scale-90 origin-top">
+          <div className="mt-3">
             <DonateButton />
           </div>
         </div>

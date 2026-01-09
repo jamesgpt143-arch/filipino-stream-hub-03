@@ -113,23 +113,6 @@ const CustomChannels = () => {
   };
 
   const handleDeleteChannel = async (channelName: string) => {
-    // 1. ASK FOR CONFIRMATION
-    if (!window.confirm(`Are you sure you want to delete ${channelName}?`)) {
-        return;
-    }
-
-    // 2. ASK FOR PASSWORD (SECURITY CHECK)
-    const password = window.prompt("Enter Admin Password to delete:");
-    if (password !== "darman18") {
-        toast({
-            title: "Access Denied",
-            description: "Incorrect password. Deletion cancelled.",
-            variant: "destructive"
-        });
-        return;
-    }
-
-    // 3. PROCEED WITH DELETION IF PASSWORD IS CORRECT
     try {
       const { error } = await supabase
         .from('custom_channels')
@@ -159,7 +142,7 @@ const CustomChannels = () => {
       
       toast({
         title: "Channel Deleted",
-        description: `${channelName} has been removed successfully.`,
+        description: `${channelName} has been removed`,
       });
     } catch (error) {
       console.error('Error deleting channel:', error);
@@ -322,9 +305,6 @@ const CustomChannels = () => {
                       onDelete={handleDeleteChannel}
                       hiddenChannels={hiddenChannels}
                       customChannels={customChannels}
-                      // 👇 Pinapanatili natin ito para makita ang button, pero may password check na sa loob ng handleDeleteChannel
-                      isAdmin={true} 
-                      currentUsername="Anonymous"
                     />
                 </div>
               </div>

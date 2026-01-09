@@ -66,8 +66,7 @@ export const UserStats = ({ pagePath }: UserStatsProps) => {
   };
 
   return (
-    // PINALITAN: "right-4" -> "left-4" para lumipat sa kaliwa
-    <div className="fixed bottom-4 left-4 z-50">
+    <div className="fixed bottom-4 right-4 z-50">
       <div className="flex items-center gap-2 px-3 py-2 bg-background/90 backdrop-blur-sm border border-border rounded-lg shadow-lg">
         <Users className="w-4 h-4 text-primary" />
         <span className="text-sm font-medium">{onlineUsers} Online</span>

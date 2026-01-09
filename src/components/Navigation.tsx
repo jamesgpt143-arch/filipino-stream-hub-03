@@ -1,77 +1,106 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Search, Bell, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Button } from './ui/button';
+import { Tv, Film, Menu, X, Home, Plus, User, Sparkles } from 'lucide-react';
+import { Clock } from './Clock';
 
-const Navigation = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
+export const Navigation = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Movies", path: "/movies" },
-    { name: "TV Series", path: "/tv-series" },
-    { name: "Live TV", path: "/channels" },
-    { name: "Anime", path: "/anime" },
+  const navItems = [
+    { path: '/', label: 'Home', icon: Home },
+    { path: '/channels', label: 'IPTV Channels', icon: Tv },
+    { path: '/custom-channels', label: 'Custom Channels', icon: Plus },
+    { path: '/movies', label: 'Movies', icon: Film },
+    { path: '/tv-series', label: 'TV Series', icon: Tv },
+    { path: '/anime', label: 'Anime', icon: Sparkles },
+    { path: '/comments', label: 'Comments', icon: User },
   ];
 
   return (
-    <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? "bg-black/80 backdrop-blur-md border-b border-white/10" : "bg-transparent bg-gradient-to-b from-black/80 to-transparent"
-      }`}
-    >
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo Area */}
-          <Link to="/" className="flex items-center gap-2 font-bold text-2xl text-primary tracking-tighter">
-            FILIPINO<span className="text-white">HUB</span>
+    <nav className="bg-gradient-hero shadow-elegant border-b border-primary/20 sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-3">
+            <div className="bg-accent p-2 rounded-lg shadow-glow">
+              <Tv className="w-6 h-6 text-accent-foreground" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-primary-foreground">
+                flameiptv
+              </h1>
+              <Clock />
+            </div>
           </Link>
 
-          {/* Desktop Links */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  location.pathname === link.path ? "text-primary" : "text-white/80"
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-2">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              
+              return (
+                <Button
+                  key={item.path}
+                  asChild
+                  variant={isActive ? "default" : "ghost"}
+                  className={`${
+                    isActive 
+                      ? 'bg-accent text-accent-foreground shadow-glow' 
+                      : 'text-primary-foreground hover:bg-primary-foreground/10'
+                  }`}
+                >
+                  <Link to={item.path} className="flex items-center gap-2">
+                    <Icon className="w-4 h-4" />
+                    {item.label}
+                  </Link>
+                </Button>
+              );
+            })}
           </div>
 
-          {/* Right Actions */}
-          <div className="hidden md:flex items-center gap-4">
-            <div className="relative w-64">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search titles..." 
-                className="pl-8 bg-secondary/50 border-transparent focus:bg-secondary text-white rounded-full h-9" 
-              />
-            </div>
-            <Button variant="ghost" size="icon" className="text-white hover:text-primary">
-              <Bell className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white">
-              <User className="h-5 w-5" />
-            </Button>
-          </div>
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsOpen(!isOpen)}
+            className="md:hidden text-primary-foreground hover:bg-primary-foreground/10"
+          >
+            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </Button>
         </div>
+
+        {/* Mobile Navigation */}
+        {isOpen && (
+          <div className="md:hidden mt-4 space-y-2">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              
+              return (
+                <Button
+                  key={item.path}
+                  asChild
+                  variant={isActive ? "default" : "ghost"}
+                  className={`w-full justify-start ${
+                    isActive 
+                      ? 'bg-accent text-accent-foreground shadow-glow' 
+                      : 'text-primary-foreground hover:bg-primary-foreground/10'
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Link to={item.path} className="flex items-center gap-2">
+                    <Icon className="w-4 h-4" />
+                    {item.label}
+                  </Link>
+                </Button>
+              );
+            })}
+          </div>
+        )}
       </div>
     </nav>
   );
 };
-
-export default Navigation;

@@ -1,75 +1,181 @@
-import { useEffect, useState } from "react";
-import HeroSection from "@/components/HeroSection";
-import ContentSection from "@/components/ContentSection";
-import MovieCard from "@/components/MovieCard";
-import ChannelCard from "@/components/ChannelCard";
-import { Skeleton } from "@/components/ui/skeleton";
-import { channels } from "@/data/channels";
-
-// Placeholder data for movies (Replace this with your actual API fetch later)
-const DUMMY_MOVIES = [
-  { id: 1, title: "Movie 1", poster_path: "/placeholder.svg", vote_average: 8.5 },
-  { id: 2, title: "Movie 2", poster_path: "/placeholder.svg", vote_average: 7.2 },
-  { id: 3, title: "Movie 3", poster_path: "/placeholder.svg", vote_average: 9.0 },
-  { id: 4, title: "Movie 4", poster_path: "/placeholder.svg", vote_average: 6.5 },
-  { id: 5, title: "Movie 5", poster_path: "/placeholder.svg", vote_average: 8.1 },
-];
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tv, Film, Play, Star, Globe } from 'lucide-react';
+import { DonateButton } from '@/components/DonateButton';
+import { UserStats } from '@/components/UserStats';
+import { PageViews } from '@/components/PageViews';
 
 const Homepage = () => {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate loading time
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const featuredChannels = channels.slice(0, 10);
-
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
-      {/* 1. New Hero Section */}
-      <HeroSection />
+    <div className="min-h-screen bg-gradient-hero">
+      {/* Hero Section */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="text-center space-y-8">
+          <div className="space-y-4">
+            <h1 className="text-5xl md:text-7xl font-bold text-primary-foreground leading-tight">
+              flame<span className="text-accent">iptv</span>
+            </h1>
+            <p className="text-xl md:text-2xl text-primary-foreground/80 max-w-3xl mx-auto">
+              Your ultimate destination for premium IPTV channels, movies, and TV series
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button asChild size="lg" className="bg-accent text-accent-foreground shadow-glow hover:shadow-glow-intense">
+              <Link to="/channels" className="flex items-center gap-2">
+                <Play className="w-5 h-5" />
+                Watch Live TV
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10">
+              <Link to="/movies" className="flex items-center gap-2">
+                <Film className="w-5 h-5" />
+                Browse Movies
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
 
-      {/* 2. Content Sections (Horizontal Scrolling) */}
-      <div className="-mt-16 relative z-10 space-y-8">
+      {/* Features Section */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
+            Why Choose FlameIPTV?
+          </h2>
+          <p className="text-primary-foreground/70 text-lg max-w-2xl mx-auto">
+            Experience the best in streaming entertainment with our premium features
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          <Card className="bg-gradient-card border-border/30 backdrop-blur-sm">
+            <CardContent className="p-8 text-center space-y-4">
+              <div className="bg-accent/10 p-4 rounded-full w-fit mx-auto">
+                <Tv className="w-8 h-8 text-accent" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground">Live Channels</h3>
+              <p className="text-muted-foreground">
+                Access hundreds of premium live TV channels from around the world
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-card border-border/30 backdrop-blur-sm">
+            <CardContent className="p-8 text-center space-y-4">
+              <div className="bg-accent/10 p-4 rounded-full w-fit mx-auto">
+                <Film className="w-8 h-8 text-accent" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground">Movies & Series</h3>
+              <p className="text-muted-foreground">
+                Enjoy the latest movies and binge-worthy TV series on demand
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-card border-border/30 backdrop-blur-sm">
+            <CardContent className="p-8 text-center space-y-4">
+              <div className="bg-accent/10 p-4 rounded-full w-fit mx-auto">
+                <Star className="w-8 h-8 text-accent" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground">HD Quality</h3>
+              <p className="text-muted-foreground">
+                Crystal clear HD streaming with minimal buffering and delays
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Quick Access Section */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
+            Quick Access
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Button asChild className="h-24 bg-gradient-primary hover:shadow-glow">
+            <Link to="/channels" className="flex flex-col items-center gap-2">
+              <Tv className="w-8 h-8" />
+              <span className="font-medium">IPTV Channels</span>
+            </Link>
+          </Button>
+
+          <Button asChild variant="outline" className="h-24 border-primary/20 hover:bg-primary/10">
+            <Link to="/movies" className="flex flex-col items-center gap-2 text-primary-foreground">
+              <Film className="w-8 h-8" />
+              <span className="font-medium">Movies</span>
+            </Link>
+          </Button>
+
+          <Button asChild variant="outline" className="h-24 border-primary/20 hover:bg-primary/10">
+            <Link to="/tv-series" className="flex flex-col items-center gap-2 text-primary-foreground">
+              <Tv className="w-8 h-8" />
+              <span className="font-medium">TV Series</span>
+            </Link>
+          </Button>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="grid md:grid-cols-3 gap-8 text-center">
+          <div className="space-y-2">
+            <div className="text-4xl font-bold text-accent">500+</div>
+            <div className="text-primary-foreground/70">Live Channels</div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-4xl font-bold text-accent">1000+</div>
+            <div className="text-primary-foreground/70">Movies & Shows</div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-4xl font-bold text-accent">24/7</div>
+            <div className="text-primary-foreground/70">Streaming</div>
+          </div>
+        </div>
         
-        {/* Live TV Channels */}
-        <ContentSection title="Watch Live TV">
-          {loading
-            ? Array(5).fill(0).map((_, i) => (
-                <div key={i} className="min-w-[200px] md:min-w-[260px]">
-                  <Skeleton className="h-[160px] w-full rounded-xl bg-secondary/50" />
-                </div>
-              ))
-            : featuredChannels.map((channel, index) => (
-                <div key={`${channel.name}-${index}`} className="min-w-[200px] md:min-w-[260px] snap-start">
-                   <ChannelCard channel={channel} />
-                </div>
-              ))}
-        </ContentSection>
+        {/* Homepage Page Views */}
+        <div className="flex justify-center mt-8">
+          <PageViews pagePath="/" />
+        </div>
+      </section>
 
-        {/* Trending Movies */}
-        <ContentSection title="Trending Now">
-          {loading
-            ? Array(5).fill(0).map((_, i) => (
-                <div key={i} className="min-w-[160px] md:min-w-[220px]">
-                  <Skeleton className="h-[300px] w-full rounded-xl bg-secondary/50" />
-                </div>
-              ))
-            : DUMMY_MOVIES.map((movie) => (
-                <div key={movie.id} className="min-w-[160px] md:min-w-[220px] snap-start">
-                  <MovieCard
-                    id={movie.id}
-                    title={movie.title}
-                    poster_path={movie.poster_path}
-                    vote_average={movie.vote_average}
-                  />
-                </div>
-              ))}
-        </ContentSection>
+      {/* Add Channel Section */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
+            Add Your Own Channels
+          </h2>
+          <p className="text-primary-foreground/70 text-lg max-w-2xl mx-auto">
+            Expand your viewing experience by adding custom IPTV channels. Login to start adding channels.
+          </p>
+        </div>
+        
+        <div className="max-w-4xl mx-auto text-center">
+          <Button asChild size="lg" className="bg-accent text-accent-foreground shadow-glow hover:shadow-glow-intense">
+            <Link to="/custom-channels" className="flex items-center gap-2">
+              <Tv className="w-5 h-5" />
+              Manage Custom Channels
+            </Link>
+          </Button>
+        </div>
+      </section>
 
-      </div>
+      {/* Footer */}
+      <footer className="border-t border-primary/20 mt-12 py-8">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-sm text-primary-foreground/60">
+            flameiptv - Premium Streaming Experience
+          </p>
+          <div className="mt-3">
+            <DonateButton />
+          </div>
+        </div>
+      </footer>
+      <UserStats pagePath="/" />
     </div>
   );
 };
