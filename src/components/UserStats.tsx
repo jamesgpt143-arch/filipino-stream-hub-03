@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UserStatsProps {
@@ -66,10 +65,10 @@ export const UserStats = ({ pagePath }: UserStatsProps) => {
   };
 
   return (
-    <div className="fixed top-4 right-4 z-50">
-      <div className="flex items-center gap-2 px-3 py-2 bg-background/90 backdrop-blur-sm border border-border rounded-lg shadow-lg">
-        <Users className="w-4 h-4 text-primary" />
-        <span className="text-sm font-medium">{onlineUsers} Online</span>
+    <div className="fixed bottom-20 left-4 z-40 md:bottom-4">
+      <div className="flex items-center gap-1.5 px-2 py-1 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full shadow-sm text-xs">
+        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+        <span className="text-muted-foreground">{onlineUsers}</span>
       </div>
     </div>
   );

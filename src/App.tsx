@@ -16,7 +16,7 @@ import TVSeries from "./pages/TVSeries";
 import TVSeriesDetail from "./pages/TVSeriesDetail";
 import Anime from "./pages/Anime";
 import AnimeDetail from "./pages/AnimeDetail";
-import Comments from "./pages/Comments";
+
 import NotFound from "./pages/NotFound";
 import { disableDevTools } from "./utils/disableDevTools";
 import { useEffect } from "react";
@@ -37,7 +37,7 @@ const AppContent = () => {
         <Route path="/tv-series/:id" element={<TVSeriesDetail />} />
         <Route path="/anime" element={<Anime />} />
         <Route path="/anime/:id" element={<AnimeDetail />} />
-        <Route path="/comments" element={<Comments />} />
+        
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
