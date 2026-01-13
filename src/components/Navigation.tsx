@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
-import { Tv, Film, Home, Plus, User, Sparkles } from 'lucide-react';
+import { Tv, Film, Home, Plus, Sparkles } from 'lucide-react';
 import { Clock } from './Clock';
 
 export const Navigation = () => {
@@ -13,7 +13,6 @@ export const Navigation = () => {
     { path: '/movies', label: 'Movies', icon: Film },
     { path: '/tv-series', label: 'Series', icon: Tv },
     { path: '/anime', label: 'Anime', icon: Sparkles },
-    { path: '/comments', label: 'Comments', icon: User },
   ];
 
   return (
